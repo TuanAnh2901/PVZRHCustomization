@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35731.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomizeLib.MelonLoader", "MelonLoader\CustomizeLib.MelonLoader\CustomizeLib.MelonLoader.csproj", "{94D44102-4ED2-488E-8039-BEBD9EACC976}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomizeLib.BepInEx", "BepInEx\CustomizeLib.BepInEx\CustomizeLib.BepInEx.csproj", "{0C1E37ED-F98F-C9AB-2788-675AD5BF7AFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectricPeaReborn.BepInEx", "BepInEx\ElectricPeaReborn.BepInEx\ElectricPeaReborn.BepInEx.csproj", "{EF36B04E-5C2E-4FDB-98F2-4877CA31809D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectricPeaReborn.MelonLoader", "MelonLoader\ElectricPeaReborn.MelonLoader\ElectricPeaReborn.MelonLoader.csproj", "{F8C09B25-0575-4BD1-8447-C29A85159292}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperDiamondNut.MelonLoader", "MelonLoader\SuperDiamondNut.MelonLoader\SuperDiamondNut.MelonLoader.csproj", "{81E133A4-C385-4325-81C5-65BDCCDD722C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperDiamondNut.BepInEx", "BepInEx\SuperDiamondNut.BepInEx\SuperDiamondNut.BepInEx.csproj", "{3F33230D-2519-4257-A313-C041DCF0D154}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94D44102-4ED2-488E-8039-BEBD9EACC976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94D44102-4ED2-488E-8039-BEBD9EACC976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94D44102-4ED2-488E-8039-BEBD9EACC976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94D44102-4ED2-488E-8039-BEBD9EACC976}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C1E37ED-F98F-C9AB-2788-675AD5BF7AFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C1E37ED-F98F-C9AB-2788-675AD5BF7AFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C1E37ED-F98F-C9AB-2788-675AD5BF7AFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C1E37ED-F98F-C9AB-2788-675AD5BF7AFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF36B04E-5C2E-4FDB-98F2-4877CA31809D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF36B04E-5C2E-4FDB-98F2-4877CA31809D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF36B04E-5C2E-4FDB-98F2-4877CA31809D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF36B04E-5C2E-4FDB-98F2-4877CA31809D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8C09B25-0575-4BD1-8447-C29A85159292}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8C09B25-0575-4BD1-8447-C29A85159292}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8C09B25-0575-4BD1-8447-C29A85159292}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8C09B25-0575-4BD1-8447-C29A85159292}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81E133A4-C385-4325-81C5-65BDCCDD722C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81E133A4-C385-4325-81C5-65BDCCDD722C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81E133A4-C385-4325-81C5-65BDCCDD722C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81E133A4-C385-4325-81C5-65BDCCDD722C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F33230D-2519-4257-A313-C041DCF0D154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F33230D-2519-4257-A313-C041DCF0D154}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F33230D-2519-4257-A313-C041DCF0D154}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F33230D-2519-4257-A313-C041DCF0D154}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DAFB2666-6553-4132-AA64-A693F3DDDE78}
+	EndGlobalSection
+EndGlobal

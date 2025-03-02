@@ -27,34 +27,10 @@ namespace ElectricPeaReborn.BepInEx
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             ClassInjector.RegisterTypeInIl2Cpp<ElectricPea>();
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
-            var ab = AssetBundle.LoadFromFileAsync("BepInEx/plugins/electricpea");
-            if (ab is null)
-            {
-                global::BepInEx.Logging.Logger.CreateLogSource("ElectricPeaReborn").LogError("Missing Resources!!!");
-                return;
-            }
-            GameObject? prefab = null;
-            GameObject? preview = null;
-            foreach (var ase in ab.assetBundle.LoadAllAssets())
-            {
-                if (ase.TryCast<GameObject>()?.name is "ElectricPeaPrefab")
-                {
-                    prefab = ase.Cast<GameObject>();
-                    prefab.AddComponent<Shooter>().thePlantType = (PlantType)960;
-                    prefab.AddComponent<ElectricPea>();
-                }
-                if (ase.TryCast<GameObject>()?.name is "ProjectileElectricPea")
-                {
-                    GameAPP.bulletPrefab[50] = ase.Cast<GameObject>();
-                }
-                if (ase.TryCast<GameObject>()?.name is "ElectricPeaPreview")
-                {
-                    preview = ase.TryCast<GameObject>()!;
-                }
-            }
-            if (prefab is null || preview is null) return;
+            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "ElectricPeaReborn.BepInEx.electricpea");
             GameAPP.bulletPrefab[50] = Resources.Load<GameObject>("bullet/prefabs/ProjectileElectricPea");
-            CustomCore.RegisterCustomPlant(960, prefab, preview, [(1005, 1103), (1103, 1005)], 3, 0, 20, 300, 7.5f, 300);
+            CustomCore.RegisterCustomPlant<Shooter, ElectricPea>(960, ab.GetAsset<GameObject>("ElectricPeaPrefab"),
+                ab.GetAsset<GameObject>("ElectricPeaPreview"), [(1005, 1103), (1103, 1005)], 3, 0, 20, 300, 7.5f, 300);
         }
     }
 

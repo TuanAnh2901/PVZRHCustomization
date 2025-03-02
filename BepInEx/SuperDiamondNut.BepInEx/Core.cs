@@ -48,6 +48,7 @@ namespace SuperDiamondNut.BepInEx
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             ClassInjector.RegisterTypeInIl2Cpp<SuperDiamondNut>();
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "SuperDiamondNut.BepInEx.superdiamondnut");
+            /*
             GameObject? prefab = null;
             GameObject? preview = null;
             foreach (var ase in ab.LoadAllAssets())
@@ -55,18 +56,18 @@ namespace SuperDiamondNut.BepInEx
                 if (ase.TryCast<GameObject>()?.name is "SuperDiamondNutPrefab")
                 {
                     prefab = ase.Cast<GameObject>();
-                    prefab.AddComponent<SuperSunNut>().thePlantType = (PlantType)961;
-                    prefab.AddComponent<SuperDiamondNut>();
                 }
                 if (ase.TryCast<GameObject>()?.name is "SuperDiamondNutPreview")
                 {
                     preview = ase.TryCast<GameObject>()!;
                 }
             }
-            if (prefab is null || preview is null) return;
-            CustomCore.RegisterCustomPlant(961, prefab, preview, [(905, 31)], 3, 0, 20, 4000, 7.5f, 150);
+            if (prefab is null || preview is null) return;*/
+            CustomCore.RegisterCustomPlant<SuperSunNut, SuperDiamondNut>(961, ab.GetAsset<GameObject>("SuperDiamondNutPrefab"),
+                ab.GetAsset<GameObject>("SuperDiamondNutPreview"), [(905, 31)], 3, 0, 20, 4000, 7.5f, 150);
             CustomCore.RegisterCustomPlantClickEvent(961, SuperDiamondNut.SummonAndRecover);
             CustomCore.AddFusion(905, 961, 1);
+            /*
             GameObject? prefab2 = null;
             GameObject? preview2 = null;
             foreach (var ase in ab.LoadAllAssets())
@@ -81,8 +82,9 @@ namespace SuperDiamondNut.BepInEx
                     preview2 = ase.TryCast<GameObject>()!;
                 }
             }
-            if (prefab2 is null || preview2 is null) return;
-            CustomCore.RegisterCustomPlant(962, prefab2, preview2, [], 3, 0, 1800, 4000, 7.5f, 150);
+            if (prefab2 is null || preview2 is null) return;*/
+            CustomCore.RegisterCustomPlant<BigWallNut>(962, ab.GetAsset<GameObject>("BigDiamondNutPrefab"),
+                ab.GetAsset<GameObject>("BigDiamondNutPreview"), [], 3, 0, 1800, 4000, 7.5f, 150);
         }
     }
 

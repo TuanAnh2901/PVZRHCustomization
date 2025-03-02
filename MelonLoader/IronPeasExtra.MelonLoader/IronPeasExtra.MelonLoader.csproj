@@ -5,7 +5,17 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="ironpeas" />
+	  <None Remove="superdiamondnut" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="ironpeas" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\CustomizeLib.MelonLoader\CustomizeLib.MelonLoader.csproj" />

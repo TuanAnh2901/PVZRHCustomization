@@ -8,6 +8,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="electricpea" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="electricpea" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\CustomizeLib.MelonLoader\CustomizeLib.MelonLoader.csproj" />
 	</ItemGroup>
 

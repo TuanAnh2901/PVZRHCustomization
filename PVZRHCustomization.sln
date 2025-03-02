@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperDiamondNut.MelonLoader
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperDiamondNut.BepInEx", "BepInEx\SuperDiamondNut.BepInEx\SuperDiamondNut.BepInEx.csproj", "{3F33230D-2519-4257-A313-C041DCF0D154}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronPeasExtra.MelonLoader", "MelonLoader\IronPeasExtra.MelonLoader\IronPeasExtra.MelonLoader.csproj", "{87C8F244-61A3-4515-B2B0-8CBA5FA54F34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronPeasExtra.BepInEx", "BepInEx\IronPeasExtra.BepInEx\IronPeasExtra.BepInEx.csproj", "{42B6EAFE-86A7-4F7C-985C-0EB470AE0A23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +49,14 @@ Global
 		{3F33230D-2519-4257-A313-C041DCF0D154}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F33230D-2519-4257-A313-C041DCF0D154}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F33230D-2519-4257-A313-C041DCF0D154}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87C8F244-61A3-4515-B2B0-8CBA5FA54F34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87C8F244-61A3-4515-B2B0-8CBA5FA54F34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87C8F244-61A3-4515-B2B0-8CBA5FA54F34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87C8F244-61A3-4515-B2B0-8CBA5FA54F34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42B6EAFE-86A7-4F7C-985C-0EB470AE0A23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42B6EAFE-86A7-4F7C-985C-0EB470AE0A23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42B6EAFE-86A7-4F7C-985C-0EB470AE0A23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42B6EAFE-86A7-4F7C-985C-0EB470AE0A23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

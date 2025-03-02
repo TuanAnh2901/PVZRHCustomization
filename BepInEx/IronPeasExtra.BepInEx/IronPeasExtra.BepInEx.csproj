@@ -1,22 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="electricpea" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="electricpea" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\CustomizeLib.BepInEx\CustomizeLib.BepInEx.csproj" />
+		<ProjectReference Include="..\CustomizeLib.BepInEx\CustomizeLib.BepInEx.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -375,5 +368,8 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;D:\Beta\pvz\rhbep\BepInEx\plugins&quot;" />
 	</Target>
+	<ItemGroup>
+		<EmbeddedResource Include="ironpeas" />
+	</ItemGroup>
 
 </Project>

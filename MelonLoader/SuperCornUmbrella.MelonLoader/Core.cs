@@ -61,6 +61,7 @@ namespace SuperCornUmbrella.MelonLoader
                     }
                 }
             });
+            CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)966);
             CustomCore.AddFusion(916, 966, 26);
             CustomCore.AddPlantAlmanacStrings(966, "黄宝石伞", "黄宝石伞能用黄油黏住靠近的僵尸，又能放出大招黏住一定范围的僵尸\n<color=#3D1400>贴图作者：@仨硝基甲苯 @摆烂的克莱尔</color>\n<color=#3D1400>特点：</color><color=red>绿宝石伞亚种，使用玉米投手、卷心菜投手切换。僵尸主动靠近黄宝石伞时特性同黄油伞，花费6000钱币释放大招，对周围僵尸施加黄油效果并击退。可同时享受人工智能词条</color>\n<color=#3D1400>融合配方：</color><color=red>绿宝石伞+玉米投手</color>\n<color=#3D1400>作为餐厅的主厨，黄宝石伞做的菜一直饱受好评，“这要归功于师傅娴熟的按摩技术，以及作为主要厨具的自我修养。”</color>");
             foreach (var d in MixData.disMixDatas)

@@ -67,6 +67,7 @@ namespace SuperDoomSqualour.MelonLoader
                     if (z is not null && !z.IsDestroyed())
                     {
                         z.isDoom = true;
+                        z.doomWithPit = false;
                         z.SetColor(Zombie.ZombieColor.Doom);
                     }
                 }

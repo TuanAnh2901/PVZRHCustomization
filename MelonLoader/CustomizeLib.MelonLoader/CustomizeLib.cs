@@ -54,6 +54,18 @@ namespace CustomizeLib
         }
     }
 
+    [HarmonyPatch(typeof(CreatePlant), "SetPlant")]
+    public static class CreatePlantPatch
+    {
+        public static void Postfix(ref GameObject __result)
+        {
+            if (__result is not null && __result.TryGetComponent<Plant>(out var plant) && CustomCore.CustomPlantTypes.Contains(plant.thePlantType))
+            {
+                TypeMgr.GetPlantTag(plant);
+            }
+        }
+    }
+
     public static class Extensions
     {
         public static void DisableDisMix(this Plant plant) => (plant.firstParent, plant.secondParent) = (PlantType.Nothing, PlantType.Nothing);
@@ -128,6 +140,19 @@ namespace CustomizeLib
     public static class MousePatch
     {
         [HarmonyPostfix]
+        [HarmonyPatch("GetPlantsOnMouse")]
+        public static void PostGetPlantsOnMouse(ref Il2CppSystem.Collections.Generic.List<Plant> __result)
+        {
+            for (int i = __result.Count - 1; i >= 0; i--)
+            {
+                if (__result[i] is not null && TypeMgr.BigNut(__result[i].thePlantType))
+                {
+                    __result.RemoveAt(i);
+                }
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch("LeftClickWithNothing")]
         public static void PostLeftClickWithNothing(Mouse __instance)
         {
@@ -197,8 +222,451 @@ namespace CustomizeLib
         }
     }
 
+    [HarmonyPatch(typeof(TypeMgr))]
+    public static class TypeMgrPatch
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("BigNut")]
+        public static bool PreBigNut(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.BigNut.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("BigZombie")]
+        public static bool PreBigZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.BigZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("DoubleBoxPlants")]
+        public static bool PreDoubleBoxPlants(ref PlantType thePlantType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.DoubleBoxPlants.Contains(thePlantType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("EliteZombie")]
+        public static bool PreEliteZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.EliteZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("FlyingPlants")]
+        public static bool PreFlyingPlants(ref PlantType thePlantType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.FlyingPlants.Contains(thePlantType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("GetPlantTag")]
+        public static bool PreGetPlantTag(ref Plant plant)
+        {
+            if (CustomCore.CustomPlantTypes.Contains(plant.thePlantType))
+            {
+                plant.plantTag = new()
+                {
+                    icePlant = TypeMgr.IsIcePlant(plant.thePlantType),
+                    caltropPlant = TypeMgr.IsCaltrop(plant.thePlantType),
+                    doubleBoxPlant = TypeMgr.DoubleBoxPlants(plant.thePlantType),
+                    firePlant = TypeMgr.IsFirePlant(plant.thePlantType),
+                    flyingPlant = TypeMgr.FlyingPlants(plant.thePlantType),
+                    lanternPlant = TypeMgr.IsPlantern(plant.thePlantType),
+                    smallLanternPlant = TypeMgr.IsSmallRangeLantern(plant.thePlantType),
+                    magnetPlant = TypeMgr.IsMagnetPlants(plant.thePlantType),
+                    nutPlant = TypeMgr.IsNut(plant.thePlantType),
+                    tallNutPlant = TypeMgr.IsTallNut(plant.thePlantType),
+                    potatoPlant = TypeMgr.IsPotatoMine(plant.thePlantType),
+                    potPlant = TypeMgr.IsPot(plant.thePlantType),
+                    puffPlant = TypeMgr.IsPuff(plant.thePlantType),
+                    pumpkinPlant = TypeMgr.IsPumpkin(plant.thePlantType),
+                    spickRockPlant = TypeMgr.IsSpickRock(plant.thePlantType),
+                    tanglekelpPlant = TypeMgr.IsTangkelp(plant.thePlantType),
+                    waterPlant = TypeMgr.IsWaterPlant(plant.thePlantType)
+                };
+
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsAirZombie")]
+        public static bool PreIsAirZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsAirZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsBossZombie")]
+        public static bool PreIsBossZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsBossZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsCaltrop")]
+        public static bool PreIsCaltrop(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsCaltrop.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsCustomPlant")]
+        public static bool PreIsCustomPlant(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsCustomPlant.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsDriverZombie")]
+        public static bool PreIsDriverZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsDriverZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsFirePlant")]
+        public static bool PreIsFirePlant(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsFirePlant.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsIcePlant")]
+        public static bool PreIsIcePlant(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsIcePlant.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsMagnetPlants")]
+        public static bool PreIsMagnetPlants(ref PlantType thePlantType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsMagnetPlants.Contains(thePlantType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsNut")]
+        public static bool PreIsNut(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsNut.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsPlantern")]
+        public static bool PreIsPlantern(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsPlantern.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsPot")]
+        public static bool PreIsPot(ref PlantType thePlantType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsPot.Contains(thePlantType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsPotatoMine")]
+        public static bool PreIsPotatoMine(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsPotatoMine.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsPuff")]
+        public static bool PreIsPuff(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsPuff.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsPumpkin")]
+        public static bool PreIsPumpkin(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsPumpkin.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsSmallRangeLantern")]
+        public static bool PreIsSmallRangeLantern(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsSmallRangeLantern.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsSpecialPlant")]
+        public static bool PreIsSpecialPlant(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsSpecialPlant.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsSpickRock")]
+        public static bool PreIsSpickRock(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsSpickRock.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsTallNut")]
+        public static bool PreIsTallNut(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsTallNut.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsTangkelp")]
+        public static bool PreIsTangkelp(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsTangkelp.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("IsWaterPlant")]
+        public static bool PreIsWaterPlant(ref PlantType theSeedType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.IsWaterPlant.Contains(theSeedType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("NotRandomBungiZombie")]
+        public static bool PreNotRandomBungiZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.NotRandomBungiZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("NotRandomZombie")]
+        public static bool PreNotRandomZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.NotRandomZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("UltimateZombie")]
+        public static bool PreUltimateZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.UltimateZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("UmbrellaPlants")]
+        public static bool PreUmbrellaPlants(ref PlantType thePlantType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.UmbrellaPlants.Contains(thePlantType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("UselessHypnoZombie")]
+        public static bool PreUselessHypnoZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.UselessHypnoZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("WaterZombie")]
+        public static bool PreWaterZombie(ref ZombieType theZombieType, ref bool __result)
+        {
+            if (CustomCore.TypeMgrExtra.WaterZombie.Contains(theZombieType))
+            {
+                __result = true;
+                return false;
+            }
+            return true;
+        }
+    }
+
     public class CustomCore : MelonMod
     {
+        public static class TypeMgrExtra
+        {
+            public static List<PlantType> BigNut { get; set; } = [];
+            public static List<ZombieType> BigZombie { get; set; } = [];
+            public static List<PlantType> DoubleBoxPlants { get; set; } = [];
+            public static List<ZombieType> EliteZombie { get; set; } = [];
+            public static List<PlantType> FlyingPlants { get; set; } = [];
+            public static List<ZombieType> IsAirZombie { get; set; } = [];
+            public static List<ZombieType> IsBossZombie { get; set; } = [];
+            public static List<PlantType> IsCaltrop { get; set; } = [];
+            public static List<PlantType> IsCustomPlant { get; set; } = [];
+            public static List<ZombieType> IsDriverZombie { get; set; } = [];
+            public static List<PlantType> IsFirePlant { get; set; } = [];
+            public static List<PlantType> IsIcePlant { get; set; } = [];
+            public static List<PlantType> IsMagnetPlants { get; set; } = [];
+            public static List<PlantType> IsNut { get; set; } = [];
+            public static List<PlantType> IsPlantern { get; set; } = [];
+            public static List<PlantType> IsPot { get; set; } = [];
+            public static List<PlantType> IsPotatoMine { get; set; } = [];
+            public static List<PlantType> IsPuff { get; set; } = [];
+            public static List<PlantType> IsPumpkin { get; set; } = [];
+            public static List<PlantType> IsSmallRangeLantern { get; set; } = [];
+            public static List<PlantType> IsSpecialPlant { get; set; } = [];
+            public static List<PlantType> IsSpickRock { get; set; } = [];
+            public static List<PlantType> IsTallNut { get; set; } = [];
+            public static List<PlantType> IsTangkelp { get; set; } = [];
+            public static List<PlantType> IsWaterPlant { get; set; } = [];
+            public static List<ZombieType> NotRandomBungiZombie { get; set; } = [];
+            public static List<ZombieType> NotRandomZombie { get; set; } = [];
+            public static List<ZombieType> UltimateZombie { get; set; } = [];
+            public static List<PlantType> UmbrellaPlants { get; set; } = [];
+            public static List<ZombieType> UselessHypnoZombie { get; set; } = [];
+            public static List<ZombieType> WaterZombie { get; set; } = [];
+        }
+
         public static void AddFusion(int target, int item1, int item2) => CustomFusions.Add((target, item1, item2));
 
         public static void AddPlantAlmanacStrings(int id, string name, string description) => PlantsAlmanac.Add((PlantType)id, (name, description));

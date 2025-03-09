@@ -45,7 +45,7 @@ namespace SuperHypnoUmbrella.MelonLoader
                 int i = 1;
                 foreach (var z in array)
                 {
-                    if (z is not null && z.gameObject.TryGetComponent<Zombie>(out _))
+                    if (z is not null && z.gameObject.TryGetComponent<Zombie>(out var zombie) && !zombie.isMindControlled)
                     {
                         i++;
                     }
@@ -65,7 +65,7 @@ namespace SuperHypnoUmbrella.MelonLoader
                     }
                 }
             });
-
+            CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)967);
             CustomCore.AddFusion(916, 967, 26);
             CustomCore.AddPlantAlmanacStrings(967, "魅宝石伞", "魅宝石伞能放大招魅惑周围的僵尸\n<color=#3D1400>贴图作者：@仨硝基甲苯 @摆烂的克莱尔</color>\n<color=#3D1400>特点：</color><color=red>绿宝石伞亚种，使用魅惑菇、卷心菜投手切换。僵尸主动靠近魅宝石伞时有5%概率魅惑，花费1000*(10+4ln(要魅惑的僵尸数+1))钱币释放大招，魅惑周围全部僵尸</color>\n<color=#3D1400>融合配方：</color><color=red>绿宝石伞+魅惑菇</color>\n<color=#3D1400>据说，若有人能找到彩宝石伞最喜爱的颜色，她将短暂地从睡梦中醒来，展露自己的光辉。但她的喜好没有规律可循，就像彩虹不会为任何人停留。</color>");
         }

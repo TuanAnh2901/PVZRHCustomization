@@ -1,11 +1,12 @@
 using CustomizeLib;
 using HarmonyLib;
+using Il2CppTMPro;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "1.0", "Infinite75", null)]
+[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "1.2", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
 
@@ -19,8 +20,44 @@ namespace CustomizeLib
         public GameObject Preview { get; set; }
     }
 
+    [HarmonyPatch(typeof(AlmanacMgr), "InitNameAndInfoFromJson")]
+    public static class AlmanacMgrPatch
+    {
+        public static bool Prefix(AlmanacMgr __instance)
+        {
+            if (CustomCore.PlantsAlmanac.ContainsKey((PlantType)__instance.theSeedType))
+            {
+                __instance.pageCount = 2;
+                for (int i = 0; i < __instance.transform.childCount; i++)
+                {
+                    Transform childTransform = __instance.transform.GetChild(i);
+                    if (childTransform == null)
+                        continue;
+                    if (childTransform.name == "Name")
+                    {
+                        childTransform.GetComponent<TextMeshPro>().text = CustomCore.PlantsAlmanac[(PlantType)__instance.theSeedType].Item1;
+                        childTransform.GetChild(0).GetComponent<TextMeshPro>().text = CustomCore.PlantsAlmanac[(PlantType)__instance.theSeedType].Item1;
+                    }
+                    if (childTransform.name == "Info")
+                    {
+                        TextMeshPro info = childTransform.GetComponent<TextMeshPro>();
+                        info.overflowMode = TextOverflowModes.Overflow;
+                        info.fontSize = 40;
+                        info.text = CustomCore.PlantsAlmanac[(PlantType)__instance.theSeedType].Item2;
+                    }
+                    if (childTransform.name == "Cost")
+                        childTransform.GetComponent<TextMeshPro>().text = "";
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
     public static class Extensions
     {
+        public static void DisableDisMix(this Plant plant) => (plant.firstParent, plant.secondParent) = (PlantType.Nothing, PlantType.Nothing);
+
         public static T GetAsset<T>(this AssetBundle ab, string name) where T : UnityEngine.Object
         {
             foreach (var ase in ab.LoadAllAssetsAsync().allAssets)
@@ -58,6 +95,35 @@ namespace CustomizeLib
         }
     }
 
+    [HarmonyPatch(typeof(Money))]
+    public static class MoneyPatch
+    {
+        [HarmonyPrefix]
+        [HarmonyPatch("ReinforcePlant")]
+        public static bool PreReinforcePlant(Money __instance, ref Plant plant)
+        {
+            if (CustomCore.SuperSkills.ContainsKey(plant.thePlantType))
+            {
+                var cost = CustomCore.SuperSkills[plant.thePlantType].Item1(plant);
+
+                if (Board.Instance.theMoney < cost)
+                {
+                    InGameText.Instance.EnableText($"大招需要{cost}金币", 5);
+                    return false;
+                }
+                if (plant.SuperSkill())
+                {
+                    CustomCore.SuperSkills[plant.thePlantType].Item2(plant);
+                    plant.AnimSuperShoot();
+                    __instance.UsedEvent(plant.thePlantColumn, plant.thePlantRow, cost);
+                    __instance.OtherSuperSkill(plant);
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
     [HarmonyPatch(typeof(Mouse))]
     public static class MousePatch
     {
@@ -85,6 +151,10 @@ namespace CustomizeLib
             {
                 if (__instance.thePlantOnGlove is not null && CustomCore.CustomPlantTypes.Contains(__instance.thePlantOnGlove.thePlantType))
 
+                {
+                    __instance.TryToSetPlantByGlove();
+                }
+                else if (__instance.theGardenPlantOnGlove is not null && CustomCore.CustomPlantTypes.Contains(__instance.theGardenPlantOnGlove.thePlantType))
                 {
                     __instance.TryToSetPlantByGlove();
                 }
@@ -131,11 +201,13 @@ namespace CustomizeLib
     {
         public static void AddFusion(int target, int item1, int item2) => CustomFusions.Add((target, item1, item2));
 
+        public static void AddPlantAlmanacStrings(int id, string name, string description) => PlantsAlmanac.Add((PlantType)id, (name, description));
+
         public static AssetBundle GetAssetBundle(Assembly assembly, string name)
         {
             try
             {
-                using Stream stream = assembly.GetManifestResourceStream(name)!;
+                using Stream stream = assembly.GetManifestResourceStream(assembly.FullName!.Split(",")[0] + "." + name) ?? assembly.GetManifestResourceStream(name)!;
                 using MemoryStream stream1 = new();
                 stream.CopyTo(stream1);
                 var ab = AssetBundle.LoadFromMemory(stream1.ToArray());
@@ -231,11 +303,14 @@ namespace CustomizeLib
                 CreatePlant.Instance.SetPlant(p.thePlantColumn, p.thePlantRow, newPlant);
             });
 
+        public static void RegisterSuperSkill([NotNull] int id, [NotNull] Func<Plant, int> cost, [NotNull] Action<Plant> skill) => SuperSkills.Add((PlantType)id, (cost, skill));
+
         public static List<(int, int, int)> CustomFusions { get; set; } = [];
         public static Dictionary<PlantType, Action<Plant>> CustomPlantClicks { get; set; } = [];
         public static Dictionary<PlantType, CustomPlantData> CustomPlants { get; set; } = [];
-
         public static List<PlantType> CustomPlantTypes { get; set; } = [];
         public static Dictionary<(PlantType, BucketType), Action<Plant>> CustomUseItems { get; set; } = [];
+        public static Dictionary<PlantType, (string, string)> PlantsAlmanac { get; set; } = [];
+        public static Dictionary<PlantType, (Func<Plant, int>, Action<Plant>)> SuperSkills { get; set; } = [];
     }
 }

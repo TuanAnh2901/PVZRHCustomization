@@ -22,37 +22,15 @@ namespace ElectricPeaReborn.MelonLoader
         }
     }
 
-    public class Core : MelonMod
+    public class Core : MelonMod//960
     {
         public override void OnInitializeMelon()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "ElectricPeaReborn.MelonLoader.electricpea");
-            /*
-            var ab = AssetBundle.LoadFromFileAsync("Mods/electricpea");
-            if (ab is null)
-            {
-                LoggerInstance.Error("Missing Resources!!!");
-                return;
-            }
-            GameObject? prefab = null;
-            GameObject? preview = null;
-            foreach (var ase in ab.assetBundle.LoadAllAssets())
-            {
-                if (ase.TryCast<GameObject>()?.name is "ElectricPeaPrefab")
-                {
-                    prefab = ase.Cast<GameObject>();
-                }
-                if (ase.TryCast<GameObject>()?.name is "ElectricPeaPreview")
-                {
-                    preview = ase.TryCast<GameObject>()!;
-                }
-            }
-            if (prefab is null || preview is null) return;*/
+            var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "electricpea");
             GameAPP.bulletPrefab[50] = Resources.Load<GameObject>("bullet/prefabs/ProjectileElectricPea");
             CustomCore.RegisterCustomPlant<Shooter, ElectricPea>(960, ab.GetAsset<GameObject>("ElectricPeaPrefab"),
-                ab.GetAsset<GameObject>("ElectricPeaPreview"), [(0, 1103), (1103, 0)], 3, 0, 200, 345678, 1f, 300);
-            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)961, BucketType.Bucket, ElectricPea.SummonAndRecover);
+                ab.GetAsset<GameObject>("ElectricPeaPreview"), [(1005, 1103), (1103, 1005)], 3, 0, 20, 300, 7.5f, 300);
         }
     }
 

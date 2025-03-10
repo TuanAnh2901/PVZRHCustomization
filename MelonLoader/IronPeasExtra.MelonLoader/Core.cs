@@ -1,5 +1,6 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
+using Il2Cpp;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
 using IronPeasExtra.MelonLoader;
@@ -49,9 +50,13 @@ namespace IronPeasExtra.MelonLoader
             {
                 if (plant.theStatus is not PlantStatus.BigGatling_raised) return;
                 var pos = plant.shoot.transform.position;
-                CreateBullet.Instance.SetBullet(pos.x, pos.y - 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = 80;
-                CreateBullet.Instance.SetBullet(pos.x, pos.y, plant.thePlantRow, 11, 0).theBulletDamage = 80;
-                CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = 80;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y - 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y - 0.2f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y - 0.1f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.1f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.2f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
             }
         }
 
@@ -70,11 +75,14 @@ namespace IronPeasExtra.MelonLoader
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "IronPeasExtra.MelonLoader.ironpeas");
             CustomCore.RegisterCustomPlant<BigGatling, BigIronGatlingPea>(1900, ab.GetAsset<GameObject>("BigIronGatlingPeaPrefab"),
-                ab.GetAsset<GameObject>("BigIronGatlingPeaPreview"), [], 0.3f, 0, 80, 2500, 15, 1000);
+                ab.GetAsset<GameObject>("BigIronGatlingPeaPreview"), [], 0.1f, 0, 150, 40000, 1, 1000);
             CustomCore.RegisterCustomPlantClickEvent(1900, (p) => { p.anim.SetTriggerString("shoot"); });
             CustomCore.RegisterCustomPlant<SuperSnowGatling, SuperIronGatling>(963, ab.GetAsset<GameObject>("SuperIronGatlingPrefab"),
-                ab.GetAsset<GameObject>("SuperIronGatlingPreview"), [(1168, 1020), (1020, 1168)], 0.3f, 0, 80, 2500, 15, 800);
+                ab.GetAsset<GameObject>("SuperIronGatlingPreview"), [(1008, 1020), (1020, 1008)], 0.1f, 0, 150, 400000, 1, 800);
             CustomCore.RegisterCustomUseItemOnPlantEvent(PlantType.BigGatling, BucketType.Bucket, (PlantType)1900);
+            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.SuperMachine, (PlantType)1900);
+            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Bucket, SuperIronGatling.Shooter);
+            //CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)1900, BucketType.Bucket, SuperIronGatling.Shooter);
         }
     }
 
@@ -86,6 +94,26 @@ namespace IronPeasExtra.MelonLoader
         public SuperIronGatling(IntPtr i) : base(i)
         {
         }
+        public static void Shooter(Plant plant)
+        {
+            if (plant.board.theMoney >= 10000)
+            {
+                plant.board.theMoney -= 3000;
+                plant.Recover(Lawnf.TravelAdvanced(4) ? 999999 : 400000);
+                GameObject gameObject = CreatePlant.Instance.SetPlant(plant.thePlantColumn +1, plant.thePlantRow, (PlantType)928, null, default, true);
+                var pos = plant.shoot.transform.position;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y, plant.thePlantRow, 24, 0).theBulletDamage = 99999;
+                //if (plant.board.theMoney >= 70000)
+                //{
+                //    GameObject gameObject2 = CreatePlant.Instance.SetPlant(plant.thePlantColumn, plant.thePlantRow, (PlantType)922, null, default, true);
+                //}
+                if (gameObject is not null)
+                {
+                    Vector3 position = gameObject.GetComponent<Plant>().shadow.transform.position;
+                    Instantiate(GameAPP.particlePrefab[11], position + new Vector3(0f, 0.5f, 0f), Quaternion.identity, plant.board.transform);
+                }
+            }
+        }
 
         public void Awake()
         {
@@ -93,5 +121,7 @@ namespace IronPeasExtra.MelonLoader
         }
 
         public SuperSnowGatling plant => gameObject.GetComponent<SuperSnowGatling>();
+
+        
     }
 }

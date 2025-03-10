@@ -1,5 +1,6 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
+using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using UnityEngine;
@@ -50,7 +51,8 @@ namespace ElectricPeaReborn.MelonLoader
             if (prefab is null || preview is null) return;*/
             GameAPP.bulletPrefab[50] = Resources.Load<GameObject>("bullet/prefabs/ProjectileElectricPea");
             CustomCore.RegisterCustomPlant<Shooter, ElectricPea>(960, ab.GetAsset<GameObject>("ElectricPeaPrefab"),
-                ab.GetAsset<GameObject>("ElectricPeaPreview"), [(1005, 1103), (1103, 1005)], 3, 0, 20, 300, 7.5f, 300);
+                ab.GetAsset<GameObject>("ElectricPeaPreview"), [(0, 1103), (1103, 0)], 3, 0, 200, 345678, 1f, 300);
+            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)961, BucketType.Bucket, ElectricPea.SummonAndRecover);
         }
     }
 
@@ -62,12 +64,32 @@ namespace ElectricPeaReborn.MelonLoader
         public ElectricPea(IntPtr i) : base(i)
         {
         }
+        public static void SummonAndRecover(Plant plant)
+        {
+            if (plant.board.theMoney >= 3000)
+            {
+                plant.board.theMoney -= 3000;
+                plant.Recover(Lawnf.TravelAdvanced(4) ? 999999 : 400000);
+                //GameObject gameObject = CreatePlant.Instance.SetPlant(plant.thePlantColumn + 1, plant.thePlantRow, (PlantType)962, null, default, true);
+                //if (plant.board.theMoney >= 70000)
+                //{
+                //    GameObject gameObject2 = CreatePlant.Instance.SetPlant(plant.thePlantColumn, plant.thePlantRow, (PlantType)922, null, default, true);
+                //}
+                //if (gameObject is not null)
+                //{
+                //    Vector3 position = gameObject.GetComponent<Plant>().shadow.transform.position;
+                //    Instantiate(GameAPP.particlePrefab[11], position + new Vector3(0f, 0.5f, 0f), Quaternion.identity, plant.board.transform);
+                //}
+                plant.isShort = true;
+                plant.keepShooting = true;
+            }
+        }
 
         public Bullet AnimShooting()
         {
             Vector3 position = transform.Find("Shoot").transform.position;
             Bullet bullet = Board.Instance.GetComponent<CreateBullet>().SetBullet((float)(position.x + 0.1f), position.y, plant.thePlantRow, 50, 0);
-            bullet.theBulletDamage = 20;
+            bullet.theBulletDamage = 200;
             return bullet;
         }
 

@@ -1,5 +1,6 @@
 using CustomizeLib;
 using HarmonyLib;
+using Il2Cpp;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;

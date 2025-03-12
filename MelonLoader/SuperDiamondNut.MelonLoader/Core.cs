@@ -93,7 +93,7 @@ namespace SuperDiamondNut.MelonLoader
 
         public void Awake()
         {
-            if (GameAPP.theGameStatus is (int)GameStatus.InGame && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)961)
+            if (GameAPP.theGameStatus is (int)GameStatus.InGame && !Board.Instance.isIZ && !Board.Instance.isEveStart && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)961)
             {
                 InGameUIMgr.Instance.MoneyBank.SetActive(true);
             }

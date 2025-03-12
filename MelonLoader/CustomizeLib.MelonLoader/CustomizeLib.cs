@@ -20,14 +20,15 @@ namespace CustomizeLib
         public GameObject Preview { get; set; }
     }
 
-    [HarmonyPatch(typeof(AlmanacMgr), "InitNameAndInfoFromJson")]
+    [HarmonyPatch(typeof(AlmanacMgr))]
     public static class AlmanacMgrPatch
     {
-        public static bool Prefix(AlmanacMgr __instance)
+        [HarmonyPatch("InitNameAndInfoFromJson")]
+        [HarmonyPrefix]
+        public static bool PreInitNameAndInfoFromJson(AlmanacMgr __instance)
         {
             if (CustomCore.PlantsAlmanac.ContainsKey((PlantType)__instance.theSeedType))
             {
-                __instance.pageCount = 2;
                 for (int i = 0; i < __instance.transform.childCount; i++)
                 {
                     Transform childTransform = __instance.transform.GetChild(i);
@@ -41,9 +42,12 @@ namespace CustomizeLib
                     if (childTransform.name == "Info")
                     {
                         TextMeshPro info = childTransform.GetComponent<TextMeshPro>();
-                        info.overflowMode = TextOverflowModes.Overflow;
+                        info.overflowMode = TextOverflowModes.Page;
                         info.fontSize = 40;
                         info.text = CustomCore.PlantsAlmanac[(PlantType)__instance.theSeedType].Item2;
+                        __instance.pageCount = 2;
+                        __instance.introduce = info;//__instance.gameObject.transform.FindChild("Info").gameObject.GetComponent<TextMeshPro>();
+                        __instance.introduce.m_pageNumber = 2;
                     }
                     if (childTransform.name == "Cost")
                         childTransform.GetComponent<TextMeshPro>().text = "";
@@ -51,6 +55,21 @@ namespace CustomizeLib
                 return false;
             }
             return true;
+        }
+
+        [HarmonyPatch("OnMouseDown")]
+        [HarmonyPrefix]
+        public static bool PreOnMouseDown(AlmanacMgr __instance)
+        {
+            __instance.introduce = __instance.gameObject.transform.FindChild("Info").gameObject.GetComponent<TextMeshPro>();
+            __instance.pageCount = __instance.introduce.m_pageNumber * 1;
+            if (__instance.currentPage <= __instance.introduce.m_pageNumber)
+                ++__instance.currentPage;
+            else
+                __instance.currentPage = 1;
+            __instance.introduce.pageToDisplay = __instance.currentPage;
+
+            return false;
         }
     }
 
@@ -366,18 +385,6 @@ namespace CustomizeLib
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch("IsDriverZombie")]
-        public static bool PreIsDriverZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.IsDriverZombie.Contains(theZombieType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
         [HarmonyPatch("IsFirePlant")]
         public static bool PreIsFirePlant(ref PlantType theSeedType, ref bool __result)
         {
@@ -643,7 +650,6 @@ namespace CustomizeLib
             public static List<ZombieType> IsBossZombie { get; set; } = [];
             public static List<PlantType> IsCaltrop { get; set; } = [];
             public static List<PlantType> IsCustomPlant { get; set; } = [];
-            public static List<ZombieType> IsDriverZombie { get; set; } = [];
             public static List<PlantType> IsFirePlant { get; set; } = [];
             public static List<PlantType> IsIcePlant { get; set; } = [];
             public static List<PlantType> IsMagnetPlants { get; set; } = [];

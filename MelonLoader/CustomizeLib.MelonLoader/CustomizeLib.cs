@@ -1,10 +1,13 @@
 using CustomizeLib;
 using HarmonyLib;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Injection;
 using Il2CppTMPro;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UI;
 
 [assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "1.2", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
@@ -112,16 +115,19 @@ namespace CustomizeLib
             foreach (var plant in CustomCore.CustomPlants)
             {
                 GameAPP.plantPrefab[(int)plant.Key] = plant.Value.Prefab;
+                GameAPP.plantPrefab[(int)plant.Key].tag = "Plant";
                 PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;
+                GameAPP.prePlantPrefab[(int)plant.Key] = plant.Value.Preview;
+                GameAPP.prePlantPrefab[(int)plant.Key].tag = "Preview";
             }
             Il2CppSystem.Array array = MixData.data.Cast<Il2CppSystem.Array>();
             foreach (var f in CustomCore.CustomFusions)
             {
                 array.SetValue(f.Item1, f.Item2, f.Item3);
             }
-            foreach (var plant in CustomCore.CustomPlants)
+            foreach (var bullet in CustomCore.CustomBullets)
             {
-                GameAPP.prePlantPrefab[(int)plant.Key] = plant.Value.Preview;
+                GameAPP.bulletPrefab[(int)bullet.Key] = bullet.Value;
             }
         }
     }
@@ -186,44 +192,6 @@ namespace CustomizeLib
                 }
             }
         }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("LeftClickWithSomeThing")]
-        public static bool PreLeftClickWithSomeThing(Mouse __instance)
-        {
-            if (CustomCore.CustomPlantTypes.Contains(__instance.thePlantTypeOnMouse))
-            {
-                if (__instance.thePlantOnGlove is not null && CustomCore.CustomPlantTypes.Contains(__instance.thePlantOnGlove.thePlantType))
-
-                {
-                    __instance.TryToSetPlantByGlove();
-                }
-                else if (__instance.theGardenPlantOnGlove is not null && CustomCore.CustomPlantTypes.Contains(__instance.theGardenPlantOnGlove.thePlantType))
-                {
-                    __instance.TryToSetPlantByGlove();
-                }
-                else
-                {
-                    __instance.TryToSetPlantByCard();
-                }
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("PutDownItem")]
-        public static bool PrePutDownItem(Mouse __instance)
-        {
-            if (CustomCore.CustomPlantTypes.Contains(__instance.thePlantTypeOnMouse))
-            {
-                __instance.theCardOnMouse?.PutDown();
-                UnityEngine.Object.Destroy(__instance.theItemOnMouse);
-                __instance.ClearItemOnMouse();
-                return false;
-            }
-            return true;
-        }
     }
 
     [HarmonyPatch(typeof(Plant))]
@@ -237,6 +205,51 @@ namespace CustomizeLib
             {
                 CustomCore.CustomUseItems[(__instance.thePlantType, type)](__instance);
                 UnityEngine.Object.Destroy(bucket.gameObject);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(TravelBuff), "ChangeSprite")]
+    public static class TravelBuffPatch
+    {
+        public static void Postfix(TravelBuff __instance)
+        {
+            if (__instance.theBuffType == 1 && CustomCore.CustomAdvancedBuffs.ContainsKey(__instance.theBuffNumber))
+            {
+                __instance.transform.Find("Icon").gameObject.GetComponent<Image>().sprite = CustomCore.CustomAdvancedBuffs[__instance.theBuffNumber].Item3;
+            }
+            if (__instance.theBuffType == 2 && CustomCore.CustomUltimateBuffs.ContainsKey(__instance.theBuffNumber))
+            {
+                __instance.transform.Find("Icon").gameObject.GetComponent<Image>().sprite = CustomCore.CustomUltimateBuffs[__instance.theBuffNumber].Item3;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(TravelMgr), "Awake")]
+    public static class TravelMgrPatch
+    {
+        public static void Postfix(TravelMgr __instance)
+        {
+            if (CustomCore.CustomAdvancedBuffs.Count > 0)
+            {
+                bool[] newAdv = new bool[__instance.advancedUpgrades.Count + CustomCore.CustomAdvancedBuffs.Count];
+                int[] newAdvUnlock = new int[__instance.advancedUnlockRound.Count + CustomCore.CustomAdvancedBuffs.Count];
+                Array.Copy(__instance.advancedUpgrades, newAdv, __instance.advancedUpgrades.Length);
+                Array.Copy(__instance.advancedUnlockRound, newAdvUnlock, __instance.advancedUnlockRound.Length);
+                __instance.advancedUpgrades = newAdv;
+                __instance.advancedUnlockRound = newAdvUnlock;
+            }
+            if (CustomCore.CustomUltimateBuffs.Count > 0)
+            {
+                bool[] newUlti = new bool[__instance.ultimateUpgrades.Count + CustomCore.CustomUltimateBuffs.Count];
+                Array.Copy(__instance.ultimateUpgrades, newUlti, __instance.ultimateUpgrades.Length);
+                __instance.ultimateUpgrades = newUlti;
+            }
+            if (CustomCore.CustomDebuffs.Count > 0)
+            {
+                bool[] newdeb = new bool[__instance.debuff.Count + CustomCore.CustomDebuffs.Count];
+                Array.Copy(__instance.debuff, newdeb, __instance.debuff.Length);
+                __instance.debuff = newdeb;
             }
         }
     }
@@ -341,18 +354,6 @@ namespace CustomizeLib
         public static bool PreIsAirZombie(ref ZombieType theZombieType, ref bool __result)
         {
             if (CustomCore.TypeMgrExtra.IsAirZombie.Contains(theZombieType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("IsBossZombie")]
-        public static bool PreIsBossZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.IsBossZombie.Contains(theZombieType))
             {
                 __result = true;
                 return false;
@@ -565,70 +566,10 @@ namespace CustomizeLib
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch("NotRandomBungiZombie")]
-        public static bool PreNotRandomBungiZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.NotRandomBungiZombie.Contains(theZombieType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("NotRandomZombie")]
-        public static bool PreNotRandomZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.NotRandomZombie.Contains(theZombieType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("UltimateZombie")]
-        public static bool PreUltimateZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.UltimateZombie.Contains(theZombieType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
         [HarmonyPatch("UmbrellaPlants")]
         public static bool PreUmbrellaPlants(ref PlantType thePlantType, ref bool __result)
         {
             if (CustomCore.TypeMgrExtra.UmbrellaPlants.Contains(thePlantType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("UselessHypnoZombie")]
-        public static bool PreUselessHypnoZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.UselessHypnoZombie.Contains(theZombieType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("WaterZombie")]
-        public static bool PreWaterZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.WaterZombie.Contains(theZombieType))
             {
                 __result = true;
                 return false;
@@ -647,7 +588,6 @@ namespace CustomizeLib
             public static List<ZombieType> EliteZombie { get; set; } = [];
             public static List<PlantType> FlyingPlants { get; set; } = [];
             public static List<ZombieType> IsAirZombie { get; set; } = [];
-            public static List<ZombieType> IsBossZombie { get; set; } = [];
             public static List<PlantType> IsCaltrop { get; set; } = [];
             public static List<PlantType> IsCustomPlant { get; set; } = [];
             public static List<PlantType> IsFirePlant { get; set; } = [];
@@ -692,6 +632,49 @@ namespace CustomizeLib
             catch (Exception e)
             {
                 throw new ArgumentException($"Failed to load {name} \n{e}");
+            }
+        }
+
+        public static int RegisterCustomBuff(string text, BuffType buffType, PlantType plantType = PlantType.Nothing, Sprite? sprite = null)
+        {
+            switch (buffType)
+            {
+                case BuffType.AdvancedBuff:
+                    {
+                        int i = TravelMgr.advancedBuffs.Count;
+                        CustomAdvancedBuffs.Add(i, (plantType, text, sprite));
+                        TravelMgr.advancedBuffs.Add(i, text);
+                        return i;
+                    }
+                case BuffType.UltimateBuff:
+                    {
+                        int i = TravelMgr.ultimateBuffs.Count;
+                        CustomUltimateBuffs.Add(i, (plantType, text, sprite));
+                        TravelMgr.ultimateBuffs.Add(i, text);
+                        return i;
+                    }
+                case BuffType.Debuff:
+                    {
+                        int i = TravelMgr.debuffs.Count;
+                        CustomDebuffs.Add(i, text);
+                        TravelMgr.debuffs.Add(i, text);
+                        return i;
+                    }
+                default:
+                    return -1;
+            }
+        }
+
+        public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab)
+        {
+            if (!CustomBullets.ContainsKey((BulletType)id) && !CreateBullet.BulletTypeMap.ContainsKey((BulletType)id))
+            {
+                CustomBullets.Add((BulletType)id, bulletPrefab);
+                CreateBullet.BulletTypeMap.Add((BulletType)id, Il2CppType.Of<TBullet>());
+            }
+            else
+            {
+                MelonLogger.Error($"Duplicate Bullet ID: {id}");
             }
         }
 
@@ -779,12 +762,22 @@ namespace CustomizeLib
 
         public static void RegisterSuperSkill([NotNull] int id, [NotNull] Func<Plant, int> cost, [NotNull] Action<Plant> skill) => SuperSkills.Add((PlantType)id, (cost, skill));
 
+        public static Dictionary<int, (PlantType, string, Sprite?)> CustomAdvancedBuffs { get; set; } = [];
+        public static Dictionary<BulletType, GameObject> CustomBullets { get; set; } = [];
+        public static Dictionary<int, string> CustomDebuffs { get; set; } = [];
         public static List<(int, int, int)> CustomFusions { get; set; } = [];
+
         public static Dictionary<PlantType, Action<Plant>> CustomPlantClicks { get; set; } = [];
+
         public static Dictionary<PlantType, CustomPlantData> CustomPlants { get; set; } = [];
+
         public static List<PlantType> CustomPlantTypes { get; set; } = [];
+
+        public static Dictionary<int, (PlantType, string, Sprite?)> CustomUltimateBuffs { get; set; } = [];
         public static Dictionary<(PlantType, BucketType), Action<Plant>> CustomUseItems { get; set; } = [];
+
         public static Dictionary<PlantType, (string, string)> PlantsAlmanac { get; set; } = [];
+
         public static Dictionary<PlantType, (Func<Plant, int>, Action<Plant>)> SuperSkills { get; set; } = [];
     }
 }

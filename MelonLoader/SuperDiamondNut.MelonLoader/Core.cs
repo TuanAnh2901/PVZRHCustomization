@@ -1,8 +1,10 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
 using Il2Cpp;
+using Il2CppInterop.Common.XrefScans;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.XrefScans;
 using MelonLoader;
 using SuperDiamondNut.MelonLoader;
 using System.Reflection;
@@ -54,50 +56,20 @@ namespace SuperDiamondNut.MelonLoader
         public override void OnInitializeMelon()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "SuperDiamondNut.MelonLoader.superdiamondnut");
+            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "superdiamondnut");
             CustomCore.RegisterCustomPlant<SuperSunNut, SuperDiamondNut>(961, ab.GetAsset<GameObject>("SuperDiamondNutPrefab"),
-                ab.GetAsset<GameObject>("SuperDiamondNutPreview"), [(3, 31)], 3, 0, 2, 999999, 1f, 50);
+                ab.GetAsset<GameObject>("SuperDiamondNutPreview"), [(905, 31)], 3, 0, 20, 4000, 7.5f, 150);
             CustomCore.RegisterCustomPlantClickEvent(961, SuperDiamondNut.SummonAndRecover);
             CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)961, BucketType.Helmet, SuperDiamondNut.SunExchange);
             CustomCore.AddFusion(905, 961, 1);
             CustomCore.AddFusion(961, 31, 3);
             CustomCore.RegisterCustomPlant<BigWallNut>(962, ab.GetAsset<GameObject>("BigDiamondNutPrefab"),
-                ab.GetAsset<GameObject>("BigDiamondNutPreview"), [], 3, 0, 1500, 999999, 1f, 50);
-            /*
-                        GameObject? prefab = null;
-                        GameObject? preview = null;
-                        foreach (var ase in ab.LoadAllAssets())
-                        {
-                            if (ase.TryCast<GameObject>()?.name is "SuperDiamondNutPrefab")
-                            {
-                                prefab = ase.Cast<GameObject>();
-                                prefab.AddComponent<SuperSunNut>().thePlantType = (PlantType)961;
-                                prefab.AddComponent<SuperDiamondNut>();
-                            }
-                            if (ase.TryCast<GameObject>()?.name is "SuperDiamondNutPreview")
-                            {
-                                preview = ase.TryCast<GameObject>()!;
-                            }
-                        }
-                        if (prefab is null || preview is null) return;
-                        CustomCore.RegisterCustomPlant<SuperSunNut, SuperDiamondNut>(961, prefab, preview, [(905, 31)], 3, 0, 20, 4000, 7.5f, 150);
-                        CustomCore.RegisterCustomPlantClickEvent(961, SuperDiamondNut.SummonAndRecover);
-                        CustomCore.AddFusion(905, 961, 1);
-                        GameObject? prefab2 = null;
-                        GameObject? preview2 = null;
-                        foreach (var ase in ab.LoadAllAssets())
-                        {
-                            if (ase.TryCast<GameObject>()?.name is "BigDiamondNutPrefab")
-                            {
-                                prefab2 = ase.Cast<GameObject>();
-                            }
-                            if (ase.TryCast<GameObject>()?.name is "BigDiamondNutPreview")
-                            {
-                                preview2 = ase.TryCast<GameObject>()!;
-                            }
-                        }
-                        if (prefab2 is null || preview2 is null) return;
-                        CustomCore.RegisterCustomPlant<BigWallNut>(962, prefab2, preview2, [], 3, 0, 1800, 4000, 7.5f, 150);*/
+                ab.GetAsset<GameObject>("BigDiamondNutPreview"), [], 3, 0, 1800, 400000, 7.5f, 200);
+            CustomCore.TypeMgrExtra.IsNut.Add((PlantType)961);
+            CustomCore.TypeMgrExtra.BigNut.Add((PlantType)962);
+            CustomCore.TypeMgrExtra.IsIcePlant.Add((PlantType)962);
+            CustomCore.AddPlantAlmanacStrings(961, "钻石帝果", "点击生成钻石保龄球\n<color=#3D1400>贴图作者：@林秋AutumnLin</color>\n<color=#3D1400>特点：</color><color=red>阳光帝果亚种，使用金盏花、向日葵切换，花费3000钱币生成1800/帧伤的钻石保龄球</color>\n<color=#3D1400>融合配方：</color><color=red>阳光帝果+金盏花</color>\n<color=#3D1400>钻石帝果每次和阳光帝果一起出场时，僵尸们总是四散而逃，每当记者采访他时，他总说：“阳光帝果生产阳光时，我反射的光照就会闪瞎他们的眼睛。”这时记者都会一口同声说一句：“天怎么黑了？”</color>");
+            CustomCore.AddPlantAlmanacStrings(962, "钻石保龄球", "就是个换皮大保龄球...吗？\n<color=#3D1400>贴图作者：@林秋AutumnLin</color>\n<color=#3D1400>伤害：</color><color=red>1800/帧伤</color>\n<color=#3D1400>！</color>");
         }
     }
 
@@ -144,10 +116,13 @@ namespace SuperDiamondNut.MelonLoader
 
         public void Awake()
         {
-            if (GameAPP.theGameStatus is (int)GameStatus.InGame && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)961)
+            if (GameAPP.theGameStatus is (int)GameStatus.InGame && !Board.Instance.isIZ && !Board.Instance.isEveStart && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)961)
             {
                 InGameUIMgr.Instance.MoneyBank.SetActive(true);
             }
+            plant.DisableDisMix();
         }
+
+        public SuperSunNut plant => gameObject.GetComponent<SuperSunNut>();
     }
 }

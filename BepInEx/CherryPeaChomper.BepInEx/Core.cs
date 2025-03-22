@@ -1,0 +1,58 @@
+﻿using BepInEx;
+using BepInEx.Unity.IL2CPP;
+using CustomizeLib;
+using HarmonyLib;
+using Il2CppInterop.Runtime.Injection;
+using System.Reflection;
+using UnityEngine;
+
+namespace CherryPeaChomper.BepInEx
+{
+    public class CherryPeaChomper : MonoBehaviour
+    {
+        public CherryPeaChomper() : base(ClassInjector.DerivedConstructorPointer<CherryPeaChomper>()) => ClassInjector.DerivedConstructorBody(this);
+
+        public CherryPeaChomper(IntPtr i) : base(i)
+        {
+        }
+
+        public Bullet AnimShooting()
+        {
+            Vector3 position = plant.shoot.transform.position;
+            Bullet bullet = Board.Instance.GetComponent<CreateBullet>().SetBullet((float)(position.x + 0.1f), position.y, plant.thePlantRow, 3, 0);
+            bullet.theBulletDamage = 900;
+            return bullet;
+        }
+
+        public void Awake()
+        {
+            plant.shoot = transform.Find("Shoot");
+        }
+
+        public void Bite()
+        {
+            Instantiate(GameAPP.particlePrefab[2], plant.shoot.transform.position, Quaternion.identityQuaternion).GetComponent<BombCherry>().bombRow = plant.thePlantRow;
+            ScreenShake.shakeDuration = 0.15f;
+            GameAPP.PlaySound(40);
+        }
+
+        public PeaChomper plant => gameObject.GetComponent<PeaChomper>();
+    }
+
+    [BepInPlugin("inf75.cherrypeachomper", "CherryPeaChomper", "1.0")]
+    public class Core : BasePlugin//1901
+    {
+        public override void Load()
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+            ClassInjector.RegisterTypeInIl2Cpp<CherryPeaChomper>();
+            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "cherrypeachomper");
+            CustomCore.RegisterCustomPlant<PeaChomper, CherryPeaChomper>(1901, ab.GetAsset<GameObject>("CherryPeaChomperPrefab"),
+                ab.GetAsset<GameObject>("CherryPeaChomperPreview"), [(0, 1016), (1016, 0), (5, 1001), (1001, 5), (2, 1011), (1011, 2)], 3, 0, 900, 300, 7.5f, 400);
+            CustomCore.AddPlantAlmanacStrings(1901, "樱桃豌豆大嘴花", "每次咬僵尸时产生爆炸，咀嚼时会发射樱桃子弹。\n<color=#3D1400>美术组：@墨白秋影 @麦蔻杰沈 @摆烂的克莱尔 @仨硝基甲苯 @Infinite75</color>\n<color=#3D1400>伤害：</color><color=red>1800(爆炸)，900(樱桃子弹)</color>\n<color=#3D1400>融合配方：</color><color=red>豌豆射手+大嘴花+樱桃炸弹</color>\n<color=#3D1400>可能需要警惕下看起开很可疑的店家或是讯息，不然会重复卷心瓜的惨案，但“退化战神”是之后才听的警讯...</color>");
+            CustomCore.AddFusion(903, 1901, 1012);
+            CustomCore.AddFusion(903, 1012, 1901);
+        }
+    }
+}

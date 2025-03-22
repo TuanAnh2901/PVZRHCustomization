@@ -7,6 +7,7 @@ using IronPeasExtra.MelonLoader;
 using MelonLoader;
 using System.Reflection;
 using UnityEngine;
+using static Il2CppSystem.Collections.Hashtable;
 using static MelonLoader.MelonLogger;
 
 [assembly: MelonInfo(typeof(Core), "IronPeasExtra", "1.0", "Infinite75", null)]
@@ -83,14 +84,24 @@ namespace IronPeasExtra.MelonLoader
             CustomCore.RegisterCustomPlant<SuperSnowGatling, SuperIronGatling>(963, ab.GetAsset<GameObject>("SuperIronGatlingPrefab"),
                 ab.GetAsset<GameObject>("SuperIronGatlingPreview"), [(1008, 1020), (1020, 1008)], 0.1f, 0, 150, 400000, 1, 800);
             CustomCore.RegisterCustomUseItemOnPlantEvent(PlantType.BigGatling, BucketType.Bucket, (PlantType)1900);
-            CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)1900);
+            CustomCore.RegisterCustomPlantClickEvent(963, SuperIronGatling.SummonSuperDoomSqualour);
+            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Machine, SuperIronGatling.Shooter);
+            //CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Machine, SuperIronGatling.RedIronPeaPatch);
+            //CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)1900);
+            CustomCore.AddFusion(963, 1008, 1008);
+            Bullet bullet = new Bullet();
+            SpriteRenderer component = bullet.GetComponent<SpriteRenderer>();
+            Sprite sprite = GameAPP.spritePrefab[39];
+            component.sprite = sprite;
+            bullet.theBulletDamage = (int)((ulong)320L);
+            bullet.GetComponent<Bullet>().isHot = true;
             CustomCore.AddPlantAlmanacStrings(1900, "铁桶机枪豌豆炮台", "会发射铁豌豆的巨型豌豆炮台\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>巨型豌豆炮台+铁桶</color>\n<color=#3D1400>铁桶机枪豌豆炮台认为，身上的每一处缺口，每一道磨痕，都象征着一场艰苦的战斗。每一次打磨，都是为了在下一场战斗中更加无坚不摧。</color>");
             CustomCore.AddPlantAlmanacStrings(963, "超级铁豌豆机枪", "会发射铁豌豆的超级机枪射手\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>超级机枪射手+铁豌豆</color>\n<color=#3D1400>超级铁豌豆机枪站在前线，像一支军队般横扫着战场上的敌人。僵尸们或许以为自己能冲破防线，但很快就会发现，面对钢铁子弹的洪流，他们毫无胜算。</color>");
         }
     }
 
     [RegisterTypeInIl2Cpp]
-    public class SuperIronGatling : MonoBehaviour
+    public class SuperIronGatling : MonoBehaviour //963
     {
         public SuperIronGatling() : base(ClassInjector.DerivedConstructorPointer<SuperIronGatling>()) => ClassInjector.DerivedConstructorBody(this);
 
@@ -99,17 +110,13 @@ namespace IronPeasExtra.MelonLoader
         }
         public static void Shooter(Plant plant)
         {
-            if (plant.board.theMoney >= 10000)
+            if (plant is not null )
             {
-                plant.board.theMoney -= 3000;
+                plant.board.theMoney -= 5000;
                 plant.Recover(Lawnf.TravelAdvanced(4) ? 999999 : 400000);
-                GameObject gameObject = CreatePlant.Instance.SetPlant(plant.thePlantColumn +1, plant.thePlantRow, (PlantType)928, null, default, true);
+                GameObject gameObject = CreatePlant.Instance.SetPlant(plant.thePlantColumn +1, plant.thePlantRow, (PlantType)928, null, default, true); // 928 = Disillusioned Mushroom
                 var pos = plant.shoot.transform.position;
                 CreateBullet.Instance.SetBullet(pos.x, pos.y, plant.thePlantRow, 24, 0).theBulletDamage = 99999;
-                //if (plant.board.theMoney >= 70000)
-                //{
-                //    GameObject gameObject2 = CreatePlant.Instance.SetPlant(plant.thePlantColumn, plant.thePlantRow, (PlantType)922, null, default, true);
-                //}
                 if (gameObject is not null)
                 {
                     Vector3 position = gameObject.GetComponent<Plant>().shadow.transform.position;
@@ -118,9 +125,44 @@ namespace IronPeasExtra.MelonLoader
             }
         }
 
+        public static void SummonSuperDoomSqualour(Plant plant)
+        {
+            if (plant != null && Input.GetKey(KeyCode.LeftShift))
+            {
+                int i = 1;
+                plant.board.theSun -= 300;
+                plant.Upgrade(3, true);
+                plant.thePlantMaxHealth = plant.thePlantMaxHealth + 16000 * i;
+                i += 2;
+                plant.UpdateHealthText();
+                GameObject game = CreatePlant.Instance.SetPlant(plant.thePlantColumn + 1, plant.thePlantRow, (PlantType)964, null, default, true);
+                if (game is not null)
+                {
+                    Vector3 position = game.GetComponent<Plant>().shadow.transform.position;
+                    Instantiate(GameAPP.particlePrefab[11], position + new Vector3(0f, 0.5f, 0f), Quaternion.identity, plant.board.transform);
+                }
+            }
+        }
+
+        //public static void RedIronPeaPatch(Plant plant)
+        //{
+        //    Bullet bullet = new Bullet();
+        //    SpriteRenderer component = bullet.GetComponent<SpriteRenderer>();
+        //    Sprite sprite = GameAPP.spritePrefab[39];
+        //    component.sprite = sprite;
+        //    bullet.theBulletDamage = (int)((ulong)320L);
+        //    bullet.GetComponent<Bullet>().isHot = true;
+        //}
+
         public void Awake()
         {
             plant.shoot = plant.gameObject.transform.GetChild(0).GetChild(0);
+            //Bullet bullet = new Bullet();
+            //SpriteRenderer component = bullet.GetComponent<SpriteRenderer>();
+            //Sprite sprite = GameAPP.spritePrefab[39];
+            //component.sprite = sprite;
+            //bullet.theBulletDamage = (int)((ulong)320L);
+            //bullet.GetComponent<Bullet>().isHot = true;
         }
 
         public SuperSnowGatling plant => gameObject.GetComponent<SuperSnowGatling>();

@@ -63,7 +63,7 @@ namespace SuperDoomSqualour.MelonLoader
                 if (z is not null && !z.isMindControlled)
                 {
                     if (z is not null && !z.IsDestroyed())
-                        z.TakeDamage(DmgType.Explode, 3600);
+                        z.TakeDamage(DmgType.Explode, 13600);
                     if (z is not null && !z.IsDestroyed())
                     {
                         z.isDoom = true;

@@ -1,5 +1,6 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
+using Il2Cpp;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
@@ -47,6 +48,11 @@ namespace SuperGarlicFume.MelonLoader
             plant.plantTag = tag;
         }
 
+        //public void Update()
+        //{
+        //    ;
+        //}
+
         public void StartShoot()
         {
             plant.emission.enabled = true;
@@ -71,10 +77,21 @@ namespace SuperGarlicFume.MelonLoader
             {
                 if (z is not null && !z.IsDestroyed() && !z.isMindControlled)
                 {
-                    z.TakeDamage(DmgType.Ice, (150 + z.poisonLevel * 20) * (Lawnf.TravelUltimate(4) ? 3 : 1));
+                    z.TakeDamage(DmgType.Ice, (150 + z.poisonLevel * 80) * (Lawnf.TravelUltimate(4) ? 10 : 3));
                     z.AddPoisonLevel();
-                    z.SetCold(10);
-                    z.AddfreezeLevel(10 * (Lawnf.TravelUltimate(5) ? 5 : 1));
+                    z.AddPoisonLevel();
+                    z.AddPoisonLevel();
+                    z.AddPoisonLevel();
+                    z.AddPoisonLevel();
+                    z.SetCold(50);
+                    z.SetCold(50);
+                    z.SetCold(50);
+                    z.AddfreezeLevel(100 * (Lawnf.TravelUltimate(5) ? 15 : 10));
+                    z.AddfreezeLevel(100 * (Lawnf.TravelUltimate(5) ? 15 : 10));
+                    z.AddfreezeLevel(100 * (Lawnf.TravelUltimate(5) ? 15 : 10));
+                    z.AddfreezeLevel(100 * (Lawnf.TravelUltimate(5) ? 15 : 10));
+                    z.AddfreezeLevel(100 * (Lawnf.TravelUltimate(5) ? 15 : 10));
+                    z.SetMindControl();
                 }
             }
         }

@@ -1,12 +1,13 @@
-using CustomizeLib;
+ï»¿using CustomizeLib;
 using HarmonyLib;
+using Il2Cpp;
 using Il2CppTMPro;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "1.0", "Infinite75", null)]
+[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "1.2", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
 
@@ -120,7 +121,7 @@ namespace CustomizeLib
 
                 if (Board.Instance.theMoney < cost)
                 {
-                    InGameText.Instance.EnableText($"´óÕÐÐèÒª{cost}½ð±Ò", 5);
+                    InGameText.Instance.EnableText($"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òª{cost}ï¿½ï¿½ï¿½", 5);
                     return false;
                 }
                 if (plant.SuperSkill())

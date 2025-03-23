@@ -3,13 +3,12 @@ using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
-using SuperDiamondNut.MelonLoader;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using BepInEx.Unity.IL2CPP;
 
-namespace SuperDiamondNut.MelonLoader
+namespace SuperDiamondNut.BepInEx
 {
     [HarmonyPatch(typeof(SuperSunNut), "TakeDamage")]
     public static class SuperSunNutPatch
@@ -27,7 +26,7 @@ namespace SuperDiamondNut.MelonLoader
                 int i = 0;
                 *(int**)((byte*)ptr + checked(1u * unchecked((nuint)sizeof(IntPtr)))) = &i;
                 System.Runtime.CompilerServices.Unsafe.SkipInit(out IntPtr exc);
-                IL2CPP.il2cpp_runtime_invoke((IntPtr)(typeof(Plant).GetField("NativeMethodInfoPtr_TakeDamage_Public_Virtual_New_Void_Int32_Int32_0", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null))!, IL2CPP.Il2CppObjectBaseToPtrNotNull(__instance), (void**)ptr, ref exc);
+                IL2CPP.il2cpp_runtime_invoke((IntPtr)typeof(Plant).GetField("NativeMethodInfoPtr_TakeDamage_Public_Virtual_New_Void_Int32_Int32_0", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!, IL2CPP.Il2CppObjectBaseToPtrNotNull(__instance), (void**)ptr, ref exc);
                 Il2CppException.RaiseExceptionIfNecessary(exc);
                 __instance.ReplaceSprite();
                 return false;
@@ -89,7 +88,7 @@ namespace SuperDiamondNut.MelonLoader
 
         public void Awake()
         {
-            if (GameAPP.theGameStatus is (int)GameStatus.InGame && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)961)
+            if (GameAPP.theGameStatus is (int)GameStatus.InGame && !Board.Instance.isIZ && !Board.Instance.isEveStart && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)961)
             {
                 InGameUIMgr.Instance.MoneyBank.SetActive(true);
             }

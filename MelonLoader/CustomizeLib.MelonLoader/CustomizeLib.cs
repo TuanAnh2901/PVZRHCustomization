@@ -1,4 +1,4 @@
-using CustomizeLib;
+ï»¿using CustomizeLib;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
@@ -7,6 +7,7 @@ using Il2Cpp;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -77,6 +78,68 @@ namespace CustomizeLib
         }
     }
 
+    [HarmonyPatch(typeof(AlmanacMgrZombie))]
+    public static class AlmanacMgrZombiePatch
+    {
+        [HarmonyPatch("InitNameAndInfoFromJson")]
+        [HarmonyPrefix]
+        public static bool PreInitNameAndInfoFromJson(AlmanacMgrZombie __instance)
+        {
+            if (CustomCore.ZombiesAlmanac.ContainsKey(__instance.theZombieType))
+            {
+                for (int i = 0; i < __instance.transform.childCount; i++)
+                {
+                    Transform childTransform = __instance.transform.GetChild(i);
+                    if (childTransform == null)
+                        continue;
+                    if (childTransform.name == "Name")
+                    {
+                        childTransform.GetComponent<TextMeshPro>().text = CustomCore.ZombiesAlmanac[__instance.theZombieType].Item1;
+                        childTransform.GetChild(0).GetComponent<TextMeshPro>().text = CustomCore.ZombiesAlmanac[__instance.theZombieType].Item1;
+                    }
+                    if (childTransform.name == "Info")
+                    {
+                        TextMeshPro info = childTransform.GetComponent<TextMeshPro>();
+                        info.overflowMode = TextOverflowModes.Page;
+                        info.fontSize = 40;
+                        info.text = CustomCore.ZombiesAlmanac[__instance.theZombieType].Item2;
+                        __instance.introduce = info;
+                    }
+                    if (childTransform.name == "Cost")
+                        childTransform.GetComponent<TextMeshPro>().text = "";
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(AlmanacZombieCtrl))]
+    public static class AlmanacZombieCtrlPatch
+    {
+        [HarmonyPatch("Awake")]
+        [HarmonyPostfix]
+        public static void PostAwake(AlmanacZombieCtrl __instance)
+        {
+            var transform = __instance.gameObject.transform.GetChild(1).GetChild(3).GetChild(0).GetChild(0);
+            var template = transform.GetChild(0).gameObject;
+            int row = 1;
+            int col = 0;
+            foreach (var z in CustomCore.CustomZombies)
+            {
+                var button = UnityEngine.Object.Instantiate(template, new(-7.5f + 1.8f * col, 2.5f - 1.8f * row, 0), new(0, 0, 0, 0), transform);
+                button.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[z.Value.Item2];
+                col++;
+                if (++col > 6)
+                {
+                    col = 0;
+                    row++;
+                }
+                button.GetComponent<AlmanacCardZombie>().theZombieType = (ZombieType)z.Key;
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(CreatePlant), "SetPlant")]
     public static class CreatePlantPatch
     {
@@ -104,6 +167,8 @@ namespace CustomizeLib
             }
             throw new ArgumentException($"Could not find {name} from {ab.name}");
         }
+
+        public static bool ObjectExist<T>(this Board board) => board.GameObject().transform.GetComponentsInChildren<T>().Length > 0;
     }
 
     [HarmonyPatch(typeof(GameAPP))]
@@ -126,9 +191,22 @@ namespace CustomizeLib
             {
                 array.SetValue(f.Item1, f.Item2, f.Item3);
             }
+            foreach (var z in CustomCore.CustomZombies)
+            {
+                GameAPP.zombiePrefab[z.Key] = z.Value.Item1;
+                GameAPP.zombiePrefab[z.Key].tag = "Zombie";
+            }
             foreach (var bullet in CustomCore.CustomBullets)
             {
                 GameAPP.bulletPrefab[(int)bullet.Key] = bullet.Value;
+            }
+            foreach (var par in CustomCore.CustomParticles)
+            {
+                GameAPP.particlePrefab[par.Key] = par.Value;
+            }
+            foreach (var spr in CustomCore.CustomSprites)
+            {
+                GameAPP.spritePrefab[spr.Key] = spr.Value;
             }
         }
     }
@@ -146,7 +224,7 @@ namespace CustomizeLib
 
                 if (Board.Instance.theMoney < cost)
                 {
-                    InGameText.Instance.EnableText($"´óÕÐÐèÒª{cost}½ð±Ò", 5);
+                    InGameText.Instance.EnableText($"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òª{cost}ï¿½ï¿½ï¿½", 5);
                     return false;
                 }
                 if (plant.SuperSkill())
@@ -210,23 +288,48 @@ namespace CustomizeLib
         }
     }
 
-    [HarmonyPatch(typeof(TravelBuff), "ChangeSprite")]
+    [HarmonyPatch(typeof(TravelBuff))]
     public static class TravelBuffPatch
     {
-        public static void Postfix(TravelBuff __instance)
+        [HarmonyPrefix]
+        [HarmonyPatch("ChangeSprite")]
+        public static void PreChangeSprite(TravelBuff __instance)
         {
             if (__instance.theBuffType == 1 && CustomCore.CustomAdvancedBuffs.ContainsKey(__instance.theBuffNumber))
             {
-                __instance.transform.Find("Icon").gameObject.GetComponent<Image>().sprite = CustomCore.CustomAdvancedBuffs[__instance.theBuffNumber].Item3;
+                __instance.thePlantType = CustomCore.CustomAdvancedBuffs[__instance.theBuffNumber].Item1;
             }
             if (__instance.theBuffType == 2 && CustomCore.CustomUltimateBuffs.ContainsKey(__instance.theBuffNumber))
             {
-                __instance.transform.Find("Icon").gameObject.GetComponent<Image>().sprite = CustomCore.CustomUltimateBuffs[__instance.theBuffNumber].Item3;
+                __instance.thePlantType = CustomCore.CustomUltimateBuffs[__instance.theBuffNumber].Item1;
             }
         }
     }
 
-    [HarmonyPatch(typeof(TravelMgr), "Awake")]
+    [HarmonyPatch(typeof(TravelMenuMgr))]
+    public static class TravelMenuMgrPatch
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("SetText")]
+        public static void PostSetText(TravelMenuMgr __instance)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                int type = __instance.options[i].optionType;
+                int number = __instance.options[i].optionNumber;
+                if (type is 1 && CustomCore.CustomAdvancedBuffs.ContainsKey(number) && CustomCore.CustomAdvancedBuffs[number].Item5 is not null)
+                {
+                    __instance.textMesh[i].text = $"<color={CustomCore.CustomAdvancedBuffs[number].Item5}>{__instance.textMesh[i].text}</color>";
+                }
+                if (type is 2 && CustomCore.CustomUltimateBuffs.ContainsKey(number) && CustomCore.CustomUltimateBuffs[number].Item4 is not null)
+                {
+                    __instance.textMesh[i].text = $"<color={CustomCore.CustomUltimateBuffs[number].Item4}>{__instance.textMesh[i].text}</color>";
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(TravelMgr))]
     public static class TravelMgrPatch
     {
         public static void Postfix(TravelMgr __instance)
@@ -251,6 +354,42 @@ namespace CustomizeLib
                 bool[] newdeb = new bool[__instance.debuff.Count + CustomCore.CustomDebuffs.Count];
                 Array.Copy(__instance.debuff, newdeb, __instance.debuff.Length);
                 __instance.debuff = newdeb;
+            }
+        }
+
+        [HarmonyPatch("GetAdvancedBuffPool")]
+        [HarmonyPostfix]
+        public static void PostGetAdvancedBuffPool(TravelMgr __instance, ref Il2CppSystem.Collections.Generic.List<int> __result)
+        {
+            for (int i = __result.Count - 1; i >= 0; i--)
+            {
+                if (CustomCore.CustomAdvancedBuffs.ContainsKey(__result[i]) && !CustomCore.CustomAdvancedBuffs[__result[i]].Item3())
+                {
+                    __result.Remove(__result[i]);
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(TravelStore))]
+    public static class TravelStorePatch
+    {
+        [HarmonyPatch("RefreshBuff")]
+        [HarmonyPostfix]
+        public static void PostRefreshBuff(TravelStore __instance)
+        {
+            foreach (var travelBuff in __instance.gameObject.GetComponentsInChildren<TravelBuff>())
+            {
+                if (travelBuff.theBuffType is (int)BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(travelBuff.theBuffNumber))
+                {
+                    travelBuff.cost = CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4;
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"ï¿½ï¿½{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
+                }
+                if (travelBuff.theBuffType is (int)BuffType.UltimateBuff && CustomCore.CustomUltimateBuffs.ContainsKey(travelBuff.theBuffNumber))
+                {
+                    travelBuff.cost = CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item3;
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"ï¿½ï¿½{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
+                }
             }
         }
     }
@@ -618,6 +757,8 @@ namespace CustomizeLib
 
         public static void AddPlantAlmanacStrings(int id, string name, string description) => PlantsAlmanac.Add((PlantType)id, (name, description));
 
+        public static void AddZombieAlmanacStrings(int id, string name, string description) => ZombiesAlmanac.Add((ZombieType)id, (name, description));
+
         public static AssetBundle GetAssetBundle(Assembly assembly, string name)
         {
             try
@@ -645,14 +786,14 @@ namespace CustomizeLib
                 case BuffType.AdvancedBuff:
                     {
                         int i = TravelMgr.advancedBuffs.Count;
-                        CustomAdvancedBuffs.Add(i, (plantType, text, sprite));
+                        CustomAdvancedBuffs.Add(i, (plantType, text, canUnlock, cost, color));
                         TravelMgr.advancedBuffs.Add(i, text);
                         return i;
                     }
                 case BuffType.UltimateBuff:
                     {
                         int i = TravelMgr.ultimateBuffs.Count;
-                        CustomUltimateBuffs.Add(i, (plantType, text, sprite));
+                        CustomUltimateBuffs.Add(i, (plantType, text, cost, color));
                         TravelMgr.ultimateBuffs.Add(i, text);
                         return i;
                     }
@@ -783,5 +924,6 @@ namespace CustomizeLib
         public static Dictionary<PlantType, (string, string)> PlantsAlmanac { get; set; } = [];
 
         public static Dictionary<PlantType, (Func<Plant, int>, Action<Plant>)> SuperSkills { get; set; } = [];
+        public static Dictionary<ZombieType, (string, string)> ZombiesAlmanac { get; set; } = [];
     }
 }

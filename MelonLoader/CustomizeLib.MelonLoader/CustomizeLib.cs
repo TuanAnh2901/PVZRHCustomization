@@ -636,6 +636,8 @@ namespace CustomizeLib
             }
         }
 
+#nullable enable
+
         public static int RegisterCustomBuff(string text, BuffType buffType, PlantType plantType = PlantType.Nothing, Sprite? sprite = null)
         {
             switch (buffType)
@@ -665,6 +667,7 @@ namespace CustomizeLib
                     return -1;
             }
         }
+
 
         public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab)
         {

@@ -1,9 +1,14 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
 using Il2Cpp;
+using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
+using ElectricPeaReborn.MelonLoader;
 using MelonLoader;
+using System.Reflection;
 using UnityEngine;
+using static Il2CppSystem.Collections.Hashtable;
+using static MelonLoader.MelonLogger;
 
 [assembly: MelonInfo(typeof(ElectricPeaReborn.MelonLoader.Core), "ElectricPeaReborn", "1.0", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
@@ -49,11 +54,16 @@ namespace ElectricPeaReborn.MelonLoader
                 }
             }
             if (prefab is null || preview is null) return;*/
+            //var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "electricpea");
+            //GameAPP.bulletPrefab[50] = Resources.Load<GameObject>("bullet/prefabs/ProjectileElectricPea");
+            //CustomCore.RegisterCustomPlant<Shooter, ElectricPea>(960, ab.GetAsset<GameObject>("ElectricPeaPrefab"),
+            //    ab.GetAsset<GameObject>("ElectricPeaPreview"), [(1005, 1103), (1103, 1005)], 3, 0, 20, 300, 7.5f, 300);
+            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "electricpea");
             GameAPP.bulletPrefab[50] = Resources.Load<GameObject>("bullet/prefabs/ProjectileElectricPea");
             CustomCore.RegisterCustomPlant<Shooter, ElectricPea>(960, ab.GetAsset<GameObject>("ElectricPeaPrefab"),
-                ab.GetAsset<GameObject>("ElectricPeaPreview"), [(0, 1103), (1103, 0)], 3, 0, 200, 345678, 1f, 300);
-            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)961, BucketType.Bucket, ElectricPea.SummonAndRecover);
-            CustomCore.AddPlantAlmanacStrings(960, "电能豌豆（重生）", "电能豌豆发射具有穿透和帧伤能力的强力电能子弹。\n<color=#3D1400>伤害：</color><color=red>20/3x3帧伤</color>\n<color=#3D1400>融合配方：</color><color=red>超级樱桃射手+磁力仙人掌</color>\n<color=#3D1400>本是版本的弃子，本是时代的眼泪。电能豌豆本该在蓝飘飘的回收站里永远沉睡。没有人知道，某个夜晚，有个叫什么玩意75的人把它翻了出来拿去当做实验品。没有人知道，这个不该、不应、也不配被人们知道的废稿，成为了引领身后那些新面孔们进入这个游戏里的先驱。没有人知道，它才是融合世界第一个有自己id的二创植物：代号，960。</color>");
+                ab.GetAsset<GameObject>("ElectricPeaPreview"), [(1005, 3), (3, 1005)], 0.5f, 0, 1000, 32000, 1.5f, 1000);
+            CustomCore.AddPlantAlmanacStrings(960, "Electric Pea", "Shoots an electric ball causing extremely fast damage\n<color=#3D1400>Image Author: </color>\n<color=#3D1400>Damage: </color><color=red>300/0.1s</color>\n<color=#3D1400>Fusion Recipe: </color><color=red>Double Cherry Pea + Wallnut</color>\n<color=#3D1400>Incredibly powerful, tearing through space with each ultra-powerful electric shot!</color>");
+
         }
     }
 
@@ -90,7 +100,7 @@ namespace ElectricPeaReborn.MelonLoader
         {
             Vector3 position = transform.Find("Shoot").transform.position;
             Bullet bullet = Board.Instance.GetComponent<CreateBullet>().SetBullet((float)(position.x + 0.1f), position.y, plant.thePlantRow, 50, 0);
-            bullet.theBulletDamage = 200;
+            bullet.theBulletDamage = 1000;
             return bullet;
         }
 

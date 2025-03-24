@@ -1,23 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>disable</Nullable>
-		<RootNamespace>CustomizeLib.MelonLoader</RootNamespace>
-		<LangVersion>default</LangVersion>
-		<IsPackable>false</IsPackable>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0</FileVersion>
-		<NeutralLanguage>en-US</NeutralLanguage>
-		<AssemblyName>CustomizeLib.MelonLoader</AssemblyName>
+		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<GamePath>D:\PvZ Fusion\Game Files</GamePath>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Include="CustomizeLib.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Reference Include="Assembly-CSharp">
-		  <HintPath>$(GamePath)\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+			<HintPath>$(GamePath)\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2CppMono.Security">
 			<HintPath>$(GamePath)\MelonLoader\Il2CppAssemblies\Il2CppMono.Security.dll</HintPath>
@@ -294,10 +291,6 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Include="CustomizeLib.cs" />
-	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;$(GamePath)\Mods&quot;" />

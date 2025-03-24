@@ -1,10 +1,10 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
 using Il2Cpp;
-=======
+=========
 using Il2CppInterop.Runtime;
->>>>>>> 1df2c653c5a94e7d7171a415c2f355d69c5791a5
+using Il2CppInterop.Runtime.Injection;
 using Il2CppTMPro;
 using Il2Cpp;
 using MelonLoader;
@@ -53,9 +53,7 @@ namespace CustomizeLib
                         info.overflowMode = TextOverflowModes.Page;
                         info.fontSize = 40;
                         info.text = CustomCore.PlantsAlmanac[(PlantType)__instance.theSeedType].Item2;
-                        __instance.pageCount = 2;
-                        __instance.introduce = info;//__instance.gameObject.transform.FindChild("Info").gameObject.GetComponent<TextMeshPro>();
-                        __instance.introduce.m_pageNumber = 2;
+                        __instance.introduce = info;
                     }
                     if (childTransform.name == "Cost")
                         childTransform.GetComponent<TextMeshPro>().text = "";
@@ -388,12 +386,12 @@ namespace CustomizeLib
                 if (travelBuff.theBuffType is (int)BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
                 }
                 if (travelBuff.theBuffType is (int)BuffType.UltimateBuff && CustomCore.CustomUltimateBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item3;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
                 }
             }
         }
@@ -782,9 +780,7 @@ namespace CustomizeLib
             }
         }
 
-#nullable enable
-
-        public static int RegisterCustomBuff(string text, BuffType buffType, PlantType plantType = PlantType.Nothing, Sprite? sprite = null)
+        public static int RegisterCustomBuff(string text, BuffType buffType, Func<bool> canUnlock, int cost, string? color = null, PlantType plantType = PlantType.Nothing)
         {
             switch (buffType)
             {

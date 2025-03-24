@@ -1,7 +1,10 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
+<<<<<<< HEAD
+using Il2Cpp;
+=======
 using Il2CppInterop.Runtime;
-using Il2CppInterop.Runtime.Injection;
+>>>>>>> 1df2c653c5a94e7d7171a415c2f355d69c5791a5
 using Il2CppTMPro;
 using Il2Cpp;
 using MelonLoader;

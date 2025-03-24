@@ -332,7 +332,9 @@ namespace CustomizeLib
     [HarmonyPatch(typeof(TravelMgr))]
     public static class TravelMgrPatch
     {
-        public static void Postfix(TravelMgr __instance)
+        [HarmonyPatch("Awake")]
+        [HarmonyPrefix]
+        public static void PostAwake(TravelMgr __instance)
         {
             if (CustomCore.CustomAdvancedBuffs.Count > 0)
             {
@@ -823,6 +825,8 @@ namespace CustomizeLib
             }
         }
 
+        public static void RegisterCustomParticle(int id, GameObject particle) => CustomParticles.Add(id, particle);
+
         public static void RegisterCustomPlant<TBase, TClass>([NotNull] int id, [NotNull] GameObject prefab, [NotNull] GameObject preview,
                     List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
                     where TBase : Plant where TClass : MonoBehaviour
@@ -896,6 +900,8 @@ namespace CustomizeLib
 
         public static void RegisterCustomPlantClickEvent([NotNull] int id, [NotNull] Action<Plant> action) => CustomPlantClicks.Add((PlantType)id, action);
 
+        public static void RegisterCustomSprite(int id, Sprite sprite) => CustomSprites.Add(id, sprite);
+
         public static void RegisterCustomUseItemOnPlantEvent([NotNull] PlantType id, [NotNull] BucketType bucketType, [NotNull] Action<Plant> callback) => CustomUseItems.Add((id, bucketType), callback);
 
         public static void RegisterCustomUseItemOnPlantEvent([NotNull] PlantType id, [NotNull] BucketType bucketType, [NotNull] PlantType newPlant)
@@ -905,24 +911,40 @@ namespace CustomizeLib
                 CreatePlant.Instance.SetPlant(p.thePlantColumn, p.thePlantRow, newPlant);
             });
 
+        public static void RegisterCustomZombie<TBase, TClass>(int id, GameObject zombie, int spriteId,
+            int theAttackDamage, int theMaxHealth, int theFirstArmorMaxHealth, int theSecondArmorMaxHealth)
+            where TBase : Zombie where TClass : MonoBehaviour
+        {
+            zombie.AddComponent<TBase>().theZombieType = (ZombieType)id;
+            zombie.AddComponent<TClass>();
+
+            ZombieData.zombieData[id] = new()
+            {
+                theAttackDamage = theAttackDamage,
+                theFirstArmorMaxHealth = theFirstArmorMaxHealth,
+                theMaxHealth = theMaxHealth,
+                theSecondArmorMaxHealth = theSecondArmorMaxHealth
+            };
+            CustomZombieTypes.Add((ZombieType)id);
+            CustomZombies.Add(id, (zombie, spriteId));
+        }
+
         public static void RegisterSuperSkill([NotNull] int id, [NotNull] Func<Plant, int> cost, [NotNull] Action<Plant> skill) => SuperSkills.Add((PlantType)id, (cost, skill));
 
-        public static Dictionary<int, (PlantType, string, Sprite?)> CustomAdvancedBuffs { get; set; } = [];
+        public static Dictionary<int, (PlantType, string, Func<bool>, int, string?)> CustomAdvancedBuffs { get; set; } = [];
         public static Dictionary<BulletType, GameObject> CustomBullets { get; set; } = [];
         public static Dictionary<int, string> CustomDebuffs { get; set; } = [];
         public static List<(int, int, int)> CustomFusions { get; set; } = [];
-
+        public static Dictionary<int, GameObject> CustomParticles { get; set; } = [];
         public static Dictionary<PlantType, Action<Plant>> CustomPlantClicks { get; set; } = [];
-
         public static Dictionary<PlantType, CustomPlantData> CustomPlants { get; set; } = [];
-
         public static List<PlantType> CustomPlantTypes { get; set; } = [];
-
-        public static Dictionary<int, (PlantType, string, Sprite?)> CustomUltimateBuffs { get; set; } = [];
+        public static Dictionary<int, Sprite> CustomSprites { get; set; } = [];
+        public static Dictionary<int, (PlantType, string, int, string?)> CustomUltimateBuffs { get; set; } = [];
         public static Dictionary<(PlantType, BucketType), Action<Plant>> CustomUseItems { get; set; } = [];
-
+        public static Dictionary<int, (GameObject, int)> CustomZombies { get; set; } = [];
+        public static List<ZombieType> CustomZombieTypes { get; set; } = [];
         public static Dictionary<PlantType, (string, string)> PlantsAlmanac { get; set; } = [];
-
         public static Dictionary<PlantType, (Func<Plant, int>, Action<Plant>)> SuperSkills { get; set; } = [];
         public static Dictionary<ZombieType, (string, string)> ZombiesAlmanac { get; set; } = [];
     }

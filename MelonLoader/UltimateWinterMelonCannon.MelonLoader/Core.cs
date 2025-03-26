@@ -32,7 +32,7 @@ namespace UltimateWinterMelonCannon.MelonLoader
                     var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                     foreach (var z in array)
                     {
-                        if (z is not null && z.gameObject.TryGetComponent<Zombie>(out var zombie) && !TypeMgr.IsAirZombie(zombie.theZombieType) && !zombie.isMindControlled)
+                        if (z is not null && z.gameObject.TryGetComponent<Zombie>(out var zombie) && !zombie.isMindControlled)
                         {
                             zombie.TakeDamage(DmgType.IceAll, __instance.theBulletDamage * (Lawnf.TravelUltimate(14) ? 3 : 1));
                             zombie.SetFreeze(10);

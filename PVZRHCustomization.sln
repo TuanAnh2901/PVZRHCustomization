@@ -25,8 +25,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperDoomSqualour.BepInEx",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperGarlicFume.MelonLoader", "MelonLoader\SuperGarlicFume.MelonLoader\SuperGarlicFume.MelonLoader.csproj", "{A3613A65-3B2A-40C7-969C-8DA191840ACC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHypnoNut.MelonLoader", "MelonLoader\SuperHypnoNut.MelonLoader\SuperHypnoNut.MelonLoader.csproj", "{AFF7502B-A71F-4446-B5AC-C331896212EC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperCornUmbrella.MelonLoader", "MelonLoader\SuperCornUmbrella.MelonLoader\SuperCornUmbrella.MelonLoader.csproj", "{BBA3DAE0-3832-45FF-BB61-0CE093A37278}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperHypnoUmbrella.MelonLoader", "MelonLoader\SuperHypnoUmbrella.MelonLoader\SuperHypnoUmbrella.MelonLoader.csproj", "{41AF7948-E4A3-4C32-AD65-10D47D5F4026}"
@@ -62,7 +60,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决�
 		LICENSE = LICENSE
 		NOTICE.txt = NOTICE.txt
 		README.md = README.md
+		更新日志.txt = 更新日志.txt
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObsidianRandomZombie.MelonLoader", "MelonLoader\ObsidianRandomZombie.MelonLoader\ObsidianRandomZombie.MelonLoader.csproj", "{DB69900B-7F6C-4ED5-ACF0-2B38C63DCAA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilkyBlover.MelonLoader", "MelonLoader\MilkyBlover.MelonLoader\MilkyBlover.MelonLoader.csproj", "{A6FE4EDE-613C-47BC-80CE-BD422D5D9DC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObsidianRandomZombie.BepInEx", "BepInEx\ObsidianRandomZombie.BepInEx\ObsidianRandomZombie.BepInEx.csproj", "{DF39C568-4B98-4947-9763-621AC9FF0FB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -114,10 +119,6 @@ Global
 		{A3613A65-3B2A-40C7-969C-8DA191840ACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3613A65-3B2A-40C7-969C-8DA191840ACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3613A65-3B2A-40C7-969C-8DA191840ACC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AFF7502B-A71F-4446-B5AC-C331896212EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFF7502B-A71F-4446-B5AC-C331896212EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AFF7502B-A71F-4446-B5AC-C331896212EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AFF7502B-A71F-4446-B5AC-C331896212EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BBA3DAE0-3832-45FF-BB61-0CE093A37278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBA3DAE0-3832-45FF-BB61-0CE093A37278}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBA3DAE0-3832-45FF-BB61-0CE093A37278}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -178,6 +179,18 @@ Global
 		{FD2E30BC-206F-4624-A577-959E1785AD9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD2E30BC-206F-4624-A577-959E1785AD9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD2E30BC-206F-4624-A577-959E1785AD9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB69900B-7F6C-4ED5-ACF0-2B38C63DCAA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB69900B-7F6C-4ED5-ACF0-2B38C63DCAA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB69900B-7F6C-4ED5-ACF0-2B38C63DCAA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB69900B-7F6C-4ED5-ACF0-2B38C63DCAA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6FE4EDE-613C-47BC-80CE-BD422D5D9DC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6FE4EDE-613C-47BC-80CE-BD422D5D9DC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6FE4EDE-613C-47BC-80CE-BD422D5D9DC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6FE4EDE-613C-47BC-80CE-BD422D5D9DC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF39C568-4B98-4947-9763-621AC9FF0FB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF39C568-4B98-4947-9763-621AC9FF0FB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF39C568-4B98-4947-9763-621AC9FF0FB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF39C568-4B98-4947-9763-621AC9FF0FB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

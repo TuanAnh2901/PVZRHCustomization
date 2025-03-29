@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -9,13 +9,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="superdiamondnut" />
-		<None Remove="superhypnodoomsqualour" />
-		<None Remove="superhypnonut" />
+		<None Remove="obsidianrandomzombie" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="superhypnonut" />
+	  <EmbeddedResource Include="obsidianrandomzombie" />
 	</ItemGroup>
 
 	<ItemGroup>

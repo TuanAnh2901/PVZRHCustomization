@@ -124,7 +124,6 @@ namespace CustomizeLib
             {
                 var button = UnityEngine.Object.Instantiate(template, new(-7.5f + 1.8f * col, 2.5f - 1.8f * row, 0), new(0, 0, 0, 0), transform);
                 button.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[z.Value.Item2];
-                col++;
                 if (++col > 6)
                 {
                     col = 0;

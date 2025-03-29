@@ -3,9 +3,7 @@ using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
 using System.Reflection;
-using Unity.VisualScripting;
 using UnityEngine;
-using UltimateWinterMelonCannon.BepInEx;
 using BepInEx.Unity.IL2CPP;
 
 namespace UltimateWinterMelonCannon.BepInEx
@@ -50,7 +48,7 @@ namespace UltimateWinterMelonCannon.BepInEx
     }
 
     [BepInPlugin("inf75.ultimatewintermeloncannon", "UltimateWinterMelonCannon", "1.0")]
-    public class Core : BasePlugin//968
+    public class Core : BasePlugin//168
     {
         public override void Load()
         {
@@ -58,15 +56,15 @@ namespace UltimateWinterMelonCannon.BepInEx
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             ClassInjector.RegisterTypeInIl2Cpp<UltimateWinterMelonCannon>();
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "ultimatewintermeloncannon");
-            CustomCore.RegisterCustomPlant<MelonCannon, UltimateWinterMelonCannon>(968, ab.GetAsset<GameObject>("UltimateWinterMelonCannonPrefab"),
+            CustomCore.RegisterCustomPlant<MelonCannon, UltimateWinterMelonCannon>(168, ab.GetAsset<GameObject>("UltimateWinterMelonCannonPrefab"),
                 ab.GetAsset<GameObject>("UltimateWinterMelonCannonPreview"), [(915, 32)], 24, 24, 450, 1000, 60f, 1200);
             CustomCore.RegisterCustomBullet<LittleGoldCannonBullet>(UltimateWinterMelonCannon.BulletId, ab.GetAsset<GameObject>("ProjectileCannon_UltimateWinterMelon"));
             CustomCore.RegisterCustomParticle(200, ab.GetAsset<GameObject>("CannonUltimateWinterMelonSplat"));
-            CustomCore.TypeMgrExtra.IsIcePlant.Add((PlantType)968);
-            CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)968);
-            CustomCore.AddFusion(915, 968, 28);
-            CustomCore.AddPlantAlmanacStrings(968, "冰毁瓜加农炮", "手动发射寒冰毁灭西瓜，范围全屏\n<color=#3D1400>贴图作者：@林秋AutumnLin @摆烂的克莱尔</color>\n<color=#3D1400>特点：</color><color=red>究极加农炮亚种，使用西瓜投手、玉米投手切换。点击发射60个伤害450的寒冰毁灭西瓜子弹，范围全屏，受击僵尸冻结15s</color>\n<color=#3D1400>融合配方：</color><color=red>究极加农炮+西瓜投手</color>\n<color=#3D1400>词条1：</color><color=red>兵贵神速：装填时间降为10秒</color>\n<color=#3D1400>词条2：</color><color=red>中心爆破：单个子弹伤害提升至1350</color>\n<color=#3D1400>词条3：</color><color=red>真正的冰毁瓜：每个冰毁瓜子弹落地时直接生成3600伤害的寒冰毁灭菇爆炸，范围全屏(解锁条件：解锁了词条1、2且场上存在冰毁瓜加农炮)</color>\n<color=#3D1400>“包装自己的最有效策略？”冰毁西瓜炮低声说道：“首先要冷静，谦逊……然后，从沉默中醒来——轰！整个世界都会记住你的名字。”</color>");
-            UltimateWinterMelonCannon.Buff1 = CustomCore.RegisterCustomBuff("真正的冰毁瓜：每个冰毁瓜子弹落地时直接生成3600伤害的寒冰毁灭菇爆炸，范围全屏", BuffType.AdvancedBuff, () => Board.Instance.ObjectExist<UltimateWinterMelonCannon>() && Lawnf.TravelUltimate(14) && Lawnf.TravelUltimate(15), 28800, "red", (PlantType)968);
+            CustomCore.TypeMgrExtra.IsIcePlant.Add((PlantType)168);
+            CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)168);
+            CustomCore.AddFusion(915, 168, 28);
+            CustomCore.AddPlantAlmanacStrings(168, "冰毁瓜加农炮", "手动发射寒冰毁灭西瓜，范围全屏\n<color=#3D1400>贴图作者：@林秋AutumnLin @暗影Dev</color>\n<color=#3D1400>特点：</color><color=red>究极加农炮亚种，使用西瓜投手、玉米投手切换。点击发射60个伤害450的寒冰毁灭西瓜子弹，范围全屏，受击僵尸冻结15s</color>\n<color=#3D1400>融合配方：</color><color=red>究极加农炮+西瓜投手</color>\n<color=#3D1400>词条1：</color><color=red>兵贵神速：装填时间降为10秒</color>\n<color=#3D1400>词条2：</color><color=red>中心爆破：单个子弹伤害提升至1350</color>\n<color=#3D1400>词条3：</color><color=red>真正的冰毁瓜：每个冰毁瓜子弹落地时直接生成3600伤害的寒冰毁灭菇爆炸，范围全屏(解锁条件：解锁了词条1、2且场上存在冰毁瓜加农炮)</color>\n<color=#3D1400>“包装自己的最有效策略？”冰毁西瓜炮低声说道：“首先要冷静，谦逊……然后，从沉默中醒来——轰！整个世界都会记住你的名字。”</color>");
+            UltimateWinterMelonCannon.Buff1 = CustomCore.RegisterCustomBuff("真正的冰毁瓜：每个冰毁瓜子弹落地时直接生成3600伤害的寒冰毁灭菇爆炸，范围全屏", BuffType.AdvancedBuff, () => Board.Instance.ObjectExist<UltimateWinterMelonCannon>() && Lawnf.TravelUltimate(14) && Lawnf.TravelUltimate(15), 28800, "red", (PlantType)168);
         }
     }
 

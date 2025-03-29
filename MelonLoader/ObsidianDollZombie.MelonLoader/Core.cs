@@ -78,7 +78,7 @@ namespace ObsidianDollZombie.MelonLoader
         public static bool PreOnTriggerStay2D(Mower __instance, ref Collider2D collision)
         {
             GameObject gameObject = collision.gameObject;
-            if (gameObject.CompareTag("Zombie") && gameObject.TryGetComponent<ObsidianDollZombie>(out var z)
+            if (gameObject.CompareTag("Zombie") && gameObject.TryGetComponent<ObsidianDollZombie>(out var z) && z.zombie is not null
                 && z.zombie.theZombieRow == __instance.theMowerRow && !z.zombie.isMindControlled)
             {
                 if (!z.HasMower)
@@ -142,7 +142,7 @@ namespace ObsidianDollZombie.MelonLoader
             CustomCore.RegisterCustomSprite(201, ab.GetAsset<Sprite>("ObsidianDollZombie_head3"));
             CustomCore.RegisterCustomSprite(202, ab.GetAsset<Sprite>("ObsidianDollZombie_0"));
             CustomCore.RegisterCustomSprite(203, ab.GetAsset<Sprite>("ObsidianDollZombie_head1"));
-            CustomCore.AddZombieAlmanacStrings(99, "黑曜石套娃僵尸", "一个很很很很肉的路障僵尸?????(似乎对小推车有着深入研究)\n\n<color=#3D1400>头套贴图作者：@E杯芒果奶昔 @摆烂的克莱尔</color>\n<color=#3D1400>韧性：</color><color=red>18000</color>\n<color=#3D1400>特点：</color><color=red>钻石盲盒僵尸生成时有10%伴生，死亡时生成3个钻石套娃僵尸。免疫击退，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，此状态下若再次遇到小推车则将所有小推车变成黑曜石套娃僵尸</color>\n<color=#3D1400>黑曜石套娃僵尸对自己的头套十分满意。这不仅是因为在外观上无可挑剔，更是因为层层嵌套让他无懈可击。</color>");
+            CustomCore.AddZombieAlmanacStrings(99, "黑曜石套娃僵尸", "一个很很很很肉的路障僵尸?????(似乎对小推车有着深入研究)\n\n<color=#3D1400>头套贴图作者：@E杯芒果奶昔 @暗影Dev</color>\n<color=#3D1400>韧性：</color><color=red>18000</color>\n<color=#3D1400>特点：</color><color=red>钻石盲盒僵尸生成时有10%伴生，死亡时生成3个钻石套娃僵尸。免疫击退，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，此状态下若再次遇到小推车则将所有小推车变成黑曜石套娃僵尸</color>\n<color=#3D1400>黑曜石套娃僵尸对自己的头套十分满意。这不仅是因为在外观上无可挑剔，更是因为层层嵌套让他无懈可击。</color>");
         }
     }
 
@@ -157,7 +157,7 @@ namespace ObsidianDollZombie.MelonLoader
 
         public void Awake()
         {
-            if (GameAPP.theGameStatus is 0)
+            if (GameAPP.theGameStatus is 0 && zombie is not null)
             {
                 zombie.theFirstArmor = gameObject.transform.FindChild("Zombie_head").GetChild(0).gameObject;
                 zombie.butterHead = zombie.theFirstArmor;
@@ -166,33 +166,36 @@ namespace ObsidianDollZombie.MelonLoader
 
         public void PickUpMower()
         {
-            zombie.theHealth = zombie.theMaxHealth;
-            zombie.theFirstArmorHealth = zombie.theFirstArmorMaxHealth;
-            zombie.FirstArmorBroken();
-            zombie.UpdateHealthText();
-            if (HasMower)
+            if (zombie is not null)
             {
-                foreach (var m in Board.Instance.mowerArray)
+                zombie.theHealth = zombie.theMaxHealth;
+                zombie.theFirstArmorHealth = zombie.theFirstArmorMaxHealth;
+                zombie.FirstArmorBroken();
+                zombie.UpdateHealthText();
+                if (HasMower)
                 {
-                    if (m is not null && m.TryGetComponent<Mower>(out var mower))
+                    foreach (var m in Board.Instance.mowerArray)
                     {
-                        var row = mower.theMowerRow;
-                        var x = m.transform.position.x;
-                        mower.Die();
-                        Destroy(mower.gameObject);
-                        CreateZombie.Instance.SetZombie(row, (ZombieType)99, x);
+                        if (m is not null && m.TryGetComponent<Mower>(out var mower))
+                        {
+                            var row = mower.theMowerRow;
+                            var x = m.transform.position.x;
+                            mower.Die();
+                            Destroy(mower.gameObject);
+                            CreateZombie.Instance.SetZombie(row, (ZombieType)99, x);
+                        }
                     }
                 }
+                HasMower = true;
             }
-            HasMower = true;
         }
 
         public void Start()
         {
-            zombie.theFirstArmorType = Zombie.FirstArmorType.Doll;
+            zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
         }
 
         public bool HasMower { get; set; } = false;
-        public DollZombie zombie => gameObject.GetComponent<DollZombie>();
+        public DollZombie? zombie => gameObject.TryGetComponent<DollZombie>(out var z) ? z : null;
     }
 }

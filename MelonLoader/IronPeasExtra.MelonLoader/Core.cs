@@ -23,7 +23,7 @@ namespace IronPeasExtra.MelonLoader
         [HarmonyPatch("GetBulletType")]
         public static void PostGetBulletType(SuperSnowGatling __instance, ref int __result)
         {
-            if (__instance.thePlantType is (PlantType)963)
+            if (__instance.thePlantType is (PlantType)163)
             {
                 __result = 11;
             }
@@ -47,7 +47,7 @@ namespace IronPeasExtra.MelonLoader
 
         public void AnimShooting()
         {
-            if (plant.thePlantType is (PlantType)1900)
+            if (plant.thePlantType is (PlantType)300)
             {
                 if (plant.theStatus is not PlantStatus.BigGatling_raised) return;
                 var pos = plant.shoot.transform.position;
@@ -80,9 +80,8 @@ namespace IronPeasExtra.MelonLoader
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "ironpeas");
-            CustomCore.RegisterCustomPlant<BigGatling, BigIronGatlingPea>(1900, ab.GetAsset<GameObject>("BigIronGatlingPeaPrefab"),
+            CustomCore.RegisterCustomPlant<BigGatling, BigIronGatlingPea>(300, ab.GetAsset<GameObject>("BigIronGatlingPeaPrefab"),
                 ab.GetAsset<GameObject>("BigIronGatlingPeaPreview"), [], 0.1f, 0, 150, 40000, 1, 1000);
-            CustomCore.RegisterCustomPlantClickEvent(1900, (p) => { p.anim.SetTriggerString("shoot"); });
             CustomCore.RegisterCustomPlant<SuperSnowGatling, SuperIronGatling>(963, ab.GetAsset<GameObject>("SuperIronGatlingPrefab"),
                 ab.GetAsset<GameObject>("SuperIronGatlingPreview"), [(1008, 1020), (1020, 1008)], 0.1f, 0, 150, 400000, 1, 800);
             CustomCore.RegisterCustomUseItemOnPlantEvent(PlantType.BigGatling, BucketType.Bucket, (PlantType)1900);

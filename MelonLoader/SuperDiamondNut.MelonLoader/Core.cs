@@ -1,15 +1,11 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
-using Il2Cpp;
-using Il2CppInterop.Common.XrefScans;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
-using Il2CppInterop.Runtime.XrefScans;
 using MelonLoader;
 using SuperDiamondNut.MelonLoader;
 using System.Reflection;
 using UnityEngine;
-using static MelonLoader.MelonLogger;
 
 [assembly: MelonInfo(typeof(Core), "SuperDiamondNut", "1.0", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
@@ -23,7 +19,7 @@ namespace SuperDiamondNut.MelonLoader
         [HarmonyPrefix]
         public static unsafe bool PreTakeDamage(SuperSunNut __instance)
         {
-            if (__instance.thePlantType is (PlantType)961)
+            if (__instance.thePlantType is (PlantType)161)
             {
                 var damage = Lawnf.TravelAdvanced(5) ? 1 : 5;
                 CreateItem.Instance.SetCoin(__instance.thePlantColumn, __instance.thePlantRow, 36, 0);
@@ -326,7 +322,7 @@ namespace SuperDiamondNut.MelonLoader
 
         public void Awake()
         {
-            if (GameAPP.theGameStatus is (int)GameStatus.InGame && !Board.Instance.isIZ && !Board.Instance.isEveStart && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)961)
+            if (GameAPP.theGameStatus is (int)GameStatus.InGame && !Board.Instance.isIZ && !Board.Instance.isEveStart && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)161)
             {
                 InGameUIMgr.Instance.MoneyBank.SetActive(true);
             }

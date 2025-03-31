@@ -18,6 +18,7 @@
 	<ItemGroup>
 		<None Remove="ironpeas" />
 		<None Remove="superdiamondnut" />
+		<None Remove="electricpea" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -25,11 +26,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\CustomizeLib.MelonLoader\CustomizeLib.MelonLoader.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(GamePath)\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="CustomizeLib">
-			<HintPath>$(GamePath)\Mods\CustomizeLib.MelonLoader.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2CppMono.Security">
 			<HintPath>$(GamePath)\MelonLoader\Il2CppAssemblies\Il2CppMono.Security.dll</HintPath>

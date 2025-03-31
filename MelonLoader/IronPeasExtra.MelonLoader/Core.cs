@@ -58,6 +58,7 @@ namespace IronPeasExtra.MelonLoader
                 CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.1f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
                 CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.2f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
                 CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                CreateZombie.Instance.SetZombieWithMindControl(plant.thePlantRow, ZombieType.UltimatePaperZombie, pos.x, false);
             }
         }
 
@@ -165,13 +166,93 @@ namespace IronPeasExtra.MelonLoader
 
         public void Awake()
         {
+            //var pos = plant.shoot.transform.position;
             plant.shoot = plant.gameObject.transform.GetChild(0).GetChild(0);
-            //Bullet bullet = new Bullet();
-            //SpriteRenderer component = bullet.GetComponent<SpriteRenderer>();
-            //Sprite sprite = GameAPP.spritePrefab[39];
-            //component.sprite = sprite;
-            //bullet.theBulletDamage = (int)((ulong)320L);
-            //bullet.GetComponent<Bullet>().isHot = true;
+            //plant.SuperShoot(5f, 100, pos.x, pos.y);
+        }
+
+        public static int shootnum = 0;
+        public void AnimShoot()
+        {
+            
+            if (plant.thePlantType is (PlantType)963)
+            {
+                var pos = plant.shoot.transform.position;
+                
+                CreateBullet.Instance.SetBullet(pos.x, pos.y, plant.thePlantRow, 11, 0).theBulletDamage = 150;
+                
+                shootnum += 2;
+                if (shootnum > 10)
+                {
+                    CreateZombie.Instance.SetZombieWithMindControl(plant.thePlantRow, ZombieType.UltimateMachineNutZombie, pos.x, false);
+                    //return;
+                    // Last Change
+                    //plant.flashCountDown = 5f;
+                    plant.timer = 0.1f;
+                    //plant.flashCountDown = 5f;
+                    plant.AttributeEvent();
+                    //plant.anim.SetBool("shooting", true);
+                    int thePlantMaxHealth = plant.thePlantMaxHealth;
+                    plant.Recover(thePlantMaxHealth);
+                    //shootnum = 0;
+                    MelonLogger.Msg($"shootnum reached {shootnum}, condition > 10 triggered.");
+                }
+                if (shootnum >= 15)
+                {
+                    plant.timer = 0.1f;
+                    //plant.flashCountDown = 5f;
+                    plant.AttributeEvent();
+                    CreateItem.Instance.SetCoin(plant.thePlantColumn, plant.thePlantRow, 4, 0, default, true);
+                    plant.anim.SetBool("shooting", true);
+                    int thePlantMaxHealth = plant.thePlantMaxHealth;
+                    plant.Recover(thePlantMaxHealth);
+                    //shootnum = 0;
+                    MelonLogger.Msg($"shootnum reached {shootnum}, condition >= 15 triggered.");
+                }
+                // set an if when shootnum goes to 30, then trigger the AttributeEvent and set plant.timer to 0.1f.
+                if (shootnum >= 30)
+                {
+                    plant.timer = 0.1f;
+                    //plant.flashCountDown = 5f;
+                    plant.AttributeEvent();
+                    CreateZombie.Instance.SetZombieWithMindControl(plant.thePlantRow, ZombieType.UltimateMachineNutZombie, pos.x, false);
+                    plant.anim.SetBool("shooting", true);
+                    plant.keepShooting = false;
+                    int thePlantMaxHealth = plant.thePlantMaxHealth;
+                    plant.Recover(thePlantMaxHealth);
+                    //shootnum = 0;
+                    MelonLogger.Msg($"shootnum reached {shootnum}, condition >= 30 triggered.");
+                }
+                if (shootnum >= 50)
+                {
+                    MelonLogger.Msg($"shootnum reached {shootnum}, condition >= 50 triggered. Reset shootnum");
+                    shootnum = 0;
+                    plant.keepShooting = true;
+                    //plant.SuperShoot(50f, 100, plant.thePlantColumn, plant.thePlantRow);
+                    MelonLogger.Msg($"shootnum reached {shootnum}, condition >= 50 triggered. Resetted shootnum");
+                }
+                //if (shootnum >= 30)
+                //{
+                //    plant.timer = 1f;
+                //    plant.flashCountDown = 5f;
+                //    plant.AttributeEvent();
+                //    plant.anim.SetBool("shooting", true);
+                //    int thePlantMaxHealth = plant.thePlantMaxHealth;
+                //    plant.Recover(thePlantMaxHealth);
+                //    shootnum = 0;
+                //    // and show a message on MelonLoader console to show log the shootnum and what condition it has been triggered, like the first one is > 10, the second one is >= 30.
+
+                //}
+                //Bullet bullet = new Bullet();
+                //bullet.theBulletDamage = (int)((ulong)320L);
+                //bullet.GetComponent<Bullet>().isHot = true;
+                //plant.timer -= 2 * Time.deltaTime;
+
+                //
+                
+
+            }
+
         }
 
         public SuperSnowGatling plant => gameObject.GetComponent<SuperSnowGatling>();

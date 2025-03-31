@@ -1,12 +1,9 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
-<<<<<<<<< Temporary merge branch 1
 using Il2Cpp;
-=========
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
 using Il2CppTMPro;
-using Il2Cpp;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;

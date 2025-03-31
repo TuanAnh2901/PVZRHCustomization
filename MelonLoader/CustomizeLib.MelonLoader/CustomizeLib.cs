@@ -1,13 +1,17 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
-using Il2CppInterop.Runtime;
+
 using Il2Cpp;
+
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.Injection;
 using Il2CppTMPro;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 [assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "1.2", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
@@ -804,6 +808,7 @@ namespace CustomizeLib
                     return -1;
             }
         }
+
 
         public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab)
         {

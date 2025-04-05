@@ -1,4 +1,6 @@
 ﻿using CustomizeLib;
+using HarmonyLib;
+using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
 using ElectricPeaReborn.MelonLoader;
 using MelonLoader;
@@ -104,6 +106,7 @@ namespace ElectricPeaReborn.MelonLoader
             return bullet;
         }
 
+        public static int Buff { get; set; } = -1;
         public void Start()
         {
             plant.shoot = plant.gameObject.transform.FindChild("Shoot");

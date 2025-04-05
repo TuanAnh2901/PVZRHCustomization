@@ -40,7 +40,7 @@ namespace SuperUmbrellasExtra.MelonLoader
                         health += (long)(zombie.theHealth + zombie.theFirstArmorHealth + zombie.theSecondArmorHealth);
                     }
                 }
-                return Lawnf.TravelAdvanced(Core.Buff1) ? 500 : (int)(50000 * (1 - Math.Pow(Math.E, (-0.00003d) * health)) - 1);
+                return Lawnf.TravelAdvanced(Core.Buff1) ? 500 : (int)(100000 * (1 - Math.Pow(Math.E, (-0.00003d) * health)) - 1);
             },
             (plant) =>
             {
@@ -54,7 +54,6 @@ namespace SuperUmbrellasExtra.MelonLoader
                         zombie.Die(2);
                     }
                 }
-                plant.flashCountDown = 45;
                 GameAPP.PlaySound(49);
             });
             CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)170);
@@ -72,16 +71,8 @@ namespace SuperUmbrellasExtra.MelonLoader
                 }
                 else
                 {
-                    if (TypeMgr.IsBossZombie(zombie.theZombieType))
-                    {
-                        __instance.thePlantHealth -= 3899;
-                        __instance.UpdateText();
-                    }
-                    else
-                    {
-                        __instance.thePlantHealth -= 900;
-                        __instance.UpdateText();
-                    }
+                    __instance.thePlantHealth -= 700;
+                    __instance.UpdateHealthText();
                 }
                 zombie.KnockBack(1.5f * (__instance.UmbrellaPot is not null ? 2 : 1));
                 zombie.Die(2);

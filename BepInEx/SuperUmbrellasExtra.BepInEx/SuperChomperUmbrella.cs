@@ -38,7 +38,7 @@ namespace SuperUmbrellasExtra.BepInEx
                         health += (long)(zombie.theHealth + zombie.theFirstArmorHealth + zombie.theSecondArmorHealth);
                     }
                 }
-                return (int)(50000 * (1 - Math.Pow(Math.E, -0.00003d * health)) - 1);
+                return (int)(100000 * (1 - Math.Pow(Math.E, -0.00003d * health)) - 1);
             },
             (plant) =>
             {
@@ -52,7 +52,6 @@ namespace SuperUmbrellasExtra.BepInEx
                         zombie.Die(2);
                     }
                 }
-                plant.flashCountDown = 45;
                 GameAPP.PlaySound(49);
             });
             CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)170);
@@ -70,16 +69,9 @@ namespace SuperUmbrellasExtra.BepInEx
                 }
                 else
                 {
-                    if (TypeMgr.IsBossZombie(zombie.theZombieType))
-                    {
-                        __instance.thePlantHealth -= 3899;
-                        __instance.UpdateHealthText();
-                    }
-                    else
-                    {
-                        __instance.thePlantHealth -= 900;
-                        __instance.UpdateHealthText();
-                    }
+                    __instance.thePlantHealth -= 700;
+                    __instance.UpdateHealthText();
+                }
                 }
                 zombie.KnockBack(1.5f * (__instance.UmbrellaPot is not null ? 2 : 1));
                 zombie.Die(2);

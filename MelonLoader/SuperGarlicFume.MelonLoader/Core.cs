@@ -75,6 +75,7 @@ namespace SuperGarlicFume.MelonLoader
                     plant.zombieList.Add(z);
                 }
             }
+            GameAPP.PlaySound(58);
             foreach (var z in plant.zombieList)
             {
                 if (z is not null && !z.IsDestroyed() && !z.isMindControlled)

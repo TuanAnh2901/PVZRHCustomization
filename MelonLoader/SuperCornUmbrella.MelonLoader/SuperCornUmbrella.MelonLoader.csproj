@@ -9,12 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="supercornumbrella" />
 		<None Remove="superdiamondnut" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="supercornumbrella" />
 	</ItemGroup>
 
 	<ItemGroup>

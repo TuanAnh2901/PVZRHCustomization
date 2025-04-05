@@ -20,6 +20,17 @@ namespace IronPeasExtra.MelonLoader
     public static class SuperSnowGatlingPatch
     {
         [HarmonyPostfix]
+        [HarmonyPatch("AnimShoot")]
+        public static void PostAnimShoot(ref Bullet __result)
+        {
+            if (Lawnf.TravelAdvanced(SuperIronGatling.Buff))
+            {
+                __result.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[39];
+                __result.theBulletDamage *= 6;
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch("GetBulletType")]
         public static void PostGetBulletType(SuperSnowGatling __instance, ref int __result)
         {
@@ -27,6 +38,22 @@ namespace IronPeasExtra.MelonLoader
             {
                 __result = 11;
             }
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("SuperShoot")]
+        public static bool PreSuperShoot(SuperSnowGatling __instance, ref float angle, ref float speed, ref float x, ref float y)
+        {
+            if (__instance.thePlantType is (PlantType)163 && Lawnf.TravelAdvanced(SuperIronGatling.Buff))
+            {
+                var b = CreateBullet.Instance.SetBullet(x, y, __instance.thePlantRow, 11, 15);
+                b.transform.Rotate(0, 0, angle);
+                b.normalSpeed = speed;
+                b.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[39];
+                b.theBulletDamage *= 6;
+                return false;
+            }
+            return true;
         }
     }
 
@@ -58,7 +85,7 @@ namespace IronPeasExtra.MelonLoader
                 CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.1f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
                 CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.2f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
                 CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = 150;
-                CreateZombie.Instance.SetZombieWithMindControl(plant.thePlantRow, ZombieType.UltimatePaperZombie, pos.x, false);
+                //CreateZombie.Instance.SetZombieWithMindControl(plant.thePlantRow, ZombieType.UltimatePaperZombie, pos.x, false);
             }
         }
 
@@ -82,31 +109,23 @@ namespace IronPeasExtra.MelonLoader
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "ironpeas");
             CustomCore.RegisterCustomPlant<BigGatling, BigIronGatlingPea>(300, ab.GetAsset<GameObject>("BigIronGatlingPeaPrefab"),
                 ab.GetAsset<GameObject>("BigIronGatlingPeaPreview"), [], 0.1f, 0, 150, 40000, 1, 1000);
-            CustomCore.RegisterCustomPlant<SuperSnowGatling, SuperIronGatling>(963, ab.GetAsset<GameObject>("SuperIronGatlingPrefab"),
-                ab.GetAsset<GameObject>("SuperIronGatlingPreview"), [(1008, 1020), (1020, 1008)], 0.1f, 0, 150, 400000, 1, 800);
-            CustomCore.RegisterCustomUseItemOnPlantEvent(PlantType.BigGatling, BucketType.Bucket, (PlantType)1900);
-            CustomCore.RegisterCustomPlantClickEvent(963, SuperIronGatling.SummonSuperDoomSqualour);
-            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Machine, SuperIronGatling.Shooter);
-            //CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Machine, SuperIronGatling.RedIronPeaPatch);
-            //CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)1900);
+            CustomCore.RegisterCustomPlant<SuperSnowGatling, SuperIronGatling>(163, ab.GetAsset<GameObject>("SuperIronGatlingPrefab"),
+                ab.GetAsset<GameObject>("SuperIronGatlingPreview"), [(1168, 1020), (1020, 1168)], 0.1f, 0, 150, 400000, 1, 800);
             CustomCore.AddFusion(963, 1008, 1008);
-            Bullet bullet = new Bullet();
-            SpriteRenderer component = bullet.GetComponent<SpriteRenderer>();
-            Sprite sprite = GameAPP.spritePrefab[39];
-            component.sprite = sprite;
-            bullet.theBulletDamage = (int)((ulong)320L);
-            bullet.GetComponent<Bullet>().isHot = true;
-            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.SuperMachine, (PlantType)1900);
-            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Bucket, SuperIronGatling.Shooter);
-            //CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)1900, BucketType.Bucket, SuperIronGatling.Shooter);
-            CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)1900);
-            CustomCore.AddPlantAlmanacStrings(1900, "铁桶机枪豌豆炮台", "会发射铁豌豆的巨型豌豆炮台\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>巨型豌豆炮台+铁桶</color>\n<color=#3D1400>铁桶机枪豌豆炮台认为，身上的每一处缺口，每一道磨痕，都象征着一场艰苦的战斗。每一次打磨，都是为了在下一场战斗中更加无坚不摧。</color>");
-            CustomCore.AddPlantAlmanacStrings(963, "超级铁豌豆机枪", "会发射铁豌豆的超级机枪射手\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>超级机枪射手+铁豌豆</color>\n<color=#3D1400>超级铁豌豆机枪站在前线，像一支军队般横扫着战场上的敌人。僵尸们或许以为自己能冲破防线，但很快就会发现，面对钢铁子弹的洪流，他们毫无胜算。</color>");
+            CustomCore.RegisterCustomPlantClickEvent(163, SuperIronGatling.SummonSuperDoomSqualour);
+            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)163, BucketType.Machine, SuperIronGatling.Shooter);
+            CustomCore.RegisterCustomUseItemOnPlantEvent(PlantType.BigGatling, BucketType.Bucket, (PlantType)300);
+            CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)300);
+            //CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)163, BucketType.SuperMachine, (PlantType)300);
+            //CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)163, BucketType.Bucket, SuperIronGatling.Shooter);
+            SuperIronGatling.Buff = CustomCore.RegisterCustomBuff("炽热铁豆：超级铁豌豆机枪发射红色铁豆，6倍伤害", BuffType.AdvancedBuff, () => Board.Instance.ObjectExist<SuperIronGatling>(), 5400, null, (PlantType)163);
+            CustomCore.AddPlantAlmanacStrings(300, "铁桶机枪豌豆炮台", "会发射铁豌豆的巨型豌豆炮台\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>巨型豌豆炮台+铁桶</color>\n<color=#3D1400>铁桶机枪豌豆炮台认为，身上的每一处缺口，每一道磨痕，都象征着一场艰苦的战斗。每一次打磨，都是为了在下一场战斗中更加无坚不摧。</color>");
+            CustomCore.AddPlantAlmanacStrings(163, "超级铁豌豆机枪", "会发射铁豌豆的超级机枪射手\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>超级机枪射手+铁豌豆</color>\n<color=#3D1400>词条：</color><color=red>炽热铁豆：超级铁豌豆机枪发射红色铁豆，6倍伤害(解锁条件：场上存在超级铁豌豆机枪)</color>\n<color=#3D1400>超级铁豌豆机枪站在前线，像一支军队般横扫着战场上的敌人。僵尸们或许以为自己能冲破防线，但很快就会发现，面对钢铁子弹的洪流，他们毫无胜算。</color>");
         }
     }
 
     [RegisterTypeInIl2Cpp]
-    public class SuperIronGatling : MonoBehaviour //963
+    public class SuperIronGatling : MonoBehaviour //163
     {
         public SuperIronGatling() : base(ClassInjector.DerivedConstructorPointer<SuperIronGatling>()) => ClassInjector.DerivedConstructorBody(this);
 

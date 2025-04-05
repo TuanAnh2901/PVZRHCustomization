@@ -9,10 +9,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="supercornumbrella" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\CustomizeLib.BepInEx\CustomizeLib.BepInEx.csproj" />
 	</ItemGroup>
 

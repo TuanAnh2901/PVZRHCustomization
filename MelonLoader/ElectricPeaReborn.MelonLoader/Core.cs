@@ -1,6 +1,4 @@
 ﻿using CustomizeLib;
-using HarmonyLib;
-using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
 using ElectricPeaReborn.MelonLoader;
 using MelonLoader;

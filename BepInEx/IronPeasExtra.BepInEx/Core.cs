@@ -12,17 +12,6 @@ namespace IronPeasExtra.BepInEx
     public static class SuperSnowGatlingPatch
     {
         [HarmonyPostfix]
-        [HarmonyPatch("AnimShoot")]
-        public static void PostAnimShoot(ref Bullet __result)
-        {
-            if (Lawnf.TravelAdvanced(SuperIronGatling.Buff))
-            {
-                __result.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[39];
-                __result.theBulletDamage *= 6;
-            }
-        }
-
-        [HarmonyPostfix]
         [HarmonyPatch("GetBulletType")]
         public static void PostGetBulletType(SuperSnowGatling __instance, ref int __result)
         {
@@ -30,22 +19,6 @@ namespace IronPeasExtra.BepInEx
             {
                 __result = 11;
             }
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("SuperShoot")]
-        public static bool PreSuperShoot(SuperSnowGatling __instance, ref float angle, ref float speed, ref float x, ref float y)
-        {
-            if (__instance.thePlantType is (PlantType)163 && Lawnf.TravelAdvanced(SuperIronGatling.Buff))
-            {
-                var b = CreateBullet.Instance.SetBullet(x, y, __instance.thePlantRow, 11, 15);
-                b.transform.Rotate(0, 0, angle);
-                b.normalSpeed = speed;
-                b.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[39];
-                b.theBulletDamage *= 6;
-                return false;
-            }
-            return true;
         }
     }
 
@@ -121,7 +94,6 @@ namespace IronPeasExtra.BepInEx
             plant.shoot = plant.gameObject.transform.GetChild(0).GetChild(0);
         }
 
-        public static int Buff { get; set; } = -1;
         public SuperSnowGatling plant => gameObject.GetComponent<SuperSnowGatling>();
     }
 }

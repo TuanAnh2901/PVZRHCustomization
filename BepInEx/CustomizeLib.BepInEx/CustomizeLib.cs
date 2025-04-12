@@ -158,6 +158,8 @@ namespace CustomizeLib
             throw new ArgumentException($"Could not find {name} from {ab.name}");
         }
 
+        public static int GetTotalHealth(this Zombie zombie) => (int)zombie.theHealth + zombie.theFirstArmorHealth + zombie.theSecondArmorHealth;
+
         public static bool ObjectExist<T>(this Board board) => board.GameObject().transform.GetComponentsInChildren<T>().Length > 0;
     }
 

@@ -25,11 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperDoomSqualour.BepInEx",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperGarlicFume.MelonLoader", "MelonLoader\SuperGarlicFume.MelonLoader\SuperGarlicFume.MelonLoader.csproj", "{A3613A65-3B2A-40C7-969C-8DA191840ACC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CherryPeaChomper.MelonLoader", "MelonLoader\CherryPeaChomper.MelonLoader\CherryPeaChomper.MelonLoader.csproj", "{428112A4-ADDA-4F80-8860-502F31ED7CCF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HypnoSquash.MelonLoader", "MelonLoader\HypnoSquash.MelonLoader\HypnoSquash.MelonLoader.csproj", "{3D95940E-3F75-4C95-9A08-9B155E6A48DF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CherryPeaChomper.BepInEx", "BepInEx\CherryPeaChomper.BepInEx\CherryPeaChomper.BepInEx.csproj", "{375AEA77-F569-479B-8449-23C90E789910}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HypnoSquash.BepInEx", "BepInEx\HypnoSquash.BepInEx\HypnoSquash.BepInEx.csproj", "{2290CD01-7BAF-4A4A-874D-69E1CB5DE9D3}"
 EndProject
@@ -123,18 +119,10 @@ Global
 		{A3613A65-3B2A-40C7-969C-8DA191840ACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3613A65-3B2A-40C7-969C-8DA191840ACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3613A65-3B2A-40C7-969C-8DA191840ACC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{428112A4-ADDA-4F80-8860-502F31ED7CCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{428112A4-ADDA-4F80-8860-502F31ED7CCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{428112A4-ADDA-4F80-8860-502F31ED7CCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{428112A4-ADDA-4F80-8860-502F31ED7CCF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3D95940E-3F75-4C95-9A08-9B155E6A48DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D95940E-3F75-4C95-9A08-9B155E6A48DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D95940E-3F75-4C95-9A08-9B155E6A48DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D95940E-3F75-4C95-9A08-9B155E6A48DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{375AEA77-F569-479B-8449-23C90E789910}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{375AEA77-F569-479B-8449-23C90E789910}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{375AEA77-F569-479B-8449-23C90E789910}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{375AEA77-F569-479B-8449-23C90E789910}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2290CD01-7BAF-4A4A-874D-69E1CB5DE9D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2290CD01-7BAF-4A4A-874D-69E1CB5DE9D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2290CD01-7BAF-4A4A-874D-69E1CB5DE9D3}.Release|Any CPU.ActiveCfg = Release|Any CPU

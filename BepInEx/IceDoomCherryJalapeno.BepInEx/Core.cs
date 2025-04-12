@@ -26,6 +26,7 @@ namespace IceDoomCherryJalapeno.MelonLoader
                     bc.explodeDamage = __instance.attackDamage;
                     bc.isFromZombie = false;
                     GameAPP.PlaySound(40, 0.2f);
+                    zombie.KnockBack(0.5f, Zombie.KnockBackReason.ByJalapeno);
                     zombie.SetFreeze(10);
                     if (!p.ZombiesHash.Contains(zombie.GetHashCode()))
                     {
@@ -53,7 +54,7 @@ namespace IceDoomCherryJalapeno.MelonLoader
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             ClassInjector.RegisterTypeInIl2Cpp<IceDoomCherryJalapeno>();
             CustomCore.RegisterCustomPlant<CherryJalapeno, IceDoomCherryJalapeno>(177, ab.GetAsset<GameObject>("IceDoomCherryJalapenoPrefab"),
-                ab.GetAsset<GameObject>("IceDoomCherryJalapenoPreview"), [(1040, 1179), (1179, 1040)], 3, 0, 80, 300, 7.5f, 300);
+                ab.GetAsset<GameObject>("IceDoomCherryJalapenoPreview"), [(1040, 1179), (1179, 1040)], 3, 0, 300, 300, 7.5f, 700);
             var par = ab.GetAsset<GameObject>("IceDoomCloudSmall");
             par.AddComponent<BombCherry>();
             CustomCore.RegisterCustomParticle(203, par);

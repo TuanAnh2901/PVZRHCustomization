@@ -21,9 +21,9 @@ namespace SuperUmbrellasExtra.MelonLoader
         {
             CustomCore.RegisterCustomPlant<SuperUmbrella, SuperCornUmbrella>(175, ab.GetAsset<GameObject>("SuperCornUmbrellaPrefab"),
                 ab.GetAsset<GameObject>("SuperCornUmbrellaPreview"), [(916, 28), (923, 28), (170, 28), (171, 28), (172, 28), (173, 28), (174, 28), (176, 28),], 3, 0, 80, 4000, 60f, 800);
-            CustomCore.RegisterSuperSkill(175, (_) => 6000, (plant) =>
+            CustomCore.RegisterSuperSkill(175, (_) => Lawnf.TravelAdvanced(Core.Buff1) ? 500 : 6000, (plant) =>
             {
-                var pos = plant.shadow.transform.position;
+                var pos = plant.axis.position;
                 LayerMask layermask = plant.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                 foreach (var z in array)

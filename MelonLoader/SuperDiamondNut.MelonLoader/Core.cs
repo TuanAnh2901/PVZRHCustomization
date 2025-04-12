@@ -81,7 +81,7 @@ namespace SuperDiamondNut.MelonLoader
                 GameObject gameObject = CreatePlant.Instance.SetPlant(plant.thePlantColumn + 1, plant.thePlantRow, (PlantType)162, null, default, true);
                 if (gameObject is not null)
                 {
-                    Vector3 position = gameObject.GetComponent<Plant>().shadow.transform.position;
+                    Vector3 position = gameObject.GetComponent<Plant>().axis.position;
                     Instantiate(GameAPP.particlePrefab[11], position + new Vector3(0f, 0.5f, 0f), Quaternion.identity, plant.board.transform);
                 }
             }
@@ -91,7 +91,7 @@ namespace SuperDiamondNut.MelonLoader
         {
             if (GameAPP.theGameStatus is (int)GameStatus.InGame && !Board.Instance.isIZ && !Board.Instance.isEveStart && gameObject.GetComponent<SuperSunNut>().thePlantType is (PlantType)161)
             {
-                InGameUIMgr.Instance.MoneyBank.SetActive(true);
+                InGameUI.Instance.MoneyBank.SetActive(true);
             }
             plant.DisableDisMix();
         }

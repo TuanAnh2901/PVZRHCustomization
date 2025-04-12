@@ -2,11 +2,6 @@
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -27,9 +22,9 @@ namespace SuperUmbrellasExtra.MelonLoader
             CustomCore.RegisterCustomPlant<SuperUmbrella, SuperIceUmbrella>(173, ab.GetAsset<GameObject>("SuperIceUmbrellaPrefab"),
               ab.GetAsset<GameObject>("SuperIceUmbrellaPreview"), [(916, 10), (923, 10), (170, 10), (171, 10), (172, 10), (174, 10), (175, 10), (176, 10),],
               3, 0, 100, 4000, 60f, 900);
-            CustomCore.RegisterSuperSkill(173, (_) => 6000, (plant) =>
+            CustomCore.RegisterSuperSkill(173, (_) => Lawnf.TravelAdvanced(Core.Buff1) ? 500 : 6000, (plant) =>
             {
-                var pos = plant.shadow.transform.position;
+                var pos = plant.axis.position;
                 LayerMask layermask = plant.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                 foreach (var z in array)

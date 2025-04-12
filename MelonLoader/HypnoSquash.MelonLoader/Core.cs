@@ -30,7 +30,7 @@ namespace HypnoSquash.MelonLoader
                         }
                     }
                 }
-                GameAPP.PlaySound(74);
+                GameAPP.PlaySound(74, 1);
                 ScreenShake.shakeDuration = 0.05f;
                 return false;
             }

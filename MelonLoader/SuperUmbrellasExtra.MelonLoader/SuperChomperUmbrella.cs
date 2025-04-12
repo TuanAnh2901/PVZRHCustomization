@@ -54,6 +54,7 @@ namespace SuperUmbrellasExtra.MelonLoader
                         zombie.Die(2);
                     }
                 }
+                plant.flashCountDown = 45;
                 GameAPP.PlaySound(49);
             });
             CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)170);

@@ -106,6 +106,11 @@ namespace ElectricPeaReborn.MelonLoader
             return bullet;
         }
 
+        public void Start()
+        {
+            plant.shoot = plant.gameObject.transform.FindChild("Shoot");
+        }
+
         public static int Buff { get; set; } = -1;
         public void Start()
         {

@@ -48,6 +48,7 @@ namespace SuperUmbrellasExtra.MelonLoader
                         zombie.SetMindControl();
                     }
                 }
+                plant.flashCountDown = 15;
             });
             CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)176);
             CustomCore.AddPlantAlmanacStrings(176, "魅宝石伞", "魅宝石伞能放大招魅惑周围的僵尸\n<color=#3D1400>贴图作者：@仨硝基甲苯_ @林秋AutumnLin @暗影Dev</color>\n<color=#3D1400>特点：</color><color=red>僵尸主动靠近魅宝石伞时将其魅惑，使伞扣除700血量且无法替伤，花费1000*(10+4ln(要魅惑的僵尸数+1))钱币释放大招，魅惑周围全部僵尸</color>\n<color=#3D1400>融合配方：</color><color=red>其他宝石伞+魅惑菇</color>\n<color=#3D1400>词条1：</color><color=red>彩虹伞神：当场上同时有9种宝石伞时，所有钱币花费量降为500(解锁条件：场上同时存在9种宝石伞)</color>\n<color=#3D1400>词条2：</color><color=red>保护保护伞：紫、黑、魅宝石伞触发被动时受伤大幅减少且可被替伤(解锁条件：场上存在紫、黑、魅宝石伞之一)</color>\n<color=#3D1400>据说，若有人能找到彩宝石伞最喜爱的颜色，她将短暂地从睡梦中醒来，展露自己的光辉。但她的喜好没有规律可循，就像彩虹不会为任何人停留。</color>");

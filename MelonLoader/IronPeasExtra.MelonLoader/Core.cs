@@ -20,17 +20,6 @@ namespace IronPeasExtra.MelonLoader
     public static class SuperSnowGatlingPatch
     {
         [HarmonyPostfix]
-        [HarmonyPatch("AnimShoot")]
-        public static void PostAnimShoot(ref Bullet __result)
-        {
-            if (Lawnf.TravelAdvanced(SuperIronGatling.Buff))
-            {
-                __result.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[39];
-                __result.theBulletDamage *= 6;
-            }
-        }
-
-        [HarmonyPostfix]
         [HarmonyPatch("GetBulletType")]
         public static void PostGetBulletType(SuperSnowGatling __instance, ref BulletType __result)
         {
@@ -38,22 +27,6 @@ namespace IronPeasExtra.MelonLoader
             {
                 __result = BulletType.Bullet_ironPea;
             }
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("SuperShoot")]
-        public static bool PreSuperShoot(SuperSnowGatling __instance, ref float angle, ref float speed, ref float x, ref float y)
-        {
-            if (__instance.thePlantType is (PlantType)163 && Lawnf.TravelAdvanced(SuperIronGatling.Buff))
-            {
-                var b = CreateBullet.Instance.SetBullet(x, y, __instance.thePlantRow, 11, 15);
-                b.transform.Rotate(0, 0, angle);
-                b.normalSpeed = speed;
-                b.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[39];
-                b.theBulletDamage *= 6;
-                return false;
-            }
-            return true;
         }
     }
 

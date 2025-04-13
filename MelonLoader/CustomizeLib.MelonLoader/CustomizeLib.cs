@@ -389,12 +389,12 @@ namespace CustomizeLib
                 if (travelBuff.theBuffType is (int)BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
                 }
                 if (travelBuff.theBuffType is (int)BuffType.UltimateBuff && CustomCore.CustomUltimateBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item3;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
                 }
             }
         }
@@ -801,8 +801,6 @@ namespace CustomizeLib
             }
         }
 
-
-        //public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab)
         public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab) where TBullet : Bullet
         {
             if (!CustomBullets.ContainsKey((BulletType)id))

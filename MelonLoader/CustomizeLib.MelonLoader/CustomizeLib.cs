@@ -228,7 +228,7 @@ namespace CustomizeLib
 
                 if (Board.Instance.theMoney < cost)
                 {
-                    InGameText.Instance.ShowText($"´óÕÐÐèÒª{cost}½ð±Ò", 5);
+                    InGameText.Instance.ShowText($"������Ҫ{cost}���", 5);
                     return false;
                 }
                 if (plant.SuperSkill())

@@ -13,7 +13,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "1.2", "Infinite75", null)]
+[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.0", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
 
@@ -27,12 +27,12 @@ namespace CustomizeLib
         public GameObject Preview { get; set; }
     }
 
-    [HarmonyPatch(typeof(AlmanacMgr))]
+    [HarmonyPatch(typeof(AlmanacPlantBank))]
     public static class AlmanacMgrPatch
     {
         [HarmonyPatch("InitNameAndInfoFromJson")]
         [HarmonyPrefix]
-        public static bool PreInitNameAndInfoFromJson(AlmanacMgr __instance)
+        public static bool PreInitNameAndInfoFromJson(AlmanacPlantBank __instance)
         {
             if (CustomCore.PlantsAlmanac.ContainsKey((PlantType)__instance.theSeedType))
             {
@@ -64,7 +64,7 @@ namespace CustomizeLib
 
         [HarmonyPatch("OnMouseDown")]
         [HarmonyPrefix]
-        public static bool PreOnMouseDown(AlmanacMgr __instance)
+        public static bool PreOnMouseDown(AlmanacPlantBank __instance)
         {
             __instance.introduce = __instance.gameObject.transform.FindChild("Info").gameObject.GetComponent<TextMeshPro>();
             __instance.pageCount = __instance.introduce.m_pageNumber * 1;
@@ -167,6 +167,8 @@ namespace CustomizeLib
             throw new ArgumentException($"Could not find {name} from {ab.name}");
         }
 
+        public static int GetTotalHealth(this Zombie zombie) => (int)zombie.theHealth + zombie.theFirstArmorHealth + zombie.theSecondArmorHealth;
+
         public static bool ObjectExist<T>(this Board board) => board.GameObject().transform.GetComponentsInChildren<T>().Length > 0;
     }
 
@@ -179,11 +181,13 @@ namespace CustomizeLib
         {
             foreach (var plant in CustomCore.CustomPlants)
             {
-                GameAPP.plantPrefab[(int)plant.Key] = plant.Value.Prefab;
-                GameAPP.plantPrefab[(int)plant.Key].tag = "Plant";
+                GameAPP.resourcesManager.plantPrefabs[plant.Key] = plant.Value.Prefab;
+                GameAPP.resourcesManager.plantPrefabs[plant.Key].tag = "Plant";
+                GameAPP.resourcesManager.allPlants.Add(plant.Key);
                 PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;
-                GameAPP.prePlantPrefab[(int)plant.Key] = plant.Value.Preview;
-                GameAPP.prePlantPrefab[(int)plant.Key].tag = "Preview";
+                PlantDataLoader.plantDatas.Add(plant.Key, plant.Value.PlantData);
+                GameAPP.resourcesManager.plantPreviews[plant.Key] = plant.Value.Preview;
+                GameAPP.resourcesManager.plantPreviews[plant.Key].tag = "Preview";
             }
             Il2CppSystem.Array array = MixData.data.Cast<Il2CppSystem.Array>();
             foreach (var f in CustomCore.CustomFusions)
@@ -197,11 +201,14 @@ namespace CustomizeLib
             }
             foreach (var bullet in CustomCore.CustomBullets)
             {
-                GameAPP.bulletPrefab[(int)bullet.Key] = bullet.Value;
+                GameAPP.resourcesManager.bulletPrefabs[bullet.Key] = bullet.Value;
+                GameAPP.resourcesManager.allBullets.Add(bullet.Key);
             }
             foreach (var par in CustomCore.CustomParticles)
             {
                 GameAPP.particlePrefab[par.Key] = par.Value;
+                GameAPP.resourcesManager.particlePrefabs[(ParticleType)par.Key] = par.Value;
+                GameAPP.resourcesManager.allParticles.Add((ParticleType)par.Key);
             }
             foreach (var spr in CustomCore.CustomSprites)
             {
@@ -384,12 +391,12 @@ namespace CustomizeLib
                 if (travelBuff.theBuffType is (int)BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
                 }
                 if (travelBuff.theBuffType is (int)BuffType.UltimateBuff && CustomCore.CustomUltimateBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item3;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
                 }
             }
         }
@@ -507,18 +514,6 @@ namespace CustomizeLib
         public static bool PreIsCaltrop(ref PlantType theSeedType, ref bool __result)
         {
             if (CustomCore.TypeMgrExtra.IsCaltrop.Contains(theSeedType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("IsCustomPlant")]
-        public static bool PreIsCustomPlant(ref PlantType theSeedType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.IsCustomPlant.Contains(theSeedType))
             {
                 __result = true;
                 return false;
@@ -808,13 +803,26 @@ namespace CustomizeLib
             }
         }
 
-
-        public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab)
+        public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab) where TBullet : Bullet
         {
-            if (!CustomBullets.ContainsKey((BulletType)id) && !CreateBullet.BulletTypeMap.ContainsKey((BulletType)id))
+            if (!CustomBullets.ContainsKey((BulletType)id))
             {
+                bulletPrefab.AddComponent<TBullet>().theBulletType = (BulletType)id;
                 CustomBullets.Add((BulletType)id, bulletPrefab);
-                CreateBullet.BulletTypeMap.Add((BulletType)id, Il2CppType.Of<TBullet>());
+            }
+            else
+            {
+                MelonLogger.Error($"Duplicate Bullet ID: {id}");
+            }
+        }
+
+        public static void RegisterCustomBullet<TBase, TBullet>(int id, GameObject bulletPrefab) where TBase : Bullet where TBullet : MonoBehaviour
+        {
+            if (!CustomBullets.ContainsKey((BulletType)id))
+            {
+                bulletPrefab.AddComponent<TBase>().theBulletType = (BulletType)id;
+                bulletPrefab.AddComponent<TBullet>();
+                CustomBullets.Add((BulletType)id, bulletPrefab);
             }
             else
             {

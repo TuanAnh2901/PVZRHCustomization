@@ -3,6 +3,7 @@ using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using ObsidianDollZombie.MelonLoader;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [assembly: MelonInfo(typeof(Core), "ObsidianDollZombie", "1.0", "Infinite75", null)]
@@ -46,24 +47,27 @@ namespace ObsidianDollZombie.MelonLoader
         [HarmonyPrefix]
         public static bool PreFirstArmorFall(DollZombie __instance)
         {
-            if (__instance.theZombieType is (ZombieType)99)
+            if (__instance.theZombieType is (ZombieType)99 && __instance is not null && !__instance.IsDestroyed())
             {
-                Vector3 position = __instance.shadow.transform.position;
+                if (__instance.axis is not null && __instance.theFirstArmor is not null)
+                {
+                    Vector3 position = __instance.axis.position;
 
-                if (!__instance.isMindControlled)
-                {
-                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
+                    if (!__instance.isMindControlled)
+                    {
+                        CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                        CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                        CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                    }
+                    else
+                    {
+                        CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                        CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                        CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                    }
+                    UnityEngine.Object.Instantiate(GameAPP.particlePrefab[11], new Vector3(__instance.transform.position.x, position.y + 1f, 0f), Quaternion.identity).transform.SetParent(GameAPP.board.transform);
                 }
-                else
-                {
-                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                }
-                UnityEngine.Object.Instantiate(GameAPP.particlePrefab[11], new Vector3(__instance.transform.position.x, position.y + 1f, 0f), Quaternion.identity).transform.SetParent(GameAPP.board.transform);
-                __instance.Die(2);
+                __instance.Die();
                 return false;
             }
             return true;
@@ -125,6 +129,9 @@ namespace ObsidianDollZombie.MelonLoader
             return true;
         }
 
+        [HarmonyPatch("SetCold")]
+        [HarmonyPatch("SetFreeze")]
+        [HarmonyPatch("Warm")]
         [HarmonyPatch("KnockBack")]
         [HarmonyPrefix]
         public static bool PreKnockBack(Zombie __instance) => __instance.theZombieType is not (ZombieType)99;
@@ -137,12 +144,12 @@ namespace ObsidianDollZombie.MelonLoader
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "obsidiandollzombie");
             CustomCore.RegisterCustomZombie<DollZombie, ObsidianDollZombie>(99,
-                ab.GetAsset<GameObject>("ObsidianDollZombie"), 202, 50, 40000, 18000, 0);
+                ab.GetAsset<GameObject>("ObsidianDollZombie"), 202, 50, 40000, 12000, 0);
             CustomCore.RegisterCustomSprite(200, ab.GetAsset<Sprite>("ObsidianDollZombie_head2"));
             CustomCore.RegisterCustomSprite(201, ab.GetAsset<Sprite>("ObsidianDollZombie_head3"));
             CustomCore.RegisterCustomSprite(202, ab.GetAsset<Sprite>("ObsidianDollZombie_0"));
             CustomCore.RegisterCustomSprite(203, ab.GetAsset<Sprite>("ObsidianDollZombie_head1"));
-            CustomCore.AddZombieAlmanacStrings(99, "黑曜石套娃僵尸", "一个很很很很肉的路障僵尸?????(似乎对小推车有着深入研究)\n\n<color=#3D1400>头套贴图作者：@E杯芒果奶昔 @暗影Dev</color>\n<color=#3D1400>韧性：</color><color=red>18000</color>\n<color=#3D1400>特点：</color><color=red>钻石盲盒僵尸生成时有10%伴生，死亡时生成3个钻石套娃僵尸。免疫击退，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，此状态下若再次遇到小推车则将所有小推车变成黑曜石套娃僵尸</color>\n<color=#3D1400>黑曜石套娃僵尸对自己的头套十分满意。这不仅是因为在外观上无可挑剔，更是因为层层嵌套让他无懈可击。</color>");
+            CustomCore.AddZombieAlmanacStrings(99, "黑曜石套娃僵尸", "一个很很很很肉的路障僵尸?????(似乎对小推车有着深入研究)\n\n<color=#3D1400>头套贴图作者：@林秋AutumnLin @E杯芒果奶昔 @暗影Dev</color>\n<color=#3D1400>韧性：</color><color=red>12000</color>\n<color=#3D1400>特点：</color><color=red>钻石盲盒僵尸生成时有10%伴生，死亡时生成3个钻石套娃僵尸。免疫击退、冰冻、红温，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，此状态下若再次遇到小推车则将所有小推车变成黑曜石套娃僵尸</color>\n<color=#3D1400>黑曜石套娃僵尸对自己的头套十分满意。这不仅是因为在外观上无可挑剔，更是因为层层嵌套让他无懈可击。</color>");
         }
     }
 
@@ -160,7 +167,7 @@ namespace ObsidianDollZombie.MelonLoader
             if (GameAPP.theGameStatus is 0 && zombie is not null)
             {
                 zombie.theFirstArmor = gameObject.transform.FindChild("Zombie_head").GetChild(0).gameObject;
-                zombie.butterHead = zombie.theFirstArmor;
+                zombie.butterHead = gameObject.transform.FindChild("Zombie_head").gameObject;
             }
         }
 
@@ -180,6 +187,7 @@ namespace ObsidianDollZombie.MelonLoader
                         {
                             var row = mower.theMowerRow;
                             var x = m.transform.position.x;
+                            Instantiate(GameAPP.particlePrefab[11], new Vector3(m.transform.position.x, m.transform.position.y + 1f, 0f), Quaternion.identity).transform.SetParent(GameAPP.board.transform);
                             mower.Die();
                             Destroy(mower.gameObject);
                             CreateZombie.Instance.SetZombie(row, (ZombieType)99, x);
@@ -193,6 +201,14 @@ namespace ObsidianDollZombie.MelonLoader
         public void Start()
         {
             zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
+        }
+
+        public void Update()
+        {
+            if (zombie is not null && zombie.beforeDying)
+            {
+                Destroy(gameObject);
+            }
         }
 
         public bool HasMower { get; set; } = false;

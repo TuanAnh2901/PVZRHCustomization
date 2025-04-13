@@ -53,8 +53,28 @@ namespace ObsidianRandomZombie.MelonLoader
         {
             if (__instance.theZombieType is (ZombieType)98)
             {
-                Vector3 position = __instance.shadow.transform.position;
-                List<int> ids = [212, 218, 219, 220, 221, 222, 223, 224];
+                Vector3 position = __instance.axis.position;
+                List<int> ids = [];
+                if (Lawnf.TravelDebuff(ObsidianRandomZombie.Debuff))
+                {
+                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    {
+                        if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.zombiePrefab[i] is not null)
+                        {
+                            ids.Add(i);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    {
+                        if (GameAPP.zombiePrefab[i] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
+                        {
+                            ids.Add(i);
+                        }
+                    }
+                }
                 if (!__instance.isMindControlled)
                 {
                     __result = CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)ids[UnityEngine.Random.RandomRangeInt(0, ids.Count)], __instance.transform.position.x);
@@ -71,6 +91,33 @@ namespace ObsidianRandomZombie.MelonLoader
         }
     }
 
+    [HarmonyPatch(typeof(Mower))]
+    public static class MowerPatch
+    {
+        [HarmonyPatch("OnTriggerStay2D")]
+        [HarmonyPrefix]
+        public static bool PreOnTriggerStay2D(Mower __instance, ref Collider2D collision)
+        {
+            GameObject gameObject = collision.gameObject;
+            if (gameObject.CompareTag("Zombie") && gameObject.TryGetComponent<ObsidianRandomZombie>(out var z) && z.zombie is not null
+                && z.zombie.theZombieRow == __instance.theMowerRow && !z.zombie.isMindControlled)
+            {
+                if (!z.HasMower)
+                {
+                    GameObject mower = __instance.gameObject;
+                    UnityEngine.Object.Destroy(mower.GetComponent<BoxCollider2D>());
+                    UnityEngine.Object.Destroy(mower.GetComponent<Animator>());
+                    UnityEngine.Object.Destroy(mower.GetComponent<Mower>());
+                    mower.transform.SetParent(z.gameObject.transform.FindChild("Zombie_innerarm_hand"));
+                    mower.transform.localPosition = new(-0.8f, -1.6f);
+                    mower.layer = mower.transform.parent.gameObject.layer;
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
     [HarmonyPatch(typeof(Zombie))]
     public static class ZombiePatch
     {
@@ -78,12 +125,36 @@ namespace ObsidianRandomZombie.MelonLoader
         [HarmonyPostfix]
         public static void PostStart(Zombie __instance)
         {
-            if (__instance.TryCast<UltimateGargantuar>() is not null && UnityEngine.Random.RandomRangeInt(0, 2) == 1)
+            if (__instance.TryCast<UltimateGargantuar>() is not null)
             {
-                CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)98, __instance.transform.position.x);
+                if (__instance.isMindControlled)
+                {
+                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)98, __instance.transform.position.x);
+                }
+                else
+                {
+                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)98, __instance.transform.position.x);
+                }
             }
         }
 
+        [HarmonyPatch("AttackEffect")]
+        [HarmonyPrefix]
+        public static bool PreAttackEffect(Zombie __instance, ref Plant plant)
+        {
+            if (__instance.theZombieType is (ZombieType)99 && __instance.gameObject.TryGetComponent<ObsidianRandomZombie>(out var z)
+                && !__instance.isMindControlled && z.HasMower)
+            {
+                plant.Die();
+                return false;
+            }
+
+            return true;
+        }
+
+        [HarmonyPatch("SetCold")]
+        [HarmonyPatch("SetFreeze")]
+        [HarmonyPatch("Warm")]
         [HarmonyPatch("KnockBack")]
         [HarmonyPrefix]
         public static bool PreKnockBack(Zombie __instance) => __instance.theZombieType is not (ZombieType)98;
@@ -106,12 +177,13 @@ namespace ObsidianRandomZombie.MelonLoader
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "obsidianrandomzombie");
             CustomCore.RegisterCustomZombie<DiamondRandomZombie, ObsidianRandomZombie>(98,
-                ab.GetAsset<GameObject>("ObsidianRandomZombie"), 206, 50, 40000, 4500, 0);
+                ab.GetAsset<GameObject>("ObsidianRandomZombie"), 206, 50, 40000, 12000, 0);
             CustomCore.RegisterCustomSprite(204, ab.GetAsset<Sprite>("ObsidianRandomZombie_head2"));
             CustomCore.RegisterCustomSprite(205, ab.GetAsset<Sprite>("ObsidianRandomZombie_head3"));
             CustomCore.RegisterCustomSprite(206, ab.GetAsset<Sprite>("ObsidianRandomZombie_0"));
             CustomCore.RegisterCustomSprite(207, ab.GetAsset<Sprite>("ObsidianRandomZombie_head1"));
-            CustomCore.AddZombieAlmanacStrings(98, "黑曜石盲盒僵尸", "?????!!!!!\n\n<color=#3D1400>头套贴图作者：@林秋AutumnLin @暗影Dev</color>\n<color=#3D1400>韧性：</color><color=red>4500</color>\n<color=#3D1400>特点：</color><color=red>究极黑曜石巨人生成时有50%概率伴生。免疫击退，每隔一段时间自动换行，受到攻击时扣除与减伤前伤害等量钱币，究极机械保龄球替伤无效，死亡时变成随机领袖僵尸</color>\n<color=#3D1400>“小植物们，快来看我的另一个新发明，黑曜石盲盒，看起来很棒对不对，我觉得非常好，他不但无比坚硬，还很看运气。不过有也给了一个小小的礼物，让你一定玩的「开心」，还有，不要再用大嘴花解决我的发明了！！“ \n(埃德加博士留的)</color>");
+            ObsidianRandomZombie.Debuff = CustomCore.RegisterCustomBuff("黑曜石盲盒僵尸只开出领袖僵尸", BuffType.Debuff, () => true, 0);
+            CustomCore.AddZombieAlmanacStrings(98, "黑曜石盲盒僵尸", "?????!!!!!\n\n<color=#3D1400>头套贴图作者：@林秋AutumnLin @E杯芒果奶昔 @暗影Dev</color>\n<color=#3D1400>韧性：</color><color=red>12000</color>\n<color=#3D1400>特点：</color><color=red>究极黑曜石巨人生成时伴生。免疫击退、冰冻、红温，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，受到攻击时扣除与减伤前伤害等量钱币，究极机械保龄球替伤无效，死亡时变成随机非领袖僵尸</color>\n<color=#3D1400>词条：</color><color=red>黑曜石盲盒僵尸只开出领袖僵尸</color>\n<color=#3D1400>“小植物们，快来看我的另一个新发明，黑曜石盲盒，看起来很棒对不对，我觉得非常好，他不但无比坚硬，还很看运气。不过有也给了一个小小的礼物，让你一定玩的「开心」，还有，不要再用大嘴花解决我的发明了！！“ \n(埃德加博士留的)</color>");
         }
     }
 
@@ -130,30 +202,7 @@ namespace ObsidianRandomZombie.MelonLoader
             {
                 zombie.theFirstArmor = gameObject.transform.FindChild("Zombie_head").GetChild(0).gameObject;
                 zombie.butterHead = zombie.theFirstArmor;
-                MelonCoroutines.Start(ChangeRoad());
             }
-        }
-
-        [HideFromIl2Cpp]
-        public IEnumerator ChangeRoad()
-        {
-            do
-            {
-                yield return new WaitForSeconds(3);
-                try
-                {
-                    if (Board.Instance is not null && zombie is not null && !zombie.isPreview && gameObject is not null
-                        && !gameObject.IsDestroyed() && zombie is not null)
-                    {
-                        zombie.Garliced();
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                catch { break; }
-            } while (Board.Instance is not null && zombie is not null && zombie.isActiveAndEnabled);
         }
 
         public void Start()
@@ -162,6 +211,8 @@ namespace ObsidianRandomZombie.MelonLoader
             zombie.theZombieType = (ZombieType)98;
         }
 
+        public static int Debuff { get; set; } = -1;
+        public bool HasMower { get; set; } = false;
         public DiamondRandomZombie? zombie => gameObject.TryGetComponent<DiamondRandomZombie>(out var z) ? z : null;
     }
 }

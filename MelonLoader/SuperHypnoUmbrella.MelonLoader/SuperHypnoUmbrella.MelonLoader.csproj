@@ -12,11 +12,6 @@
 		<None Remove="superdiamondnut" />
 		<None Remove="superdoomsqualour" />
 		<None Remove="superhypnodoomsqualour" />
-		<None Remove="superhypnoumbrella" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="superhypnoumbrella" />
 	</ItemGroup>
 
 	<ItemGroup>

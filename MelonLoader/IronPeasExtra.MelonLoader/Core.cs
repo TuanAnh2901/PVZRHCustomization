@@ -21,11 +21,11 @@ namespace IronPeasExtra.MelonLoader
     {
         [HarmonyPostfix]
         [HarmonyPatch("GetBulletType")]
-        public static void PostGetBulletType(SuperSnowGatling __instance, ref int __result)
+        public static void PostGetBulletType(SuperSnowGatling __instance, ref BulletType __result)
         {
             if (__instance.thePlantType is (PlantType)163)
             {
-                __result = 11;
+                __result = BulletType.Bullet_ironPea;
             }
         }
     }
@@ -47,7 +47,7 @@ namespace IronPeasExtra.MelonLoader
 
         public void AnimShooting()
         {
-            if (plant.thePlantType is (PlantType)300)
+            if (plant.thePlantType is (PlantType)301)
             {
                 if (plant.theStatus is not PlantStatus.BigGatling_raised) return;
                 var pos = plant.shoot.transform.position;
@@ -79,16 +79,16 @@ namespace IronPeasExtra.MelonLoader
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "ironpeas");
-            CustomCore.RegisterCustomPlant<BigGatling, BigIronGatlingPea>(300, ab.GetAsset<GameObject>("BigIronGatlingPeaPrefab"),
+            CustomCore.RegisterCustomPlant<BigGatling, BigIronGatlingPea>(301, ab.GetAsset<GameObject>("BigIronGatlingPeaPrefab"),
                 ab.GetAsset<GameObject>("BigIronGatlingPeaPreview"), [], 0.3f, 0, 80, 2500, 15, 1000);
-            CustomCore.RegisterCustomPlant<SuperSnowGatling, SuperIronGatling>(963, ab.GetAsset<GameObject>("SuperIronGatlingPrefab"),
+            CustomCore.RegisterCustomPlant<SuperSnowGatling, SuperIronGatling>(163, ab.GetAsset<GameObject>("SuperIronGatlingPrefab"),
                 ab.GetAsset<GameObject>("SuperIronGatlingPreview"), [(1008, 1020), (1020, 1008)], 0.1f, 0, 150, 400000, 1, 800);
             CustomCore.RegisterCustomUseItemOnPlantEvent(PlantType.BigGatling, BucketType.Bucket, (PlantType)1900);
-            CustomCore.RegisterCustomPlantClickEvent(963, SuperIronGatling.SummonSuperDoomSqualour);
-            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Machine, SuperIronGatling.Shooter);
+            CustomCore.RegisterCustomPlantClickEvent(163, SuperIronGatling.SummonSuperDoomSqualour);
+            CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)163, BucketType.Machine, SuperIronGatling.Shooter);
             //CustomCore.RegisterCustomUseItemOnPlantEvent((PlantType)963, BucketType.Machine, SuperIronGatling.RedIronPeaPatch);
             //CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)1900);
-            CustomCore.AddFusion(963, 1008, 1008);
+            CustomCore.AddFusion(163, 1008, 1008);
             Bullet bullet = new Bullet();
             SpriteRenderer component = bullet.GetComponent<SpriteRenderer>();
             Sprite sprite = GameAPP.spritePrefab[39];
@@ -96,12 +96,12 @@ namespace IronPeasExtra.MelonLoader
             bullet.theBulletDamage = (int)((ulong)320L);
             bullet.GetComponent<Bullet>().isHot = true;
             CustomCore.AddPlantAlmanacStrings(1900, "铁桶机枪豌豆炮台", "会发射铁豌豆的巨型豌豆炮台\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>巨型豌豆炮台+铁桶</color>\n<color=#3D1400>铁桶机枪豌豆炮台认为，身上的每一处缺口，每一道磨痕，都象征着一场艰苦的战斗。每一次打磨，都是为了在下一场战斗中更加无坚不摧。</color>");
-            CustomCore.AddPlantAlmanacStrings(963, "超级铁豌豆机枪", "会发射铁豌豆的超级机枪射手\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>超级机枪射手+铁豌豆</color>\n<color=#3D1400>超级铁豌豆机枪站在前线，像一支军队般横扫着战场上的敌人。僵尸们或许以为自己能冲破防线，但很快就会发现，面对钢铁子弹的洪流，他们毫无胜算。</color>");
+            CustomCore.AddPlantAlmanacStrings(163, "超级铁豌豆机枪", "会发射铁豌豆的超级机枪射手\n<color=#3D1400>贴图作者：@屑红leong</color>\n<color=#3D1400>伤害：</color><color=red>80</color>\n<color=#3D1400>融合配方：</color><color=red>超级机枪射手+铁豌豆</color>\n<color=#3D1400>超级铁豌豆机枪站在前线，像一支军队般横扫着战场上的敌人。僵尸们或许以为自己能冲破防线，但很快就会发现，面对钢铁子弹的洪流，他们毫无胜算。</color>");
         }
     }
 
     [RegisterTypeInIl2Cpp]
-    public class SuperIronGatling : MonoBehaviour //963
+    public class SuperIronGatling : MonoBehaviour //163
     {
         public SuperIronGatling() : base(ClassInjector.DerivedConstructorPointer<SuperIronGatling>()) => ClassInjector.DerivedConstructorBody(this);
 

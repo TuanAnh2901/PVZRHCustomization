@@ -23,8 +23,8 @@ namespace CherryPeaChomper.MelonLoader
         public Bullet AnimShooting()
         {
             Vector3 position = plant.shoot.transform.position;
-            Bullet bullet = Board.Instance.GetComponent<CreateBullet>().SetBullet((float)(position.x + 0.1f), position.y, plant.thePlantRow, 3, 0);
-            bullet.theBulletDamage = plant.attackDamage;
+            Bullet bullet = Board.Instance.GetComponent<CreateBullet>().SetBullet((float)(position.x + 0.1f), position.y, plant.thePlantRow, BulletType.Bullet_cherry, 0);
+            bullet.Damage = plant.attackDamage;
             return bullet;
         }
 
@@ -42,10 +42,10 @@ namespace CherryPeaChomper.MelonLoader
             plant.thePlantMaxHealth += plant.thePlantHealth / 5;
             plant.Recover(plant.thePlantMaxHealth);
             var pos = plant.shoot.transform.position;
-            CreateBullet.Instance.SetBullet(pos.x - 5, pos.y, plant.thePlantRow, 24, 0).theBulletDamage = 99999;
+            CreateBullet.Instance.SetBullet(pos.x - 5, pos.y, plant.thePlantRow, BulletType.Bullet_doom, 0).Damage = 99999;
             if (gameObject is not null)
             {
-                Vector3 position = gameObject.GetComponent<Plant>().shadow.transform.position;
+                Vector3 position = gameObject.GetComponent<Plant>().axis.transform.position;
                 Instantiate(GameAPP.particlePrefab[11], position + new Vector3(0f, 0.5f, 0f), Quaternion.identity, plant.board.transform);
             }
         }

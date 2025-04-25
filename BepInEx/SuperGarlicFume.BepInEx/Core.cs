@@ -61,7 +61,7 @@ namespace SuperGarlicFume.BepInEx
             plant.zombieList.Clear();
             foreach (var z in Board.Instance.zombieArray)
             {
-                if (z is not null && !z.IsDestroyed() && !z.isMindControlled && !TypeMgr.IsAirZombie(z.theZombieType) && z.theZombieRow == plant.thePlantRow && z.shadow.transform.position.x > plant.shadow.transform.position.x)
+                if (z is not null && !z.IsDestroyed() && !z.isMindControlled && !TypeMgr.IsAirZombie(z.theZombieType) && z.theZombieRow == plant.thePlantRow && z.axis.position.x > plant.axis.position.x)
                 {
                     plant.zombieList.Add(z);
                 }

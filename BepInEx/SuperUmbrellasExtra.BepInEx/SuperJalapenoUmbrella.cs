@@ -27,7 +27,7 @@ namespace SuperUmbrellasExtra.BepInEx
               3, 0, 100, 4000, 60f, 1400);
             CustomCore.RegisterSuperSkill(174, (_) => 7000, (plant) =>
             {
-                var pos = plant.shadow.transform.position;
+                var pos = plant.axis.position;
                 LayerMask layermask = plant.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                 foreach (var z in array)

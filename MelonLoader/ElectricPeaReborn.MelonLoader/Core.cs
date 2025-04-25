@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using Unity.VisualScripting;

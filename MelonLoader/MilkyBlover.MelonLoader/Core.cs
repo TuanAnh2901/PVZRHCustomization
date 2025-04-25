@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
@@ -36,32 +36,38 @@ namespace MilkyBlover.MelonLoader
         {
             try
             {
-                var slot = GameObject.Find("CustomPeashooter");
-                if (slot.transform.GetChildCount() > 0)
-                {
-                    for (int i = 0; i < slot.transform.GetChildCount(); i++)
-                    {
-                        UnityEngine.Object.Destroy(slot.transform.GetChild(i).gameObject);
-                    }
-                }
                 var template = GameObject.Find("Blover");
-                var cardBg = template.transform.GetChild(0).gameObject;
-                var mkbBg = UnityEngine.Object.Instantiate(cardBg, slot.transform);
+                var card = UnityEngine.Object.Instantiate(template, template.transform.parent.parent.GetChild(1));
+                var mkbBg = card.transform.GetChild(0).gameObject;
                 Lawnf.ChangeCardSprite((PlantType)169, mkbBg);
                 mkbBg.GetComponent<Image>().sprite = GameAPP.spritePrefab[208];
                 mkbBg.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = PlantDataLoader.plantData[169].field_Public_Int32_1.ToString();
                 if (Board.Instance is not null && (Board.Instance.boardTag.enableTravelPlant || Board.Instance.boardTag.enableAllTravelPlant || GameAPP.developerMode))
                 {
-                    var card = template.transform.GetChild(2).gameObject;
+                    var mkb1 = card.transform.GetChild(2).gameObject;
+                    Lawnf.ChangeCardSprite((PlantType)169, mkb1);
+                    mkb1.GetComponent<Image>().sprite = GameAPP.spritePrefab[208];
+                    mkb1.GetComponent<CardUI>().parent = card;
+                    mkb1.GetComponent<CardUI>().CD = PlantDataLoader.plantData[169].field_Public_Single_2;
+                    mkb1.GetComponent<CardUI>().theSeedCost = PlantDataLoader.plantData[169].field_Public_Int32_1;
+                    mkb1.GetComponent<CardUI>().thePlantType = (PlantType)169;
+                    mkb1.GetComponent<CardUI>().theZombieType = (ZombieType)169;
+                    InGameUI.Instance.cards.Add(mkb1.GetComponent<CardUI>());
 
-                    var mkb = UnityEngine.Object.Instantiate(card, slot.transform);
-                    Lawnf.ChangeCardSprite((PlantType)169, mkb);
-                    mkb.GetComponent<Image>().sprite = GameAPP.spritePrefab[208];
-                    mkb.GetComponent<CardUI>().parent = slot;
-                    mkb.GetComponent<CardUI>().CD = PlantDataLoader.plantData[169].field_Public_Single_2;
-                    mkb.GetComponent<CardUI>().theSeedCost = PlantDataLoader.plantData[169].field_Public_Int32_1;
-                    mkb.GetComponent<CardUI>().thePlantType = (PlantType)169;
-                    mkb.GetComponent<CardUI>().theZombieType = (ZombieType)169;
+                    var mkb2 = card.transform.GetChild(1).gameObject;
+                    Lawnf.ChangeCardSprite((PlantType)169, mkb2);
+                    mkb2.GetComponent<Image>().sprite = GameAPP.spritePrefab[208];
+                    mkb2.GetComponent<CardUI>().parent = card;
+                    mkb2.GetComponent<CardUI>().CD = PlantDataLoader.plantData[169].field_Public_Single_2;
+                    mkb2.GetComponent<CardUI>().theSeedCost = PlantDataLoader.plantData[169].field_Public_Int32_1;
+                    mkb2.GetComponent<CardUI>().thePlantType = (PlantType)169;
+                    mkb2.GetComponent<CardUI>().theZombieType = (ZombieType)169;
+                    InGameUI.Instance.cards.Add(mkb2.GetComponent<CardUI>());
+                }
+                else
+                {
+                    UnityEngine.Object.Destroy(card.transform.GetChild(1).gameObject);
+                    UnityEngine.Object.Destroy(card.transform.GetChild(2).gameObject);
                 }
             }
             catch { }

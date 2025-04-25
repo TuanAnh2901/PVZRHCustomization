@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using IceMelonCannon.MelonLoader;
 using Il2Cpp;

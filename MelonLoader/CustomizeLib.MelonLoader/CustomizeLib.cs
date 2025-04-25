@@ -1,4 +1,4 @@
-using CustomizeLib;
+using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppTMPro;
@@ -8,11 +8,11 @@ using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.0", "Infinite75", null)]
+[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.4.2-2.1", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
 
-namespace CustomizeLib
+namespace CustomizeLib.MelonLoader
 {
     public struct CustomPlantData
     {
@@ -191,8 +191,9 @@ namespace CustomizeLib
             }
             foreach (var z in CustomCore.CustomZombies)
             {
-                GameAPP.zombiePrefab[z.Key] = z.Value.Item1;
-                GameAPP.zombiePrefab[z.Key].tag = "Zombie";
+                GameAPP.resourcesManager.allZombieTypes.Add((ZombieType)z.Key);
+                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key] = z.Value.Item1;
+                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key].tag = "Zombie";
             }
             foreach (var bullet in CustomCore.CustomBullets)
             {
@@ -307,12 +308,13 @@ namespace CustomizeLib
         }
     }
 
-    [HarmonyPatch(typeof(TravelMenuMgr))]
+    /*
+    [HarmonyPatch(typeof(TravelBuffMenu))]
     public static class TravelMenuMgrPatch
     {
         [HarmonyPostfix]
         [HarmonyPatch("SetText")]
-        public static void PostSetText(TravelMenuMgr __instance)
+        public static void PostSetText(TravelBuffMenu __instance)
         {
             for (int i = 0; i < 3; i++)
             {
@@ -329,6 +331,7 @@ namespace CustomizeLib
             }
         }
     }
+    */
 
     [HarmonyPatch(typeof(TravelMgr))]
     public static class TravelMgrPatch

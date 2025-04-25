@@ -46,19 +46,19 @@ namespace ObsidianDollZombie.MelonLoader
         {
             if (__instance.theZombieType is (ZombieType)99)
             {
-                Vector3 position = __instance.shadow.transform.position;
+                Vector3 position = __instance.axis.position;
 
                 if (!__instance.isMindControlled)
                 {
-                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
+                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                    CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
                 }
                 else
                 {
-                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
-                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.shadow.transform.position.x, false);
+                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
+                    CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)21, __instance.axis.position.x, false);
                 }
                 UnityEngine.Object.Instantiate(GameAPP.particlePrefab[11], new Vector3(__instance.transform.position.x, position.y + 1f, 0f), Quaternion.identity).transform.SetParent(GameAPP.board.transform);
                 __instance.Die(2);

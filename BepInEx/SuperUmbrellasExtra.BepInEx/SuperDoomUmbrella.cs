@@ -43,7 +43,7 @@ namespace SuperUmbrellasExtra.BepInEx
                 else
                 {
                     __instance.thePlantHealth -= 700;
-                    __instance.UpdateHealthText();
+                    __instance.UpdateText();
                 }
                 zombie.KnockBack(1.5f * (__instance.UmbrellaPot is not null ? 2 : 1));
                 return false;

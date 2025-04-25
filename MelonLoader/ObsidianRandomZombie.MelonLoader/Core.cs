@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime.Attributes;
@@ -57,9 +57,9 @@ namespace ObsidianRandomZombie.MelonLoader
                 List<int> ids = [];
                 if (Lawnf.TravelDebuff(ObsidianRandomZombie.Debuff))
                 {
-                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.zombiePrefabs.Count; i++)
                     {
-                        if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.zombiePrefab[i] is not null)
+                        if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null)
                         {
                             ids.Add(i);
                         }
@@ -67,9 +67,9 @@ namespace ObsidianRandomZombie.MelonLoader
                 }
                 else
                 {
-                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.zombiePrefabs.Count; i++)
                     {
-                        if (GameAPP.zombiePrefab[i] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
+                        if (GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
                         {
                             ids.Add(i);
                         }

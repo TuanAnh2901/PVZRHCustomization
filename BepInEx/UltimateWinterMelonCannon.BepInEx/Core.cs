@@ -8,14 +8,14 @@ using BepInEx.Unity.IL2CPP;
 
 namespace UltimateWinterMelonCannon.BepInEx
 {
-    [HarmonyPatch(typeof(LittleGoldCannonBullet))]
-    public static class LittleGoldCannonBulletPatch
+    [HarmonyPatch(typeof(Bullet_cannon))]
+    public static class Bullet_cannonPatch
     {
         [HarmonyPrefix]
         [HarmonyPatch("HitLand")]
-        public static bool PreHitLand(LittleGoldCannonBullet __instance)
+        public static bool PreHitLand(Bullet_cannon __instance)
         {
-            if (__instance.theBulletType == UltimateWinterMelonCannon.BulletId)
+            if (__instance.theBulletType == (BulletType)UltimateWinterMelonCannon.BulletId)
             {
                 CreateParticle.SetParticle(200, new(__instance.cannonPos.x, __instance.cannonPos.y), __instance.theBulletRow);
                 var pos = __instance.transform.position;
@@ -25,7 +25,7 @@ namespace UltimateWinterMelonCannon.BepInEx
                 {
                     if (z is not null && z.gameObject.TryGetComponent<Zombie>(out var zombie) && !zombie.isMindControlled)
                     {
-                        zombie.TakeDamage(DmgType.IceAll, __instance.theBulletDamage * (Lawnf.TravelUltimate(14) ? 3 : 1));
+                        zombie.TakeDamage(DmgType.IceAll, __instance.Damage * (Lawnf.TravelUltimate(14) ? 3 : 1));
                         zombie.SetFreeze(10);
                         zombie.AddfreezeLevel(400);
                         zombie.SetCold(30);
@@ -59,7 +59,7 @@ namespace UltimateWinterMelonCannon.BepInEx
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "ultimatewintermeloncannon");
             CustomCore.RegisterCustomPlant<MelonCannon, UltimateWinterMelonCannon>(168, ab.GetAsset<GameObject>("UltimateWinterMelonCannonPrefab"),
                 ab.GetAsset<GameObject>("UltimateWinterMelonCannonPreview"), [(915, 32)], 24, 24, 450, 1000, 60f, 1200);
-            CustomCore.RegisterCustomBullet<LittleGoldCannonBullet>(UltimateWinterMelonCannon.BulletId, ab.GetAsset<GameObject>("ProjectileCannon_UltimateWinterMelon"));
+            CustomCore.RegisterCustomBullet<Bullet_melonCannon>(UltimateWinterMelonCannon.BulletId, ab.GetAsset<GameObject>("ProjectileCannon_UltimateWinterMelon"));
             CustomCore.RegisterCustomParticle(200, ab.GetAsset<GameObject>("CannonUltimateWinterMelonSplat"));
             CustomCore.TypeMgrExtra.IsIcePlant.Add((PlantType)168);
             CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)168);
@@ -82,14 +82,14 @@ namespace UltimateWinterMelonCannon.BepInEx
         {
             GameAPP.PlaySound(4, 1.0f);
             var RowFromY = Mouse.Instance.GetRowFromY(plant.target.x, plant.target.y);
-            var bullet = plant.board.GetComponent<CreateBullet>().SetBullet(plant.shoot.transform.position.x, plant.shoot.transform.position.y, RowFromY, BulletId, 14);
+            var bullet = plant.board.GetComponent<CreateBullet>().SetBullet(plant.shoot.transform.position.x, plant.shoot.transform.position.y, RowFromY, (BulletType)BulletId, 14);
             var pos2 = bullet.cannonPos;
             pos2.x = plant.target.x;
             pos2.y = plant.target.y;
             bullet.cannonPos = pos2;
             bullet.rb.velocity = new(1.5f, 0);
-            bullet.specitalType = BulletStatus.GoldMelon_cannon;
-            bullet.theBulletDamage = plant.attackDamage;
+            bullet.bulletStatus = BulletStatus.GoldMelon_cannon;
+            bullet.Damage = plant.attackDamage;
         }
 
         public void Awake()
@@ -108,7 +108,8 @@ namespace UltimateWinterMelonCannon.BepInEx
 
         public static int Buff1 { get; set; } = -1;
         public static int Buff2 { get; set; } = -1;
-        public static int BulletId { get; set; } = 126;
+
+        public static int BulletId { get; set; } = 901;
 
         public MelonCannon plant => gameObject.GetComponent<MelonCannon>();
     }

@@ -49,13 +49,13 @@ namespace ObsidianRandomZombie.BepInEx
         {
             if (__instance.theZombieType is (ZombieType)98)
             {
-                Vector3 position = __instance.shadow.transform.position;
+                Vector3 position = __instance.axis.position;
                 List<int> ids = [];
                 if (Lawnf.TravelDebuff(ObsidianRandomZombie.Debuff))
                 {
-                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.zombiePrefabs.Count; i++)
                     {
-                        if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.zombiePrefab[i] is not null)
+                        if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null)
                         {
                             ids.Add(i);
                         }
@@ -63,9 +63,9 @@ namespace ObsidianRandomZombie.BepInEx
                 }
                 else
                 {
-                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.zombiePrefabs.Count; i++)
                     {
-                        if (GameAPP.zombiePrefab[i] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
+                        if (GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
                         {
                             ids.Add(i);
                         }

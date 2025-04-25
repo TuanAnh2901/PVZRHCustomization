@@ -24,6 +24,11 @@ namespace IronPeasExtra.BepInEx
 
     public class BigIronGatlingPea : MonoBehaviour
     {
+        // Counter for bullets created
+        private int bulletCounter = 0;
+        // Threshold for creating a zombie
+        private const int ZOMBIE_CREATION_THRESHOLD = 30;
+
         public BigIronGatlingPea() : base(ClassInjector.DerivedConstructorPointer<BigIronGatlingPea>()) => ClassInjector.DerivedConstructorBody(this);
 
         public BigIronGatlingPea(IntPtr i) : base(i)
@@ -42,9 +47,34 @@ namespace IronPeasExtra.BepInEx
             {
                 if (plant.theStatus is not PlantStatus.BigGatling_raised) return;
                 var pos = plant.shoot.transform.position;
+
+                // Create bullets
                 CreateBullet.Instance.SetBullet(pos.x, pos.y - 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = plant.attackDamage;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y - 0.2f, plant.thePlantRow, 11, 0).theBulletDamage = plant.attackDamage;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y - 0.1f, plant.thePlantRow, 11, 0).theBulletDamage = plant.attackDamage;
                 CreateBullet.Instance.SetBullet(pos.x, pos.y, plant.thePlantRow, 11, 0).theBulletDamage = plant.attackDamage;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.1f, plant.thePlantRow, 11, 0).theBulletDamage = plant.attackDamage;
+                CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.2f, plant.thePlantRow, 11, 0).theBulletDamage = plant.attackDamage;
                 CreateBullet.Instance.SetBullet(pos.x, pos.y + 0.3f, plant.thePlantRow, 11, 0).theBulletDamage = plant.attackDamage;
+
+                // Increment bullet counter (7 bullets per shot)
+                bulletCounter += 7;
+
+                // Log the current bullet count
+                UnityEngine.Debug.Log($"BigIronGatlingPea bullet count: {bulletCounter}");
+
+                // Check if we've reached the threshold to create a zombie
+                if (bulletCounter >= ZOMBIE_CREATION_THRESHOLD)
+                {
+                    // Create a mind-controlled zombie
+                    CreateZombie.Instance.SetZombieWithMindControl(plant.thePlantRow, ZombieType.UltimatePaperZombie, pos.x, false);
+
+                    // Log zombie creation
+                    UnityEngine.Debug.Log("Created mind-controlled UltimatePaperZombie after reaching bullet threshold");
+
+                    // Reset counter (subtract threshold to account for any excess)
+                    bulletCounter -= ZOMBIE_CREATION_THRESHOLD;
+                }
             }
         }
 
@@ -55,6 +85,9 @@ namespace IronPeasExtra.BepInEx
             tag.doubleBoxPlant = true;
             plant.plantTag = tag;
             plant.isConnected = true;
+
+            // Initialize bullet counter
+            bulletCounter = 0;
         }
 
         public BigGatling plant => gameObject.GetComponent<BigGatling>();

@@ -50,7 +50,7 @@ namespace IceMelonCannon.MelonLoader
         {
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "icemeloncannon");
             CustomCore.RegisterCustomPlant<MelonCannon, IceMelonCannon>(303, ab.GetAsset<GameObject>("IceMelonCannonPrefab"),
-                ab.GetAsset<GameObject>("IceMelonCannonPreview"), [(1132, 10)], 24, 30, 120, 1000, 30f, 900);
+                ab.GetAsset<GameObject>("IceMelonCannonPreview"), [(1132, 10)], 1, 10, 240, 10000, 10f, 900);
             CustomCore.TypeMgrExtra.IsIcePlant.Add((PlantType)303);
             CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)303);
             CustomCore.RegisterCustomBullet<Bullet_melonCannon>(IceMelonCannon.BulletId, ab.GetAsset<GameObject>("ProjectileCannon_wintermelon"));
@@ -79,6 +79,12 @@ namespace IceMelonCannon.MelonLoader
             bullet.rb.velocity = new(1.5f, 0);
             bullet.bulletStatus = BulletStatus.Melon_cannon;
             bullet.Damage = plant.attackDamage;
+            plant.thePlantAttackInterval = 0.1f;
+            plant.thePlantProduceInterval = 0.1f;
+            plant.thePlantAttackCountDown = 0.1f;
+            plant.thePlantProduceCountDown = 0.1f;
+            plant.attributeCountdown = 0.1f;
+            plant.defence = 9999999;
         }
 
         public void Awake()

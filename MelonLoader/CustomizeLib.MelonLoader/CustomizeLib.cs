@@ -1,15 +1,13 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
-using Il2Cpp;
 using Il2CppInterop.Runtime;
-using Il2CppInterop.Runtime.Injection;
 using Il2CppTMPro;
+using Il2Cpp;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 [assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.0", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
@@ -194,8 +192,8 @@ namespace CustomizeLib
             }
             foreach (var z in CustomCore.CustomZombies)
             {
-                GameAPP.zombiePrefab[z.Key] = z.Value.Item1;
-                GameAPP.zombiePrefab[z.Key].tag = "Zombie";
+                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key] = z.Value.Item1;
+                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key].tag = "Zombie";
             }
             foreach (var bullet in CustomCore.CustomBullets)
             {
@@ -228,7 +226,7 @@ namespace CustomizeLib
 
                 if (Board.Instance.theMoney < cost)
                 {
-                    InGameText.Instance.ShowText($"´óÕÐÐèÒª{cost}½ð±Ò", 5);
+                    InGameText.Instance.ShowText($"������Ҫ{cost}���", 5);
                     return false;
                 }
                 if (plant.SuperSkill())
@@ -310,27 +308,27 @@ namespace CustomizeLib
         }
     }
 
-    [HarmonyPatch(typeof(TravelMenuMgr))]
-    public static class TravelMenuMgrPatch
-    {
-        [HarmonyPostfix]
-        [HarmonyPatch("SetText")]
-        public static void PostSetText(TravelMenuMgr __instance)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                int type = __instance.options[i].optionType;
-                int number = __instance.options[i].optionNumber;
-                if (type is 1 && CustomCore.CustomAdvancedBuffs.ContainsKey(number) && CustomCore.CustomAdvancedBuffs[number].Item5 is not null)
-                {
-                    __instance.textMesh[i].text = $"<color={CustomCore.CustomAdvancedBuffs[number].Item5}>{__instance.textMesh[i].text}</color>";
-                }
-                if (type is 2 && CustomCore.CustomUltimateBuffs.ContainsKey(number) && CustomCore.CustomUltimateBuffs[number].Item4 is not null)
-                {
-                    __instance.textMesh[i].text = $"<color={CustomCore.CustomUltimateBuffs[number].Item4}>{__instance.textMesh[i].text}</color>";
-                }
-            }
-        }
+    //[HarmonyPatch(typeof(TravelMenuMgr))]
+    //public static class TravelMenuMgrPatch
+    //{
+    //    [HarmonyPostfix]
+    //    [HarmonyPatch("SetText")]
+    //    public static void PostSetText(TravelMenuMgr __instance)
+    //    {
+    //        for (int i = 0; i < 3; i++)
+    //        {
+    //            int type = __instance.options[i].optionType;
+    //            int number = __instance.options[i].optionNumber;
+    //            if (type is 1 && CustomCore.CustomAdvancedBuffs.ContainsKey(number) && CustomCore.CustomAdvancedBuffs[number].Item5 is not null)
+    //            {
+    //                __instance.textMesh[i].text = $"<color={CustomCore.CustomAdvancedBuffs[number].Item5}>{__instance.textMesh[i].text}</color>";
+    //            }
+    //            if (type is 2 && CustomCore.CustomUltimateBuffs.ContainsKey(number) && CustomCore.CustomUltimateBuffs[number].Item4 is not null)
+    //            {
+    //                __instance.textMesh[i].text = $"<color={CustomCore.CustomUltimateBuffs[number].Item4}>{__instance.textMesh[i].text}</color>";
+    //            }
+    //        }
+    //    }
     }
 
     [HarmonyPatch(typeof(TravelMgr))]
@@ -951,4 +949,4 @@ namespace CustomizeLib
         public static Dictionary<PlantType, (Func<Plant, int>, Action<Plant>)> SuperSkills { get; set; } = [];
         public static Dictionary<ZombieType, (string, string)> ZombiesAlmanac { get; set; } = [];
     }
-}
+

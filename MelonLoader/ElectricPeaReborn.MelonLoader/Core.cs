@@ -1,5 +1,6 @@
 ﻿using CustomizeLib;
 using Il2CppInterop.Runtime.Injection;
+using Il2Cpp;
 using MelonLoader;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace ElectricPeaReborn.MelonLoader
         {
             if (GameAPP.theGameStatus is (int)GameStatus.InGame)
             {
-                bullet.normalSpeed = 3;
+                bullet.normalSpeed = 7;
                 var pos = bullet.transform.position;
                 LayerMask layermask = bullet.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 1.5f);
@@ -40,10 +41,17 @@ namespace ElectricPeaReborn.MelonLoader
                     {
                         zombie.TakeDamage(DmgType.Normal, bullet.Damage);
                         GameAPP.PlaySound(UnityEngine.Random.RandomRange(0, 3));
+                        //Plant plant = GetComponent<Plant>();
+                        //plant.thePlantMaxHealth += zombie.theMaxHealth;
+                        //if (plant.thePlantMaxHealth > int.MaxValue)
+                        //{
+                        //    plant.thePlantMaxHealth = int.MaxValue/ 2;
+                        //}
                         CreateParticle.SetParticle(53, new(zombie.axis.position.x, zombie.axis.position.y + 0.5f, zombie.axis.position.z), zombie.theZombieRow);
                         if (Lawnf.TravelAdvanced(ElectricPea.Buff))
                         {
-                            zombie.BodyTakeDamage((int)(0.05 * (zombie.theHealth + zombie.theFirstArmorHealth + zombie.theSecondArmorHealth)));
+                            //zombie.BodyTakeDamage((int)(0.05 * (zombie.theHealth + zombie.theFirstArmorHealth + zombie.theSecondArmorHealth)));
+                            zombie.BodyTakeDamage((int)(0.11 * bullet.Damage));
                         }
                     }
                 }
@@ -64,7 +72,7 @@ namespace ElectricPeaReborn.MelonLoader
                 ab.GetAsset<GameObject>("ElectricPeaPreview"), [(1005, 3), (3, 1005)], 0.5f, 0, 1000, 32000, 1.5f, 1000);
             CustomCore.AddPlantAlmanacStrings(960, "Electric Pea", "Shoots an electric ball causing extremely fast damage\n<color=#3D1400>Image Author: </color>\n<color=#3D1400>Damage: </color><color=red>300/0.1s</color>\n<color=#3D1400>Fusion Recipe: </color><color=red>Double Cherry Pea + Wallnut</color>\n<color=#3D1400>Incredibly powerful, tearing through space with each ultra-powerful electric shot!</color>");
             
-            ElectricPea.Buff = CustomCore.RegisterCustomBuff("电涌穿透：电能豌豆的子弹每次攻击对本体额外造成总血量5%的伤害", BuffType.AdvancedBuff, () => Board.Instance.ObjectExist<ElectricPea>(), 36100, "red", (PlantType)960);
+            ElectricPea.Buff = CustomCore.RegisterCustomBuff("The surge penetration: The energy pea's bullet inflicts additional damage equal to 5% of the total health to the main body with each attack.", BuffType.AdvancedBuff, () => Board.Instance.ObjectExist<ElectricPea>(), 3610, "red", (PlantType)960);
         }
     }
 

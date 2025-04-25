@@ -1,10 +1,12 @@
 ﻿using CustomizeLib;
 using HarmonyLib;
+using Il2Cpp;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using SuperDiamondNut.MelonLoader;
 using System.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [assembly: MelonInfo(typeof(Core), "SuperDiamondNut", "1.0", "Infinite75", null)]
@@ -19,21 +21,23 @@ namespace SuperDiamondNut.MelonLoader
         [HarmonyPrefix]
         public static unsafe bool PreTakeDamage(SuperSunNut __instance)
         {
-            if (__instance.thePlantType is (PlantType)161)
+            if (__instance.thePlantType is (PlantType)961)
             {
                 var damage = Lawnf.TravelAdvanced(5) ? 1 : 5;
-                CreateItem.Instance.SetCoin(__instance.thePlantColumn, __instance.thePlantRow, 36, 0);
-                CreateItem.Instance.SetCoin(__instance.thePlantColumn, __instance.thePlantRow, 41, 0);
-                CreateItem.Instance.SetCoin(__instance.thePlantColumn + 2, __instance.thePlantRow, 4, 0);
-                CreateItem.Instance.SetCoin(__instance.thePlantColumn -1, __instance.thePlantRow, 6, 0);
-                CreateItem.Instance.SetCoin(__instance.thePlantColumn - 1, __instance.thePlantRow, 1, 0);
+                CreateItem.Instance.SetCoin(__instance.thePlantColumn, __instance.thePlantRow, (int)ItemType.NormalSun, default);
+                //CreateItem.Instance.SetCoin(__instance.thePlantColumn, __instance.thePlantRow, (int)ItemType.Portal, default);
+                CreateItem.Instance.SetCoin(__instance.thePlantColumn, __instance.thePlantRow, (int)ItemType.Helmet, default);
+                CreateItem.Instance.SetCoin(__instance.thePlantColumn + 2, __instance.thePlantRow, (int)ItemType.BigSun, default);
+                CreateItem.Instance.SetCoin(__instance.thePlantColumn -1, __instance.thePlantRow, (int)ItemType.Bucket, default);
+                CreateItem.Instance.SetCoin(__instance.thePlantColumn - 1, __instance.thePlantRow, (int)ItemType.Machine, default);
                 __instance.brightness = 999f;
+                __instance.defence = 999999;
+                __instance.magnetCount = 999999;
                 __instance.alwaysLightUp = true;
                 __instance.exchangeSpeed = 999999;
                 __instance.GiveSunInIZ();
                 __instance.isCrashed = false;
                 __instance.thePlantMaxHealth += 16000;
-                __instance.regeneration = true;
                 //__instance.invincible = true;
                 //SuperDiamondNut.SpawnItem("Items/SuperMachine");
                 //Board.Instance.CreateUltimateMateorite();
@@ -80,57 +84,6 @@ namespace SuperDiamondNut.MelonLoader
             CustomCore.AddPlantAlmanacStrings(962, "钻石保龄球", "就是个换皮大保龄球...吗？\n<color=#3D1400>贴图作者：@林秋AutumnLin</color>\n<color=#3D1400>伤害：</color><color=red>1800/帧伤</color>\n<color=#3D1400>！</color>");
         }
 
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-
-            List<Bucket> buckets = GetBuckets();
-
-            foreach (var bucket in buckets)
-            {
-                // Giảm existTime xuống
-                if (bucket.existTime > 0)
-                {
-                    bucket.existTime--;
-                }
-
-                // Kiểm tra khi existTime bằng 0
-                if (bucket.existTime == 0 || bucket.disappear == true)
-                {
-                    // Tạo SuperDiamondNut và hồi máu
-                    SuperSunNut superSunNutPlant = new SuperSunNut();
-                    superSunNutPlant.thePlantMaxHealth += 32000;
-                    superSunNutPlant.Recover(superSunNutPlant.thePlantMaxHealth);
-
-                    // Gọi phương thức ExistTime
-                    SuperDiamondNut.ExistTime(bucket);
-
-                    // Đặt lại existTime nếu cần
-                    bucket.existTime = 3;
-                    bucket.disappear = false;
-                }
-            }
-        }
-
-        public static List<Bucket> GetBuckets()
-        {
-            // Trả về danh sách các bucket hiện có
-            return new List<Bucket>
-            {
-                new Bucket { itemType = BucketType.Bucket, existTime = 3 },
-                new Bucket { itemType = BucketType.Helmet, existTime = 3 },
-                new Bucket { itemType = BucketType.Machine, existTime = 3 },
-                new Bucket { itemType = BucketType.SuperMachine, existTime = 3 },
-                new Bucket { itemType = BucketType.Door, existTime = 3 },
-                new Bucket { itemType = BucketType.IronHead, existTime = 3 },
-                new Bucket { itemType = BucketType.Jackbox, existTime = 3 },
-                new Bucket { itemType = BucketType.Jumper, existTime = 3 },
-                new Bucket { itemType = BucketType.Ladder, existTime = 3 },
-                new Bucket { itemType = BucketType.Pickaxe, existTime = 3 },
-                new Bucket { itemType = BucketType.RedIronHead, existTime = 3 },
-                // Thêm các bucket khác nếu cần
-            };
-        }
     }
 
     [RegisterTypeInIl2Cpp]
@@ -158,6 +111,7 @@ namespace SuperDiamondNut.MelonLoader
                 SuperDiamondNut.SpawnItem("Items/SuperMachine");
                 SuperDiamondNut.SpawnItem("Items/SuperMachine");
                 SuperDiamondNut.SpawnItem("Items/SuperMachine");
+                SuperDiamondNut.SpawnItem("Items/PortalHeart");
                 Board.Instance.CreateUltimateMateorite();
                 GameAPP.board.GetComponent<InitBoard>().InitMower();
                 GameAPP.board.GetComponent<InitBoard>().InitMower();
@@ -173,6 +127,8 @@ namespace SuperDiamondNut.MelonLoader
                 }
             }
         }
+
+
 
         //[HarmonyPatch(typeof(SuperSunNut))]
         //public static class SuperSunNutPatch
@@ -194,25 +150,7 @@ namespace SuperDiamondNut.MelonLoader
         //    }
         //}
 
-        public static List<Bucket> GetBuckets()
-        {
-            // Trả về danh sách các bucket hiện có
-            return new List<Bucket>
-            {
-                new Bucket { itemType = BucketType.Bucket, existTime = 3 },
-                new Bucket { itemType = BucketType.Helmet, existTime = 3 },
-                new Bucket { itemType = BucketType.Machine, existTime = 3 },
-                new Bucket { itemType = BucketType.SuperMachine, existTime = 3 },
-                new Bucket { itemType = BucketType.Door, existTime = 3 },
-                new Bucket { itemType = BucketType.IronHead, existTime = 3 },
-                new Bucket { itemType = BucketType.Jackbox, existTime = 3 },
-                new Bucket { itemType = BucketType.Jumper, existTime = 3 },
-                new Bucket { itemType = BucketType.Ladder, existTime = 3 },
-                new Bucket { itemType = BucketType.Pickaxe, existTime = 3 },
-                new Bucket { itemType = BucketType.RedIronHead, existTime = 3 },
-                // Thêm các bucket khác nếu cần
-            };
-        }
+        
 
         public static void SunExchange(Plant plant)
         {
@@ -252,16 +190,22 @@ namespace SuperDiamondNut.MelonLoader
                     if (Board.Instance.theSun >= 0 && Board.Instance.theSun < 10000)
                     {
                         p.Upgrade(1, true);
+                        //EnableBuffs1();
+                        //EnableBuffs2();
                         plant.Recover(Lawnf.TravelAdvanced(4) ? 999999 : 400000);
                     }
                     else if (Board.Instance.theSun >= 10000 && Board.Instance.theSun < 20000)
                     {
                         p.Upgrade(2, true);
+                        //EnableBuffs1();
+                        //EnableBuffs2();
                         plant.Recover(Lawnf.TravelAdvanced(4) ? 999999 : 400000);
                     }
                     else if (Board.Instance.theSun >= 20000 && Board.Instance.theSun < 40000)
                     {
                         p.Upgrade(3, true);
+                        //EnableBuffs1();
+                        //EnableBuffs2();
                         plant.Recover(Lawnf.TravelAdvanced(4) ? 999999 : 400000);
                     }
                     //else if (Board.Instance.theSun > 999999 && Input.GetKey(KeyCode.LeftShift))
@@ -271,6 +215,8 @@ namespace SuperDiamondNut.MelonLoader
                     else
                     {
                         p.Upgrade(3, true);
+                        //EnableBuffs1();
+                        //EnableBuffs2();
                     }
                 }
             }

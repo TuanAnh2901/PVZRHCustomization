@@ -89,7 +89,7 @@ namespace SuperGarlicFume.MelonLoader
                     z.SetCold(10);
                     z.AddfreezeLevel(10 * (Lawnf.TravelUltimate(5) ? 5 : 1));
 
-                    if (z.poisonLevel <= 1000000 && Lawnf.TravelAdvanced(Buff3) && z.theFreezeCountDown > 3)
+                    if (z.poisonLevel <= 1000000 && Lawnf.TravelAdvanced(Buff3) && z.freezeTimer > 3)
                     {
                         double multiplier = 1;
                         foreach (var p in Board.Instance.plantArray)
@@ -101,7 +101,7 @@ namespace SuperGarlicFume.MelonLoader
                         }
                         double newPoison = z.poisonLevel + Math.Pow(Math.E, multiplier);
                         if (newPoison > int.MaxValue / 2) newPoison = int.MaxValue / 2;
-                        z.theFreezeCountDown = 3;
+                        z.freezeTimer = 3;
                         z.poisonLevel = (int)newPoison;
                         z.BodyTakeDamage((int)(multiplier * multiplier * multiplier * z.poisonLevel));
                     }

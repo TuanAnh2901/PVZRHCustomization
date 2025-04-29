@@ -684,7 +684,7 @@ namespace CustomizeLib.BepInEx
         }
     }
 
-    [BepInPlugin("inf75.customizelib", "PVZRHCustomization", "2.4.2-2.1")]
+    [BepInPlugin("inf75.customizelib", "PVZRHCustomization", "2.2")]
     public class CustomCore : BasePlugin
     {
         public static class TypeMgrExtra

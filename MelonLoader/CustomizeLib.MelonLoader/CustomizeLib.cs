@@ -9,7 +9,7 @@ using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.4.2-2.1", "Infinite75", null)]
+[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.5-2.2", "Infinite75", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
 

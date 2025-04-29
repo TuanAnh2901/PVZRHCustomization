@@ -74,7 +74,7 @@ namespace IceMelonCannon.BepInEx
             pos2.y = plant.target.y;
             bullet.cannonPos = pos2;
             bullet.rb.velocity = new(1.5f, 0);
-            bullet.bulletStatus = BulletStatus.Melon_cannon;
+            bullet.theStatus = BulletStatus.Melon_cannon;
             bullet.Damage = plant.attackDamage;
         }
 
@@ -83,7 +83,7 @@ namespace IceMelonCannon.BepInEx
             plant.shoot = gameObject.transform.FindChild("Shoot");
         }
 
-        public static int BulletId { get; set; } = 127;
+        public static int BulletId { get; set; } = 902;
         public MelonCannon plant => gameObject.GetComponent<MelonCannon>();
     }
 }

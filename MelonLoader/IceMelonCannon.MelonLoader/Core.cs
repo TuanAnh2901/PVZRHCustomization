@@ -77,7 +77,7 @@ namespace IceMelonCannon.MelonLoader
             pos2.y = plant.target.y;
             bullet.cannonPos = pos2;
             bullet.rb.velocity = new(1.5f, 0);
-            bullet.bulletStatus = BulletStatus.Melon_cannon;
+            bullet.theStatus = BulletStatus.Melon_cannon;
             bullet.Damage = plant.attackDamage;
         }
 

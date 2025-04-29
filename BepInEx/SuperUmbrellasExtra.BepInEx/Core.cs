@@ -1,9 +1,9 @@
-﻿using CustomizeLib;
-using HarmonyLib;
+﻿using HarmonyLib;
 using BepInEx;
 using System.Reflection;
 using BepInEx.Unity.IL2CPP;
 using Il2CppInterop.Runtime.Injection;
+using CustomizeLib.BepInEx;
 
 namespace SuperUmbrellasExtra.BepInEx
 {

@@ -1,10 +1,10 @@
-﻿using CustomizeLib;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
 using UnityEngine;
 using BepInEx.Unity.IL2CPP;
 using System.Reflection;
+using CustomizeLib.BepInEx;
 
 namespace IceDoomScaredyShroom.BepInEx
 {

@@ -1,11 +1,11 @@
-﻿using CustomizeLib;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 using BepInEx.Unity.IL2CPP;
+using CustomizeLib.BepInEx;
 
 namespace SuperDoomSqualour.BepInEx
 {

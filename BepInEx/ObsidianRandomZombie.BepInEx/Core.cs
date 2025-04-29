@@ -1,5 +1,4 @@
-﻿using CustomizeLib;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
@@ -9,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using BepInEx.Unity.IL2CPP;
 using System.Reflection;
+using CustomizeLib.BepInEx;
 
 namespace ObsidianRandomZombie.BepInEx
 {
@@ -47,13 +47,13 @@ namespace ObsidianRandomZombie.BepInEx
         [HarmonyPrefix]
         public static bool PreSetRandomZombie(DiamondRandomZombie __instance, ref GameObject __result)
         {
-            if (__instance.theZombieType is (ZombieType)98)
+            if (__instance is not null && __instance.theZombieType is (ZombieType)98)
             {
                 Vector3 position = __instance.axis.position;
                 List<int> ids = [];
                 if (Lawnf.TravelDebuff(ObsidianRandomZombie.Debuff))
                 {
-                    for (int i = 0; i < GameAPP.resourcesManager.zombiePrefabs.Count; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.allZombieTypes.Count; i++)
                     {
                         if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null)
                         {
@@ -63,7 +63,7 @@ namespace ObsidianRandomZombie.BepInEx
                 }
                 else
                 {
-                    for (int i = 0; i < GameAPP.resourcesManager.zombiePrefabs.Count; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.allZombieTypes.Count; i++)
                     {
                         if (GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
                         {
@@ -107,19 +107,13 @@ namespace ObsidianRandomZombie.BepInEx
             }
         }
 
+        [HarmonyPatch("FindAndDestoryZombieHead")]
+        [HarmonyPatch("SetCold")]
+        [HarmonyPatch("SetFreeze")]
+        [HarmonyPatch("Warm")]
         [HarmonyPatch("KnockBack")]
         [HarmonyPrefix]
         public static bool PreKnockBack(Zombie __instance) => __instance.theZombieType is not (ZombieType)98;
-
-        [HarmonyPatch("TakeDamage")]
-        [HarmonyPrefix]
-        public static void PreTakeDamage(Zombie __instance, ref int theDamage)
-        {
-            if (__instance.theZombieType is (ZombieType)98)
-            {
-                Board.Instance.theMoney -= theDamage;
-            }
-        }
     }
 
     [BepInPlugin("inf75.obsidianrandomzombie", "ObsidianRandomZombie", "1.0")]
@@ -131,7 +125,7 @@ namespace ObsidianRandomZombie.BepInEx
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             ClassInjector.RegisterTypeInIl2Cpp<ObsidianRandomZombie>();
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "obsidianrandomzombie");
-            CustomCore.RegisterCustomZombie<DiamondRandomZombie, ObsidianRandomZombie>(98,
+            CustomCore.RegisterCustomZombie<DiamondRandomZombie, ObsidianRandomZombie>((ZombieType)98,
                 ab.GetAsset<GameObject>("ObsidianRandomZombie"), 206, 50, 40000, 9000, 0);
             CustomCore.RegisterCustomSprite(204, ab.GetAsset<Sprite>("ObsidianRandomZombie_head2"));
             CustomCore.RegisterCustomSprite(205, ab.GetAsset<Sprite>("ObsidianRandomZombie_head3"));
@@ -184,8 +178,11 @@ namespace ObsidianRandomZombie.BepInEx
 
         public void Start()
         {
-            zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
-            zombie.theZombieType = (ZombieType)98;
+            if (GameAPP.theGameStatus is 0 && zombie is not null)
+            {
+                zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
+                zombie.theZombieType = (ZombieType)98;
+            }
         }
 
         public static int Debuff { get; set; } = -1;

@@ -5,10 +5,11 @@ using Il2CppInterop.Runtime;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TMPro;
+using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace CustomizeLib
+namespace CustomizeLib.BepInEx
 {
     public struct CustomPlantData
     {
@@ -105,31 +106,6 @@ namespace CustomizeLib
         }
     }
 
-    [HarmonyPatch(typeof(AlmanacZombieCtrl))]
-    public static class AlmanacZombieCtrlPatch
-    {
-        [HarmonyPatch("Awake")]
-        [HarmonyPostfix]
-        public static void PostAwake(AlmanacZombieCtrl __instance)
-        {
-            var transform = __instance.gameObject.transform.GetChild(1).GetChild(3).GetChild(0).GetChild(0);
-            var template = transform.GetChild(0).gameObject;
-            int row = 1;
-            int col = 0;
-            foreach (var z in CustomCore.CustomZombies)
-            {
-                var button = UnityEngine.Object.Instantiate(template, new(-7.5f + 1.8f * col, 2.5f - 1.8f * row, 0), new(0, 0, 0, 0), transform);
-                button.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[z.Value.Item2];
-                if (++col > 6)
-                {
-                    col = 0;
-                    row++;
-                }
-                button.GetComponent<AlmanacCardZombie>().theZombieType = (ZombieType)z.Key;
-            }
-        }
-    }
-
     [HarmonyPatch(typeof(CreatePlant), "SetPlant")]
     public static class CreatePlantPatch
     {
@@ -174,7 +150,7 @@ namespace CustomizeLib
             {
                 GameAPP.resourcesManager.plantPrefabs[plant.Key] = plant.Value.Prefab;
                 GameAPP.resourcesManager.plantPrefabs[plant.Key].tag = "Plant";
-                GameAPP.resourcesManager.allPlants.Add(plant.Key);
+                if (!GameAPP.resourcesManager.allPlants.Contains(plant.Key)) GameAPP.resourcesManager.allPlants.Add(plant.Key);
                 PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;
                 PlantDataLoader.plantDatas.Add(plant.Key, plant.Value.PlantData);
                 GameAPP.resourcesManager.plantPreviews[plant.Key] = plant.Value.Preview;
@@ -187,20 +163,20 @@ namespace CustomizeLib
             }
             foreach (var z in CustomCore.CustomZombies)
             {
-                GameAPP.resourcesManager.allZombieTypes.Add((ZombieType)z.Key);
-                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key] = z.Value.Item1;
-                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key].tag = "Zombie";
+                if (!GameAPP.resourcesManager.allZombieTypes.Contains(z.Key)) GameAPP.resourcesManager.allZombieTypes.Add(z.Key);
+                GameAPP.resourcesManager.zombiePrefabs[z.Key] = z.Value.Item1;
+                GameAPP.resourcesManager.zombiePrefabs[z.Key].tag = "Zombie";
             }
             foreach (var bullet in CustomCore.CustomBullets)
             {
                 GameAPP.resourcesManager.bulletPrefabs[bullet.Key] = bullet.Value;
-                GameAPP.resourcesManager.allBullets.Add(bullet.Key);
+                if (!GameAPP.resourcesManager.allBullets.Contains(bullet.Key)) GameAPP.resourcesManager.allBullets.Add(bullet.Key);
             }
             foreach (var par in CustomCore.CustomParticles)
             {
-                GameAPP.particlePrefab[par.Key] = par.Value;
-                GameAPP.resourcesManager.particlePrefabs[(ParticleType)par.Key] = par.Value;
-                GameAPP.resourcesManager.allParticles.Add((ParticleType)par.Key);
+                GameAPP.particlePrefab[(int)par.Key] = par.Value;
+                GameAPP.resourcesManager.particlePrefabs[par.Key] = par.Value;
+                if (!GameAPP.resourcesManager.allParticles.Contains(par.Key)) GameAPP.resourcesManager.allParticles.Add(par.Key);
             }
             foreach (var spr in CustomCore.CustomSprites)
             {
@@ -256,7 +232,7 @@ namespace CustomizeLib
 
         [HarmonyPostfix]
         [HarmonyPatch("LeftClickWithNothing")]
-        public static void PostLeftClickWithNothing(Mouse __instance)
+        public static void PostLeftClickWithNothing()
         {
             foreach (GameObject gameObject in (List<GameObject>)[..from RaycastHit2D raycastHit2D in
                                            (RaycastHit2D[])Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition),
@@ -361,7 +337,7 @@ namespace CustomizeLib
 
         [HarmonyPatch("GetAdvancedBuffPool")]
         [HarmonyPostfix]
-        public static void PostGetAdvancedBuffPool(TravelMgr __instance, ref Il2CppSystem.Collections.Generic.List<int> __result)
+        public static void PostGetAdvancedBuffPool(ref Il2CppSystem.Collections.Generic.List<int> __result)
         {
             for (int i = __result.Count - 1; i >= 0; i--)
             {
@@ -798,34 +774,26 @@ namespace CustomizeLib
             }
         }
 
-        public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab) where TBullet : Bullet
+        public static void RegisterCustomBullet<TBullet>(BulletType id, GameObject bulletPrefab) where TBullet : Bullet
         {
-            if (!CustomBullets.ContainsKey((BulletType)id))
+            if (!CustomBullets.ContainsKey(id))
             {
-                bulletPrefab.AddComponent<TBullet>().theBulletType = (BulletType)id;
-                CustomBullets.Add((BulletType)id, bulletPrefab);
-            }
-            else
-            {
-                Instance.Value.Log.LogError($"Duplicate Bullet ID: {id}");
+                bulletPrefab.AddComponent<TBullet>().theBulletType = id;
+                CustomBullets.Add(id, bulletPrefab);
             }
         }
 
-        public static void RegisterCustomBullet<TBase, TBullet>(int id, GameObject bulletPrefab) where TBase : Bullet where TBullet : MonoBehaviour
+        public static void RegisterCustomBullet<TBase, TBullet>(BulletType id, GameObject bulletPrefab) where TBase : Bullet where TBullet : MonoBehaviour
         {
-            if (!CustomBullets.ContainsKey((BulletType)id))
+            if (!CustomBullets.ContainsKey(id))
             {
-                bulletPrefab.AddComponent<TBase>().theBulletType = (BulletType)id;
+                bulletPrefab.AddComponent<TBase>().theBulletType = id;
                 bulletPrefab.AddComponent<TBullet>();
-                CustomBullets.Add((BulletType)id, bulletPrefab);
-            }
-            else
-            {
-                Instance.Value.Log.LogError($"Duplicate Bullet ID: {id}");
+                CustomBullets.Add(id, bulletPrefab);
             }
         }
 
-        public static void RegisterCustomParticle(int id, GameObject particle) => CustomParticles.Add(id, particle);
+        public static void RegisterCustomParticle(ParticleType id, GameObject particle) => CustomParticles.Add(id, particle);
 
         public static void RegisterCustomPlant<TBase, TClass>([NotNull] int id, [NotNull] GameObject prefab, [NotNull] GameObject preview,
                     List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
@@ -911,21 +879,21 @@ namespace CustomizeLib
                 CreatePlant.Instance.SetPlant(p.thePlantColumn, p.thePlantRow, newPlant);
             });
 
-        public static void RegisterCustomZombie<TBase, TClass>(int id, GameObject zombie, int spriteId,
+        public static void RegisterCustomZombie<TBase, TClass>(ZombieType id, GameObject zombie, int spriteId,
             int theAttackDamage, int theMaxHealth, int theFirstArmorMaxHealth, int theSecondArmorMaxHealth)
             where TBase : Zombie where TClass : MonoBehaviour
         {
-            zombie.AddComponent<TBase>().theZombieType = (ZombieType)id;
+            zombie.AddComponent<TBase>().theZombieType = id;
             zombie.AddComponent<TClass>();
 
-            ZombieData.zombieData[id] = new()
+            ZombieData.zombieData[(int)id] = new()
             {
                 theAttackDamage = theAttackDamage,
                 theFirstArmorMaxHealth = theFirstArmorMaxHealth,
                 theMaxHealth = theMaxHealth,
                 theSecondArmorMaxHealth = theSecondArmorMaxHealth
             };
-            CustomZombieTypes.Add((ZombieType)id);
+            CustomZombieTypes.Add(id);
             CustomZombies.Add(id, (zombie, spriteId));
         }
 
@@ -941,14 +909,14 @@ namespace CustomizeLib
         public static Dictionary<BulletType, GameObject> CustomBullets { get; set; } = [];
         public static Dictionary<int, string> CustomDebuffs { get; set; } = [];
         public static List<(int, int, int)> CustomFusions { get; set; } = [];
-        public static Dictionary<int, GameObject> CustomParticles { get; set; } = [];
+        public static Dictionary<ParticleType, GameObject> CustomParticles { get; set; } = [];
         public static Dictionary<PlantType, Action<Plant>> CustomPlantClicks { get; set; } = [];
         public static Dictionary<PlantType, CustomPlantData> CustomPlants { get; set; } = [];
         public static List<PlantType> CustomPlantTypes { get; set; } = [];
         public static Dictionary<int, Sprite> CustomSprites { get; set; } = [];
         public static Dictionary<int, (PlantType, string, int, string?)> CustomUltimateBuffs { get; set; } = [];
         public static Dictionary<(PlantType, BucketType), Action<Plant>> CustomUseItems { get; set; } = [];
-        public static Dictionary<int, (GameObject, int)> CustomZombies { get; set; } = [];
+        public static Dictionary<ZombieType, (GameObject, int)> CustomZombies { get; set; } = [];
         public static List<ZombieType> CustomZombieTypes { get; set; } = [];
         public static Lazy<CustomCore> Instance { get; set; } = new();
         public static Dictionary<PlantType, (string, string)> PlantsAlmanac { get; set; } = [];

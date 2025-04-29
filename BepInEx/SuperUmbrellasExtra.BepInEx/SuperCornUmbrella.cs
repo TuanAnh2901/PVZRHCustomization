@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.BepInEx;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using Unity.VisualScripting;

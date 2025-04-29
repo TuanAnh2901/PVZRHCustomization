@@ -60,8 +60,8 @@ namespace UltimateWinterMelonCannon.MelonLoader
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "ultimatewintermeloncannon");
             CustomCore.RegisterCustomPlant<MelonCannon, UltimateWinterMelonCannon>(168, ab.GetAsset<GameObject>("UltimateWinterMelonCannonPrefab"),
                 ab.GetAsset<GameObject>("UltimateWinterMelonCannonPreview"), [(915, 32)], 24, 24, 450, 1000, 60f, 1200);
-            CustomCore.RegisterCustomBullet<Bullet_melonCannon>(UltimateWinterMelonCannon.BulletId, ab.GetAsset<GameObject>("ProjectileCannon_UltimateWinterMelon"));
-            CustomCore.RegisterCustomParticle(200, ab.GetAsset<GameObject>("CannonUltimateWinterMelonSplat"));
+            CustomCore.RegisterCustomBullet<Bullet_melonCannon>((BulletType)UltimateWinterMelonCannon.BulletId, ab.GetAsset<GameObject>("ProjectileCannon_UltimateWinterMelon"));
+            CustomCore.RegisterCustomParticle((ParticleType)200, ab.GetAsset<GameObject>("CannonUltimateWinterMelonSplat"));
             CustomCore.TypeMgrExtra.IsIcePlant.Add((PlantType)168);
             CustomCore.TypeMgrExtra.DoubleBoxPlants.Add((PlantType)168);
             CustomCore.AddFusion(915, 168, 28);

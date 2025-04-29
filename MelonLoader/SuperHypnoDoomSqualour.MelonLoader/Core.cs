@@ -83,7 +83,7 @@ namespace SuperDoomSqualour.MelonLoader
                     }
                 }
             }
-            Board.Instance.SetDoom(plant.thePlantColumn, plant.thePlantRow, true);
+            Board.Instance.SetDoom(plant.thePlantColumn, plant.thePlantRow, false, damage: 0);
         }
 
         public static int Buff { get; set; } = -1;

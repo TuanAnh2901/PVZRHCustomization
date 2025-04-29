@@ -1,11 +1,11 @@
-﻿using CustomizeLib;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
 using System.Reflection;
 using UnityEngine;
 using BepInEx.Unity.IL2CPP;
+using CustomizeLib.BepInEx;
 
 namespace SuperDiamondNut.BepInEx
 {

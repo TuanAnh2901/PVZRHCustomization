@@ -38,6 +38,7 @@ namespace MilkyBlover.MelonLoader
             {
                 var template = GameObject.Find("Blover");
                 var card = UnityEngine.Object.Instantiate(template, template.transform.parent.parent.GetChild(1));
+                card.name = "MilkyBlover";
                 var mkbBg = card.transform.GetChild(0).gameObject;
                 Lawnf.ChangeCardSprite((PlantType)169, mkbBg);
                 mkbBg.GetComponent<Image>().sprite = GameAPP.spritePrefab[208];
@@ -47,21 +48,21 @@ namespace MilkyBlover.MelonLoader
                     var mkb1 = card.transform.GetChild(2).gameObject;
                     Lawnf.ChangeCardSprite((PlantType)169, mkb1);
                     mkb1.GetComponent<Image>().sprite = GameAPP.spritePrefab[208];
-                    mkb1.GetComponent<CardUI>().parent = card;
+                    //mkb1.GetComponent<CardUI>().parent = card;
                     mkb1.GetComponent<CardUI>().CD = PlantDataLoader.plantData[169].field_Public_Single_2;
                     mkb1.GetComponent<CardUI>().theSeedCost = PlantDataLoader.plantData[169].field_Public_Int32_1;
                     mkb1.GetComponent<CardUI>().thePlantType = (PlantType)169;
-                    mkb1.GetComponent<CardUI>().theZombieType = (ZombieType)169;
+                    mkb1.GetComponent<CardUI>().theSeedType = 169;
                     InGameUI.Instance.cards.Add(mkb1.GetComponent<CardUI>());
 
                     var mkb2 = card.transform.GetChild(1).gameObject;
                     Lawnf.ChangeCardSprite((PlantType)169, mkb2);
                     mkb2.GetComponent<Image>().sprite = GameAPP.spritePrefab[208];
-                    mkb2.GetComponent<CardUI>().parent = card;
+                    //mkb2.GetComponent<CardUI>().parent = card;
                     mkb2.GetComponent<CardUI>().CD = PlantDataLoader.plantData[169].field_Public_Single_2;
                     mkb2.GetComponent<CardUI>().theSeedCost = PlantDataLoader.plantData[169].field_Public_Int32_1;
                     mkb2.GetComponent<CardUI>().thePlantType = (PlantType)169;
-                    mkb2.GetComponent<CardUI>().theZombieType = (ZombieType)169;
+                    mkb2.GetComponent<CardUI>().theSeedType = 169;
                     InGameUI.Instance.cards.Add(mkb2.GetComponent<CardUI>());
                 }
                 else

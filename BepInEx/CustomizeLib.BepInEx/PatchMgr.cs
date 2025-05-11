@@ -48,7 +48,7 @@ namespace CustomizeLib.BepInEx
                                 //加载资源文件
                                 AssetBundle ab = AssetBundle.LoadFromFile(file);
                                 //获得新皮肤预制体
-                                GameObject newPrefab = ab.GetAsset<GameObject>((int)plantType + "_Prefab");
+                                GameObject newPrefab = ab.GetAsset<GameObject>("Prefab_" + (int)plantType);
                                 //旧的预制体
                                 GameObject prefab = GameAPP.resourcesManager.plantPrefabs[plantType];
                                 //拿到脚本

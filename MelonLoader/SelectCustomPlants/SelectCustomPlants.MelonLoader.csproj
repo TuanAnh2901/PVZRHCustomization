@@ -297,7 +297,6 @@
 	<ItemGroup>
 		<Compile Include="SelectCustomPlants.cs" />
 		<Compile Include="ShowCustomPlantCards.cs" />
-		<Compile Include="HideCustomPlantCards.cs" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

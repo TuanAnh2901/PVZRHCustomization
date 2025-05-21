@@ -19,6 +19,7 @@ namespace SelectCustomPlants
 {
 	public class SelectCustomPlants : MelonMod
 	{
+
 		// List to track picked plant IDs
 		public static List<PlantType> PickedPlantsList = new List<PlantType>();
 		
@@ -77,7 +78,7 @@ namespace SelectCustomPlants
 		public static void InitCustomCards()
 		{
 			SelectCustomPlants.MyShowCustomPlantsButton = UnityEngine.Object.Instantiate<GameObject>(Resources.Load<GameObject>("ui/prefabs/InGameUI").transform.FindChild("Bottom/SeedLibrary/ShowNormal").gameObject, InGameUI.Instance.SeedBank.transform.parent.FindChild("Bottom/SeedLibrary"));
-			SelectCustomPlants.MyShowCustomPlantsButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(580f, -230f);
+			SelectCustomPlants.MyShowCustomPlantsButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(580f, -210f);
 			SelectCustomPlants.MyShowCustomPlantsButton.GetComponent<RectTransform>().position = new Vector3(SelectCustomPlants.MyShowCustomPlantsButton.GetComponent<RectTransform>().position.x, SelectCustomPlants.MyShowCustomPlantsButton.GetComponent<RectTransform>().position.y, InGameUI.Instance.SeedBank.transform.parent.FindChild("Bottom/SeedLibrary/ShowNormal").position.z);
 			SelectCustomPlants.MyShowCustomPlantsButton.SetActive(true);
 			if (SelectCustomPlants.MyShowCustomPlantsButton.GetComponent<UIButton>() != null)
@@ -92,7 +93,7 @@ namespace SelectCustomPlants
 
 			// Create Next Page button
 			SelectCustomPlants.MyNextPageButton = UnityEngine.Object.Instantiate<GameObject>(Resources.Load<GameObject>("ui/prefabs/InGameUI").transform.FindChild("Bottom/SeedLibrary/ShowNormal").gameObject, InGameUI.Instance.SeedBank.transform.parent.FindChild("Bottom/SeedLibrary"));
-			SelectCustomPlants.MyNextPageButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(580f, -200f);
+			SelectCustomPlants.MyNextPageButton.GetComponent<RectTransform>().anchoredPosition = new Vector2(580f, -160f);
 			SelectCustomPlants.MyNextPageButton.GetComponent<RectTransform>().position = new Vector3(SelectCustomPlants.MyNextPageButton.GetComponent<RectTransform>().position.x, SelectCustomPlants.MyNextPageButton.GetComponent<RectTransform>().position.y, InGameUI.Instance.SeedBank.transform.parent.FindChild("Bottom/SeedLibrary/ShowNormal").position.z);
 			SelectCustomPlants.MyNextPageButton.SetActive(true);
 			if (SelectCustomPlants.MyNextPageButton.GetComponent<UIButton>() != null)

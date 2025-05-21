@@ -11,7 +11,6 @@ public class HideCustomPlantCards
     [HarmonyPostfix]
     private static void Postfix()
     {
-        //SelectCustomPlants.MelonLoader.SelectCustomPlants.CloseCustomPlantCards();
-        
+        SelectCustomPlants.SelectCustomPlants.CloseCustomPlantCards();
     }
 }

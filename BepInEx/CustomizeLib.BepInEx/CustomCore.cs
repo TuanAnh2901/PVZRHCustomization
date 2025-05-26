@@ -22,7 +22,7 @@ namespace CustomizeLib.BepInEx
         }
     }
 
-    [BepInPlugin("inf75.pvzcustomization", "PVZCustomization", "2.3")]
+    [BepInPlugin("inf75.pvzcustomization", "PVZCustomization", "2.4")]
     public class CustomCore : BasePlugin
     {
         public static class TypeMgrExtra
@@ -56,6 +56,78 @@ namespace CustomizeLib.BepInEx
             public static List<PlantType> UmbrellaPlants { get; set; } = [];
             public static List<ZombieType> UselessHypnoZombie { get; set; } = [];
             public static List<ZombieType> WaterZombie { get; set; } = [];
+        }
+
+        /// <summary>
+        /// 用于储存皮肤的数据
+        /// </summary>
+        public static class TypeMgrExtraSkin
+        {
+            public static Dictionary<PlantType, int> BigNut { get; set; } = [];
+            public static Dictionary<ZombieType, int> BigZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> DoubleBoxPlants { get; set; } = [];
+            public static Dictionary<ZombieType, int> EliteZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> FlyingPlants { get; set; } = [];
+            public static Dictionary<ZombieType, int> IsAirZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> IsCaltrop { get; set; } = [];
+            public static Dictionary<PlantType, int> IsCustomPlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsFirePlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsIcePlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsMagnetPlants { get; set; } = [];
+            public static Dictionary<PlantType, int> IsNut { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPlantern { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPot { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPotatoMine { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPuff { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPumpkin { get; set; } = [];
+            public static Dictionary<PlantType, int> IsSmallRangeLantern { get; set; } = [];
+            public static Dictionary<PlantType, int> IsSpecialPlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsSpickRock { get; set; } = [];
+            public static Dictionary<PlantType, int> IsTallNut { get; set; } = [];
+            public static Dictionary<PlantType, int> IsTangkelp { get; set; } = [];
+            public static Dictionary<PlantType, int> IsWaterPlant { get; set; } = [];
+            public static Dictionary<ZombieType, int> NotRandomBungiZombie { get; set; } = [];
+            public static Dictionary<ZombieType, int> NotRandomZombie { get; set; } = [];
+            public static Dictionary<ZombieType, int> UltimateZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> UmbrellaPlants { get; set; } = [];
+            public static Dictionary<ZombieType, int> UselessHypnoZombie { get; set; } = [];
+            public static Dictionary<ZombieType, int> WaterZombie { get; set; } = [];
+        }
+
+        /// <summary>
+        /// 用于储存皮肤的数据
+        /// </summary>
+        public static class TypeMgrExtraSkinBackup
+        {
+            public static Dictionary<PlantType, int> BigNut { get; set; } = [];
+            public static Dictionary<ZombieType, int> BigZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> DoubleBoxPlants { get; set; } = [];
+            public static Dictionary<ZombieType, int> EliteZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> FlyingPlants { get; set; } = [];
+            public static Dictionary<ZombieType, int> IsAirZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> IsCaltrop { get; set; } = [];
+            public static Dictionary<PlantType, int> IsCustomPlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsFirePlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsIcePlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsMagnetPlants { get; set; } = [];
+            public static Dictionary<PlantType, int> IsNut { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPlantern { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPot { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPotatoMine { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPuff { get; set; } = [];
+            public static Dictionary<PlantType, int> IsPumpkin { get; set; } = [];
+            public static Dictionary<PlantType, int> IsSmallRangeLantern { get; set; } = [];
+            public static Dictionary<PlantType, int> IsSpecialPlant { get; set; } = [];
+            public static Dictionary<PlantType, int> IsSpickRock { get; set; } = [];
+            public static Dictionary<PlantType, int> IsTallNut { get; set; } = [];
+            public static Dictionary<PlantType, int> IsTangkelp { get; set; } = [];
+            public static Dictionary<PlantType, int> IsWaterPlant { get; set; } = [];
+            public static Dictionary<ZombieType, int> NotRandomBungiZombie { get; set; } = [];
+            public static Dictionary<ZombieType, int> NotRandomZombie { get; set; } = [];
+            public static Dictionary<ZombieType, int> UltimateZombie { get; set; } = [];
+            public static Dictionary<PlantType, int> UmbrellaPlants { get; set; } = [];
+            public static Dictionary<ZombieType, int> UselessHypnoZombie { get; set; } = [];
+            public static Dictionary<ZombieType, int> WaterZombie { get; set; } = [];
         }
 
         public static void AddFusion(int target, int item1, int item2) => CustomFusions.Add((target, item1, item2));
@@ -134,8 +206,8 @@ namespace CustomizeLib.BepInEx
         public static void RegisterCustomParticle(ParticleType id, GameObject particle) => CustomParticles.Add(id, particle);
 
         public static void RegisterCustomPlant<TBase, TClass>([NotNull] int id, [NotNull] GameObject prefab, [NotNull] GameObject preview,
-                    List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
-                    where TBase : Plant where TClass : MonoBehaviour
+                            List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
+                            where TBase : Plant where TClass : MonoBehaviour
         {
             prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
             prefab.AddComponent<TClass>();
@@ -170,8 +242,8 @@ namespace CustomizeLib.BepInEx
         }
 
         public static void RegisterCustomPlant<TBase>([NotNull] int id, [NotNull] GameObject prefab, [NotNull] GameObject preview,
-            List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
-            where TBase : Plant
+                    List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
+                    where TBase : Plant
         {
             prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
             if (!CustomPlantTypes.Contains((PlantType)id))
@@ -227,9 +299,12 @@ namespace CustomizeLib.BepInEx
             float cd, int sun)
             where TBase : Plant where TClass : MonoBehaviour
         {
+            prefab.tag = "Plant";
+            preview.tag = "Preview";
             //植物预制体挂载植物脚本
             prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
             prefab.AddComponent<TClass>();
+            CustomPlantsSkinActive.Add((PlantType)id, false);
             //植物id不重复才进行注册
             if (!CustomPlantsSkin.ContainsKey((PlantType)id))
             {
@@ -287,8 +362,11 @@ namespace CustomizeLib.BepInEx
             float cd, int sun)
             where TBase : Plant
         {
+            prefab.tag = "Plant";
+            preview.tag = "Preview";
             //植物预制体挂载植物脚本
             prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
+            CustomPlantsSkinActive.Add((PlantType)id, false);
             if (!CustomPlantsSkin.ContainsKey((PlantType)id))
             {
                 //植物id不重复才进行注册
@@ -320,7 +398,6 @@ namespace CustomizeLib.BepInEx
             }
             else
             {
-                //添加融合配方
                 Instance.Value.Log.LogError($"Duplicate Plant ID: {id}");
             }
         }
@@ -330,15 +407,15 @@ namespace CustomizeLib.BepInEx
         public static void RegisterCustomUseItemOnPlantEvent([NotNull] PlantType id, [NotNull] BucketType bucketType, [NotNull] Action<Plant> callback) => CustomUseItems.Add((id, bucketType), callback);
 
         public static void RegisterCustomUseItemOnPlantEvent([NotNull] PlantType id, [NotNull] BucketType bucketType, [NotNull] PlantType newPlant)
-            => CustomUseItems.Add((id, bucketType), (p) =>
-            {
-                p.Die();
-                CreatePlant.Instance.SetPlant(p.thePlantColumn, p.thePlantRow, newPlant);
-            });
+                    => CustomUseItems.Add((id, bucketType), (p) =>
+                    {
+                        p.Die();
+                        CreatePlant.Instance.SetPlant(p.thePlantColumn, p.thePlantRow, newPlant);
+                    });
 
         public static void RegisterCustomZombie<TBase, TClass>(ZombieType id, GameObject zombie, int spriteId,
-            int theAttackDamage, int theMaxHealth, int theFirstArmorMaxHealth, int theSecondArmorMaxHealth)
-            where TBase : Zombie where TClass : MonoBehaviour
+                    int theAttackDamage, int theMaxHealth, int theFirstArmorMaxHealth, int theSecondArmorMaxHealth)
+                    where TBase : Zombie where TClass : MonoBehaviour
         {
             zombie.AddComponent<TBase>().theZombieType = id;
             zombie.AddComponent<TClass>();
@@ -366,6 +443,7 @@ namespace CustomizeLib.BepInEx
         public override void Load()
         {
             ClassInjector.RegisterTypeInIl2Cpp<CoroutineRunner>();
+            ClassInjector.RegisterTypeInIl2Cpp<CustomPlantMonoBehaviour>();
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             Instance = new(this);
             TextureStore.Init();
@@ -378,11 +456,17 @@ namespace CustomizeLib.BepInEx
         }
 
         public static Dictionary<int, (PlantType, string, Func<bool>, int, string?)> CustomAdvancedBuffs { get; set; } = [];
+
         public static Dictionary<BulletType, GameObject> CustomBullets { get; set; } = [];
+
         public static Dictionary<int, string> CustomDebuffs { get; set; } = [];
+
         public static List<(int, int, int)> CustomFusions { get; set; } = [];
+
         public static Dictionary<ParticleType, GameObject> CustomParticles { get; set; } = [];
+
         public static Dictionary<PlantType, Action<Plant>> CustomPlantClicks { get; set; } = [];
+
         public static Dictionary<PlantType, CustomPlantData> CustomPlants { get; set; } = [];
 
         /// <summary>
@@ -390,14 +474,32 @@ namespace CustomizeLib.BepInEx
         /// </summary>
         public static Dictionary<PlantType, CustomPlantData> CustomPlantsSkin { get; set; } = [];
 
+        /// <summary>
+        /// 自定义皮肤是否激活
+        /// </summary>
+        public static Dictionary<PlantType, bool> CustomPlantsSkinActive { get; set; } = [];
+
         public static List<PlantType> CustomPlantTypes { get; set; } = [];
+
         public static Dictionary<int, Sprite> CustomSprites { get; set; } = [];
+
         public static Dictionary<int, (PlantType, string, int, string?)> CustomUltimateBuffs { get; set; } = [];
+
         public static Dictionary<(PlantType, BucketType), Action<Plant>> CustomUseItems { get; set; } = [];
+
         public static Dictionary<ZombieType, (GameObject, int, ZombieData.ZombieData_)> CustomZombies { get; set; } = [];
+
         public static List<ZombieType> CustomZombieTypes { get; set; } = [];
+
         public static Lazy<CustomCore> Instance { get; set; } = new();
+
         public static Dictionary<PlantType, (string, string)> PlantsAlmanac { get; set; } = [];
+
+        /// <summary>
+        /// 皮肤图鉴
+        /// </summary>
+        public static Dictionary<PlantType, (string, string)?> PlantsSkinAlmanac { get; set; } = [];
+
         public static CoroutineRunner? ReplaceTextureRoutine { get; set; } = null;
         public static Dictionary<PlantType, (Func<Plant, int>, Action<Plant>)> SuperSkills { get; set; } = [];
         public static Dictionary<ZombieType, (string, string)> ZombiesAlmanac { get; set; } = [];

@@ -82,7 +82,7 @@ namespace MilkyBlover.MelonLoader
             CustomCore.RegisterCustomPlant<Blover, MilkyBlover>(169, ab.GetAsset<GameObject>("MilkyBloverPrefab"),
                 ab.GetAsset<GameObject>("MilkyBloverPreview"), [], 3, 0, 80, 300, 60f, 500);
             CustomCore.RegisterCustomSprite(208, ab.GetAsset<Sprite>("SeedPacket_MilkyBlover"));
-            CustomCore.AddPlantAlmanacStrings(169, "银河三叶草", "似乎只是个比较可爱的三叶草...吗???\n<color=#3D1400>贴图作者：@Just Eris</color>\n<color=#3D1400>特点：</color><color=red>二创彩蛋植物，不参与融合，一般情况下同三叶草，当词条星神合一解锁时每0.3s召唤一个究极陨星/阳光陨星，3s后消失</color>\n<color=#3D1400>花费：</color><color=red>500</color>\n<color=#3D1400>冷却时间：</color><color=red>60s</color>\n<color=#3D1400>快看，是专为「沉睡戴夫」工作的特别列车长\n驾驶穿梭于银河的梦之推车的特别三叶草\n噗噗!列车出发~今天的银河三叶草也格外闪耀呢\n虽然大多数时候有些懒散 不过在面对僵尸的捣乱时，她会二话不说出面处理。</color>");
+            CustomCore.AddPlantAlmanacStrings(169, "银河三叶草(169)", "似乎只是个比较可爱的三叶草...吗???\n<color=#3D1400>贴图作者：@Just Eris</color>\n<color=#3D1400>特点：</color><color=red>二创彩蛋植物，不参与融合，一般情况下同三叶草，当词条星神合一解锁时每0.3s召唤一个究极陨星/阳光陨星，3s后消失</color>\n<color=#3D1400>花费：</color><color=red>500</color>\n<color=#3D1400>冷却时间：</color><color=red>60s</color>\n<color=#3D1400>快看，是专为「沉睡戴夫」工作的特别列车长\n驾驶穿梭于银河的梦之推车的特别三叶草\n噗噗!列车出发~今天的银河三叶草也格外闪耀呢\n虽然大多数时候有些懒散 不过在面对僵尸的捣乱时，她会二话不说出面处理。</color>");
         }
     }
 

@@ -1,26 +1,28 @@
-using CustomizeLib.MelonLoader;
-using HarmonyLib;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
+ï»¿using HarmonyLib;
 using Il2CppTMPro;
-using MelonLoader;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
+using System.Text.Json;
 using UnityEngine;
 
 ///
-///Credit to likefengzi(https://github.com/likefengzi)(https://space.bilibili.com/237491236)
+/// Specially credit to æš—å½±Dev
+/// Specially credit to likefengzi(https://github.com/likefengzi)(https://space.bilibili.com/237491236)
+/// Specially credit to BloomsTeam
 ///
 namespace CustomizeLib.MelonLoader
 {
     /// <summary>
-    /// Ö²ÎïÍ¼¼ø
+    /// åˆå§‹åŒ–ç»“æŸæ˜¾ç¤ºæ¢è‚¤æŒ‰é’®ï¼ŒåŠ è½½çš®è‚¤
+    /// </summary>
+    /// <param name="__instance"></param>
+    /// <returns></returns>
+    /// <summary>
+    /// æ¤ç‰©å›¾é‰´
     /// </summary>
     [HarmonyPatch(typeof(AlmanacPlantBank))]
     public static class AlmanacMgrPatch
     {
         /// <summary>
-        /// ³õÊ¼»¯½áÊøÏÔÊ¾»»·ô°´Å¥£¬¼ÓÔØÆ¤·ô
+        /// åˆå§‹åŒ–ç»“æŸæ˜¾ç¤ºæ¢è‚¤æŒ‰é’®ï¼ŒåŠ è½½çš®è‚¤
         /// </summary>
         /// <param name="__instance"></param>
         /// <returns></returns>
@@ -29,71 +31,219 @@ namespace CustomizeLib.MelonLoader
         public static void PostStart(AlmanacPlantBank __instance)
         {
             PlantType plantType = (PlantType)__instance.theSeedType;
-            //³õ´Î¼ÓÔØÆ¤·ô
+            //åˆæ¬¡åŠ è½½çš®è‚¤
             if (!CustomCore.CustomPlantsSkin.ContainsKey(plantType))
             {
-                bool flag = false;
+                //æ˜¯å¦æœ‰çš®è‚¤æˆåŠŸ
+                bool buttonFlag = __instance.skinButton.active;
+                //exeçš„ä½ç½®
                 string? fullName = Directory.GetParent(Application.dataPath)?.FullName;
                 if (fullName != null)
                 {
-                    //Ñ°ÕÒMods/Skin/
+                    //å¯»æ‰¾Mods/Skin/
                     string modsPath = Path.Combine(fullName, "Mods", "Skin");
                     if (Directory.Exists(modsPath))
                     {
-                        string[] files = Directory.GetFiles(modsPath);
+                        //åªè¦skin_å¼€å¤´çš„æ–‡ä»¶
+                        string[] files = Directory.GetFiles(modsPath, "skin_*");
 
                         foreach (string file in files)
                         {
-                            //Èç¹ûÎÄ¼şÃû"Skin_"ºóÃæµÄidÆ¥Åä
-                            if (((int)plantType).ToString() == Path.GetFileName(file)[5..])
+                            try
                             {
-                                //¼ÓÔØ×ÊÔ´ÎÄ¼ş
-                                AssetBundle ab = AssetBundle.LoadFromFile(file);
-                                //»ñµÃĞÂÆ¤·ôÔ¤ÖÆÌå
-                                GameObject newPrefab = ab.GetAsset<GameObject>("Prefab_" + (int)plantType);
-                                //¾ÉµÄÔ¤ÖÆÌå
-                                GameObject prefab = GameAPP.resourcesManager.plantPrefabs[plantType];
-                                //ÄÃµ½½Å±¾
-                                Plant plant = prefab.GetComponent<Plant>();
-                                //Ìí¼Óµ½ĞÂµÄÔ¤ÖÆÌåÉÏ
-                                newPrefab.AddComponent(plant.GetIl2CppType());
-                                Plant newPlant = newPrefab.GetComponent<Plant>();
-                                //Ö¸¶¨id
-                                newPlant.thePlantType = plantType;
-                                //shoot³ÉÔ±¶¼ÓĞÎÊÌâ£¬Çå¿Õ
-                                newPlant.shoot = null;
-                                newPlant.shoot2 = null;
-                                //Ö¸¶¨shoot
-                                newPlant.FindShoot(newPrefab.transform);
-
-                                //Êı¾İ¼ÓÔØµ½×Ô¶¨ÒåÆ¤·ôÖĞ
-                                CustomPlantData newCustomPlantData = new()
+                                //å¦‚æœæ–‡ä»¶å"Skin_"åé¢çš„idåŒ¹é…
+                                if (((int)plantType).ToString() == Path.GetFileName(file)[5..])
                                 {
-                                    ID = (int)plantType,
-                                    PlantData = PlantDataLoader.plantDatas[plantType],
-                                    Prefab = newPrefab,
-                                    Preview = GameAPP.resourcesManager.plantPreviews[plantType]
-                                };
-                                CustomCore.CustomPlantsSkin.Add(plantType, newCustomPlantData);
+                                    //åŠ è½½èµ„æºæ–‡ä»¶
+                                    AssetBundle ab = AssetBundle.LoadFromFile(file);
+                                    //å°è¯•åŠ è½½json
+                                    bool jsonFlag = false;
+                                    CustomPlantData plantDataFromJson = default;
+                                    CustomPlantAlmanac plantAlmanac = default;
+                                    Dictionary<int, int> bulletTypesFormJson = [];
+                                    foreach (string jsonFile in files)
+                                    {
+                                        try
+                                        {
+                                            if (((int)plantType) + ".json" ==
+                                                Path.GetFileName(jsonFile)[5..])
+                                            {
+                                                // è¯»å– JSON æ–‡ä»¶å†…å®¹
+                                                string jsonContent = File.ReadAllText(jsonFile);
 
-                                //ÓĞÆ¤·ô£¬°´Å¥¿ÉÒÔÏÔÊ¾
-                                flag = true;
+                                                // ååºåˆ—åŒ– JSON å†…å®¹
+                                                var options = new JsonSerializerOptions
+                                                {
+                                                    PropertyNameCaseInsensitive = true // å…è®¸ä¸åŒºåˆ†å¤§å°å†™çš„å±æ€§åç§°åŒ¹é…
+                                                };
+
+                                                JsonSkinObject? root =
+                                                    JsonSerializer.Deserialize<JsonSkinObject>(jsonContent, options);
+
+                                                // è®¿é—®æ•°æ®
+                                                if (root != null)
+                                                {
+                                                    plantDataFromJson = root.CustomPlantData;
+                                                    root.TypeMgrExtraSkin.AddValueToTypeMgrExtraSkinBackup(plantType);
+                                                    bulletTypesFormJson = root.CustomBulletType;
+                                                    plantAlmanac = root.PlantAlmanac;
+                                                }
+
+                                                //æ‰¾åˆ°äº†jsonæ–‡ä»¶å¹¶æˆåŠŸåŠ è½½
+                                                jsonFlag = true;
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Console.WriteLine(e);
+                                        }
+                                    }
+
+                                    //è·å¾—æ–°çš®è‚¤é¢„åˆ¶ä½“
+                                    GameObject? newPrefab = null;
+                                    try
+                                    {
+                                        newPrefab = ab.GetAsset<GameObject>("Prefab");
+                                        newPrefab.tag = "Plant";
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Console.WriteLine(e);
+                                    }
+
+                                    //è·å¾—æ–°çš®è‚¤é¢„è§ˆå›¾
+                                    GameObject? newPreview = null;
+                                    try
+                                    {
+                                        newPreview = ab.GetAsset<GameObject>("Preview");
+                                        newPreview.tag = "Preview";
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Console.WriteLine(e);
+                                    }
+
+                                    //æˆåŠŸåŠ è½½é¢„åˆ¶ä½“
+                                    if (newPrefab != null)
+                                    {
+                                        //æ—§çš„é¢„åˆ¶ä½“
+                                        GameObject prefab;
+                                        try
+                                        {
+                                            prefab = GameAPP.resourcesManager.plantPrefabs[jsonFlag ? (PlantType)plantDataFromJson.ID : plantType];
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Console.WriteLine(e);
+                                            prefab = GameAPP.resourcesManager.plantPrefabs[plantType];
+                                        }
+
+                                        //æ‹¿åˆ°è„šæœ¬
+                                        Plant plant = prefab.GetComponent<Plant>();
+                                        //æ·»åŠ åˆ°æ–°çš„é¢„åˆ¶ä½“ä¸Š
+                                        newPrefab.AddComponent(plant.GetIl2CppType());
+                                        CustomPlantMonoBehaviour temp =
+                                            newPrefab.AddComponent<CustomPlantMonoBehaviour>();
+                                        CustomPlantMonoBehaviour.BulletTypes.Add(plantType, bulletTypesFormJson);
+
+                                        Plant newPlant = newPrefab.GetComponent<Plant>();
+
+                                        //æŒ‡å®šid
+                                        newPlant.thePlantType = plantType;
+
+                                        //shootæˆå‘˜éƒ½æœ‰é—®é¢˜ï¼Œæ¸…ç©º
+                                        newPlant.shoot = null;
+                                        newPlant.shoot2 = null;
+                                        //æŒ‡å®šshoot
+                                        try
+                                        {
+                                            newPlant.FindShoot(newPrefab.transform);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Console.WriteLine(e);
+                                        }
+                                    }
+
+                                    CustomPlantData newCustomPlantData = default;
+                                    //åˆ¤æ–­æ˜¯å¦æˆåŠŸåŠ è½½å¯¹åº”çš„json
+                                    if (jsonFlag)
+                                    {
+                                        //ä½¿ç”¨jsonä¸­çš„æ•°æ®
+                                        newCustomPlantData = new()
+                                        {
+                                            ID = (int)plantType,
+                                            PlantData = plantDataFromJson.PlantData,
+                                            Prefab = GameAPP.resourcesManager.plantPrefabs[plantType],
+                                            Preview = GameAPP.resourcesManager.plantPreviews[plantType]
+                                        };
+                                    }
+                                    else
+                                    {
+                                        //æ²¡æœ‰jsonæ–‡ä»¶ï¼Œä½¿ç”¨é»˜è®¤æ•°æ®
+                                        //æ•°æ®åŠ è½½åˆ°è‡ªå®šä¹‰çš®è‚¤ä¸­
+                                        newCustomPlantData = new()
+                                        {
+                                            ID = (int)plantType,
+                                            PlantData = PlantDataLoader.plantDatas[plantType],
+                                            Prefab = GameAPP.resourcesManager.plantPrefabs[plantType],
+                                            Preview = GameAPP.resourcesManager.plantPreviews[plantType]
+                                        };
+                                    }
+
+                                    //æˆåŠŸè¯»å–äº†è°å°±åŠ è½½è°
+                                    if (newPrefab != null)
+                                    {
+                                        newCustomPlantData.Prefab = newPrefab;
+                                    }
+
+                                    if (newPreview != null)
+                                    {
+                                        newCustomPlantData.Preview = newPreview;
+                                    }
+
+                                    CustomCore.CustomPlantsSkin.Add(plantType, newCustomPlantData);
+                                    //åŠ è½½å›¾é‰´
+                                    try
+                                    {
+                                        CustomCore.PlantsSkinAlmanac.Add(plantType, jsonFlag ?
+                                            (plantAlmanac.Name, plantAlmanac.Description) : null);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Console.WriteLine(e);
+                                    }
+
+                                    //æœ‰çš®è‚¤ï¼ŒæŒ‰é’®å¯ä»¥æ˜¾ç¤º
+                                    buttonFlag = true;
+                                    CustomCore.CustomPlantsSkinActive[plantType] = false;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
                             }
                         }
                     }
                 }
 
-                __instance.skinButton.SetActive(flag);
+                __instance.skinButton.SetActive(buttonFlag);
             }
             else
             {
-                //ÓĞÆ¤·ô£¬°´Å¥¿ÉÒÔÏÔÊ¾
+                //æœ‰çš®è‚¤ï¼ŒæŒ‰é’®å¯ä»¥æ˜¾ç¤º
                 __instance.skinButton.SetActive(true);
+            }
+
+            if (CustomCore.CustomPlants.ContainsKey(plantType))
+            {
+                //äºŒåˆ›æ¤ç‰©ï¼ŒæŒ‰é’®å¯ä»¥æ˜¾ç¤º
+                __instance.skinButton.SetActive(CustomCore.CustomPlantsSkin.ContainsKey(plantType));
             }
         }
 
         /// <summary>
-        /// ´Ójson¼ÓÔØÖ²ÎïĞÅÏ¢
+        /// ä»jsonåŠ è½½æ¤ç‰©ä¿¡æ¯
         /// </summary>
         /// <param name="__instance"></param>
         /// <returns></returns>
@@ -101,10 +251,10 @@ namespace CustomizeLib.MelonLoader
         [HarmonyPrefix]
         public static bool PreInitNameAndInfoFromJson(AlmanacPlantBank __instance)
         {
-            //Èç¹û×Ô¶¨ÒåÖ²ÎïÍ¼¼øĞÅÏ¢°üº¬
+            //å¦‚æœè‡ªå®šä¹‰æ¤ç‰©å›¾é‰´ä¿¡æ¯åŒ…å«
             if (CustomCore.PlantsAlmanac.ContainsKey((PlantType)__instance.theSeedType))
             {
-                //±éÀúÍ¼¼øÉÏµÄ×é¼ş
+                //éå†å›¾é‰´ä¸Šçš„ç»„ä»¶
                 for (int i = 0; i < __instance.transform.childCount; i++)
                 {
                     Transform childTransform = __instance.transform.GetChild(i);
@@ -113,7 +263,7 @@ namespace CustomizeLib.MelonLoader
                         continue;
                     }
 
-                    //Ö²ÎïĞÕÃû
+                    //æ¤ç‰©å§“å
                     if (childTransform.name == "Name")
                     {
                         childTransform.GetComponent<TextMeshPro>().text =
@@ -122,7 +272,7 @@ namespace CustomizeLib.MelonLoader
                             CustomCore.PlantsAlmanac[(PlantType)__instance.theSeedType].Item1;
                     }
 
-                    //Ö²ÎïĞÅÏ¢
+                    //æ¤ç‰©ä¿¡æ¯
                     if (childTransform.name == "Info")
                     {
                         TextMeshPro info = childTransform.GetComponent<TextMeshPro>();
@@ -132,14 +282,56 @@ namespace CustomizeLib.MelonLoader
                         __instance.introduce = info;
                     }
 
-                    //Ö²ÎïÑô¹â
+                    //æ¤ç‰©é˜³å…‰
                     if (childTransform.name == "Cost")
                     {
                         childTransform.GetComponent<TextMeshPro>().text = "";
                     }
                 }
 
-                //×è¶ÏÔ­Ê¼µÄ¼ÓÔØ
+                //é˜»æ–­åŸå§‹çš„åŠ è½½
+                return false;
+            }
+
+            if (CustomCore.CustomPlantsSkinActive.ContainsKey((PlantType)__instance.theSeedType) && CustomCore.PlantsSkinAlmanac.ContainsKey((PlantType)__instance.theSeedType) && CustomCore.CustomPlantsSkinActive[(PlantType)__instance.theSeedType])
+            {
+                var alm = CustomCore.PlantsSkinAlmanac[(PlantType)__instance.theSeedType];
+                if (alm is null) return true;
+                var almanac = alm.Value;
+                //éå†å›¾é‰´ä¸Šçš„ç»„ä»¶
+                for (int i = 0; i < __instance.transform.childCount; i++)
+                {
+                    Transform childTransform = __instance.transform.GetChild(i);
+                    if (childTransform == null)
+                    {
+                        continue;
+                    }
+
+                    //æ¤ç‰©å§“å
+                    if (childTransform.name == "Name")
+                    {
+                        childTransform.GetComponent<TextMeshPro>().text = almanac.Item1;
+                        childTransform.GetChild(0).GetComponent<TextMeshPro>().text = almanac.Item1;
+                    }
+
+                    //æ¤ç‰©ä¿¡æ¯
+                    if (childTransform.name == "Info")
+                    {
+                        TextMeshPro info = childTransform.GetComponent<TextMeshPro>();
+                        info.overflowMode = TextOverflowModes.Page;
+                        info.fontSize = 40;
+                        info.text = almanac.Item2;
+                        __instance.introduce = info;
+                    }
+
+                    //æ¤ç‰©é˜³å…‰
+                    if (childTransform.name == "Cost")
+                    {
+                        childTransform.GetComponent<TextMeshPro>().text = "";
+                    }
+                }
+
+                //é˜»æ–­åŸå§‹çš„åŠ è½½
                 return false;
             }
 
@@ -147,7 +339,7 @@ namespace CustomizeLib.MelonLoader
         }
 
         /// <summary>
-        /// Í¼¼øÖĞÊó±ê°´ÏÂ£¬ÓÃÓÚ·­Ò³
+        /// å›¾é‰´ä¸­é¼ æ ‡æŒ‰ä¸‹ï¼Œç”¨äºç¿»é¡µ
         /// </summary>
         /// <param name="__instance"></param>
         /// <returns></returns>
@@ -155,20 +347,25 @@ namespace CustomizeLib.MelonLoader
         [HarmonyPrefix]
         public static bool PreOnMouseDown(AlmanacPlantBank __instance)
         {
-            //ÓÒ²àÏÔÊ¾
+            //å³ä¾§æ˜¾ç¤º
             __instance.introduce =
                 __instance.gameObject.transform.FindChild("Info").gameObject.GetComponent<TextMeshPro>();
-            //Ò³Êı
+            //é¡µæ•°
             __instance.pageCount = __instance.introduce.m_pageNumber * 1;
-            //ÏÂÒ»Ò³
+            //ä¸‹ä¸€é¡µ
             if (__instance.currentPage <= __instance.introduce.m_pageNumber)
+            {
                 ++__instance.currentPage;
+            }
             else
+            {
                 __instance.currentPage = 1;
-            //·­Ò³
+            }
+
+            //ç¿»é¡µ
             __instance.introduce.pageToDisplay = __instance.currentPage;
 
-            //×è¶ÏÔ­Ê¼·­Ò³
+            //é˜»æ–­åŸå§‹ç¿»é¡µ
             return false;
         }
     }
@@ -189,9 +386,12 @@ namespace CustomizeLib.MelonLoader
                         continue;
                     if (childTransform.name == "Name")
                     {
-                        childTransform.GetComponent<TextMeshPro>().text = CustomCore.ZombiesAlmanac[__instance.theZombieType].Item1;
-                        childTransform.GetChild(0).GetComponent<TextMeshPro>().text = CustomCore.ZombiesAlmanac[__instance.theZombieType].Item1;
+                        childTransform.GetComponent<TextMeshPro>().text =
+                            CustomCore.ZombiesAlmanac[__instance.theZombieType].Item1;
+                        childTransform.GetChild(0).GetComponent<TextMeshPro>().text =
+                            CustomCore.ZombiesAlmanac[__instance.theZombieType].Item1;
                     }
+
                     if (childTransform.name == "Info")
                     {
                         TextMeshPro info = childTransform.GetComponent<TextMeshPro>();
@@ -200,11 +400,14 @@ namespace CustomizeLib.MelonLoader
                         info.text = CustomCore.ZombiesAlmanac[__instance.theZombieType].Item2;
                         __instance.introduce = info;
                     }
+
                     if (childTransform.name == "Cost")
                         childTransform.GetComponent<TextMeshPro>().text = "";
                 }
+
                 return false;
             }
+
             return true;
         }
     }
@@ -214,7 +417,8 @@ namespace CustomizeLib.MelonLoader
     {
         public static void Postfix(ref GameObject __result)
         {
-            if (__result is not null && __result.TryGetComponent<Plant>(out var plant) && CustomCore.CustomPlantTypes.Contains(plant.thePlantType))
+            if (__result is not null && __result.TryGetComponent<Plant>(out var plant) &&
+                CustomCore.CustomPlantTypes.Contains(plant.thePlantType))
             {
                 TypeMgr.GetPlantTag(plant);
             }
@@ -232,34 +436,43 @@ namespace CustomizeLib.MelonLoader
             {
                 GameAPP.resourcesManager.plantPrefabs[plant.Key] = plant.Value.Prefab;
                 GameAPP.resourcesManager.plantPrefabs[plant.Key].tag = "Plant";
-                if (!GameAPP.resourcesManager.allPlants.Contains(plant.Key)) GameAPP.resourcesManager.allPlants.Add(plant.Key);
+                if (!GameAPP.resourcesManager.allPlants.Contains(plant.Key))
+                    GameAPP.resourcesManager.allPlants.Add(plant.Key);
                 PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;
                 PlantDataLoader.plantDatas.Add(plant.Key, plant.Value.PlantData);
                 GameAPP.resourcesManager.plantPreviews[plant.Key] = plant.Value.Preview;
                 GameAPP.resourcesManager.plantPreviews[plant.Key].tag = "Preview";
             }
+
             Il2CppSystem.Array array = MixData.data.Cast<Il2CppSystem.Array>();
             foreach (var f in CustomCore.CustomFusions)
             {
                 array.SetValue(f.Item1, f.Item2, f.Item3);
             }
+
             foreach (var z in CustomCore.CustomZombies)
             {
-                if (!GameAPP.resourcesManager.allZombieTypes.Contains(z.Key)) GameAPP.resourcesManager.allZombieTypes.Add(z.Key);
+                if (!GameAPP.resourcesManager.allZombieTypes.Contains(z.Key))
+                    GameAPP.resourcesManager.allZombieTypes.Add(z.Key);
                 GameAPP.resourcesManager.zombiePrefabs[z.Key] = z.Value.Item1;
                 GameAPP.resourcesManager.zombiePrefabs[z.Key].tag = "Zombie";
             }
+
             foreach (var bullet in CustomCore.CustomBullets)
             {
                 GameAPP.resourcesManager.bulletPrefabs[bullet.Key] = bullet.Value;
-                if (!GameAPP.resourcesManager.allBullets.Contains(bullet.Key)) GameAPP.resourcesManager.allBullets.Add(bullet.Key);
+                if (!GameAPP.resourcesManager.allBullets.Contains(bullet.Key))
+                    GameAPP.resourcesManager.allBullets.Add(bullet.Key);
             }
+
             foreach (var par in CustomCore.CustomParticles)
             {
                 GameAPP.particlePrefab[(int)par.Key] = par.Value;
                 GameAPP.resourcesManager.particlePrefabs[par.Key] = par.Value;
-                if (!GameAPP.resourcesManager.allParticles.Contains(par.Key)) GameAPP.resourcesManager.allParticles.Add(par.Key);
+                if (!GameAPP.resourcesManager.allParticles.Contains(par.Key))
+                    GameAPP.resourcesManager.allParticles.Add(par.Key);
             }
+
             foreach (var spr in CustomCore.CustomSprites)
             {
                 GameAPP.spritePrefab[spr.Key] = spr.Value;
@@ -280,9 +493,10 @@ namespace CustomizeLib.MelonLoader
 
                 if (Board.Instance.theMoney < cost)
                 {
-                    InGameText.Instance.ShowText($"´óÕĞĞèÒª{cost}½ğ±Ò", 5);
+                    InGameText.Instance.ShowText($"å¤§æ‹›éœ€è¦{cost}é‡‘å¸", 5);
                     return false;
                 }
+
                 if (plant.SuperSkill())
                 {
                     CustomCore.SuperSkills[plant.thePlantType].Item2(plant);
@@ -290,8 +504,10 @@ namespace CustomizeLib.MelonLoader
                     __instance.UsedEvent(plant.thePlantColumn, plant.thePlantRow, cost);
                     __instance.OtherSuperSkill(plant);
                 }
+
                 return false;
             }
+
             return true;
         }
     }
@@ -305,23 +521,44 @@ namespace CustomizeLib.MelonLoader
         {
             for (int i = __result.Count - 1; i >= 0; i--)
             {
-                if (__result[i] is not null && TypeMgr.BigNut(__result[i].thePlantType))
+                if (__result.ToArray()[i] is not null && TypeMgr.BigNut(__result.ToArray()[i].thePlantType))
                 {
                     __result.RemoveAt(i);
                 }
             }
         }
 
+        /// <summary>
+        /// å·¦é”®ç‚¹å‡»
+        /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch("LeftClickWithNothing")]
         public static void PostLeftClickWithNothing()
         {
-            foreach (GameObject gameObject in (List<GameObject>)[..from RaycastHit2D raycastHit2D in
-                                           (RaycastHit2D[])Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition),
-                                           Vector2.zero) select raycastHit2D.collider.gameObject])
+            // æ‰§è¡Œå°„çº¿æ£€æµ‹è·å–æ‰€æœ‰ç¢°æ’ç‰©ä½“
+            RaycastHit2D[] raycastHits = Physics2D.RaycastAll(
+                Camera.main.ScreenToWorldPoint(Input.mousePosition),
+                Vector2.zero
+            );
+
+            // åˆ›å»ºåˆ—è¡¨å­˜å‚¨æ‰€æœ‰ç¢°æ’çš„æ¸¸æˆå¯¹è±¡
+            List<GameObject> hitGameObjects = [];
+            foreach (RaycastHit2D raycastHit in raycastHits)
             {
-                if (gameObject.TryGetComponent<Plant>(out var plant) && CustomCore.CustomPlantClicks.ContainsKey(plant.thePlantType))
+                if (raycastHit.collider != null)
                 {
+                    hitGameObjects.Add(raycastHit.collider.gameObject);
+                }
+            }
+
+            // éå†æ‰€æœ‰ç¢°æ’çš„æ¸¸æˆå¯¹è±¡
+            foreach (GameObject gameObject in hitGameObjects)
+            {
+                //å¦‚æœæ¤ç‰©å­˜åœ¨å¹¶ä¸”è‡ªå®šä¹‰å•å‡»åˆ—è¡¨ä¸­å­˜åœ¨
+                if (gameObject.TryGetComponent<Plant>(out var plant) &&
+                    CustomCore.CustomPlantClicks.ContainsKey(plant.thePlantType))
+                {
+                    //è§¦å‘å•å‡»
                     CustomCore.CustomPlantClicks[plant.thePlantType](plant);
                     return;
                 }
@@ -345,7 +582,23 @@ namespace CustomizeLib.MelonLoader
     }
 
     /// <summary>
-    /// µã»÷»»·ô
+    /// åˆ·æ–°å¡ç‰Œè´´å›¾
+    /// </summary>
+    [HarmonyPatch(typeof(SeedLibrary))]
+    public static class SeedLibraryPatch
+    {
+        [HarmonyPatch(nameof(SeedLibrary.Awake))]
+        [HarmonyPostfix]
+        public static void PostAwake(SeedLibrary __instance)
+        {
+            //ä¸ºä»€ä¹ˆPostShowNormalCardä¼šæ— é™é€’å½’ï¼Ÿï¼Ÿï¼Ÿ
+            //Grid
+            __instance.transform.FindCardUIAndChangeSprite();
+        }
+    }
+
+    /// <summary>
+    /// ç‚¹å‡»æ¢è‚¤
     /// </summary>
     [HarmonyPatch(typeof(SkinButton), nameof(SkinButton.OnMouseUpAsButton))]
     public static class SkinButton_OnMouseUpAsButton
@@ -356,28 +609,56 @@ namespace CustomizeLib.MelonLoader
             PlantType plantType = (PlantType)__instance.showPlant.theSeedType;
             if (CustomCore.CustomPlantsSkin.ContainsKey(plantType))
             {
-                //½»»»Ô¤ÖÆÌåÒıÓÃ
                 CustomPlantData customPlantData = CustomCore.CustomPlantsSkin[plantType];
+                //äº¤æ¢é¢„åˆ¶ä½“å¼•ç”¨
                 (GameAPP.resourcesManager.plantPrefabs[plantType], customPlantData.Prefab) =
                     (customPlantData.Prefab, GameAPP.resourcesManager.plantPrefabs[plantType]);
+
+                //äº¤æ¢é¢„è§ˆå›¾
+                (GameAPP.resourcesManager.plantPreviews[plantType], customPlantData.Preview) =
+                    (customPlantData.Preview, GameAPP.resourcesManager.plantPreviews[plantType]);
+
+                //äº¤æ¢æ¤ç‰©æ•°æ®
+                (PlantDataLoader.plantData[(int)plantType], customPlantData.PlantData) =
+                    (customPlantData.PlantData, PlantDataLoader.plantData[(int)plantType]);
+                PlantDataLoader.plantDatas[plantType] = PlantDataLoader.plantData[(int)plantType];
                 CustomCore.CustomPlantsSkin[plantType] = customPlantData;
 
-                GameObject prefab = GameAPP.resourcesManager.plantPrefabs[(PlantType)__instance.showPlant.theSeedType];
-                Transform transform = AlmanacMenu.Instance.currentShowCtrl.localShowPlant.transform.parent;
+                //äº¤æ¢ç‰¹æ€§åˆ—è¡¨
+                Extensions.SwapTypeMgrExtraSkinAndBackup(plantType);
 
-                //¾ÉµÄ£¬´«µİÍêÊı¾İ¾ÍÏú»Ù
+                //GameObject prefab = GameAPP.resourcesManager.plantPrefabs[(PlantType)__instance.showPlant.theSeedType];
+
+                //Transform transform = AlmanacMenu.Instance.currentShowCtrl.localShowPlant.transform.parent;
+
+                //æ—§çš„ï¼Œä¼ é€’å®Œæ•°æ®å°±é”€æ¯
                 GameObject oldGameObject = AlmanacMenu.Instance.currentShowCtrl.localShowPlant;
                 oldGameObject.name = "ToDestroy";
-                //ÊµÀı»¯ĞÂµÄ
-                AlmanacMenu.Instance.currentShowCtrl.localShowPlant = UnityEngine.Object.Instantiate(prefab, transform);
+                // //å®ä¾‹åŒ–æ–°çš„
+                // AlmanacMenu.Instance.currentShowCtrl.localShowPlant = UnityEngine.Object.Instantiate(prefab, transform);
+                // //åŒæ­¥ä½ç½®
+                // AlmanacMenu.Instance.currentShowCtrl.localShowPlant.transform.position =
+                //     oldGameObject.transform.position;
+                // AlmanacMenu.Instance.currentShowCtrl.localShowPlant.transform.localPosition =
+                //     oldGameObject.transform.localPosition;
 
-                //Í¬²½Î»ÖÃ
-                AlmanacMenu.Instance.currentShowCtrl.localShowPlant.transform.position = oldGameObject.transform.position;
-                AlmanacMenu.Instance.currentShowCtrl.localShowPlant.transform.localPosition =
-                    oldGameObject.transform.localPosition;
-
-                //Ïú»Ù¾ÉµÄ
+                //é”€æ¯æ—§çš„
                 UnityEngine.Object.Destroy(oldGameObject);
+
+                //æ ‡è®°æ˜¯å¦æ¢è‚¤
+                CustomCore.CustomPlantsSkinActive[plantType] = !CustomCore.CustomPlantsSkinActive[plantType];
+                //__instance.showPlant.gameObject.SetActive(false);
+                __instance.showPlant.InitNameAndInfoFromJson();
+                AlmanacMenu.Instance.currentShowCtrl.localShowPlant =
+                    AlmanacMenu.Instance.currentShowCtrl.SetPlant((int)plantType);
+
+                if (AlmanacMenu.Instance.currentShowCtrl.localShowPlant.GetComponent<CustomPlantMonoBehaviour>() !=
+                    null)
+                {
+                    UnityEngine.Object.Destroy(AlmanacMenu.Instance.currentShowCtrl.localShowPlant
+                        .GetComponent<CustomPlantMonoBehaviour>());
+                }
+
                 return false;
             }
 
@@ -396,6 +677,7 @@ namespace CustomizeLib.MelonLoader
             {
                 __instance.thePlantType = CustomCore.CustomAdvancedBuffs[__instance.theBuffNumber].Item1;
             }
+
             if (__instance.theBuffType == 2 && CustomCore.CustomUltimateBuffs.ContainsKey(__instance.theBuffNumber))
             {
                 __instance.thePlantType = CustomCore.CustomUltimateBuffs[__instance.theBuffNumber].Item1;
@@ -413,18 +695,21 @@ namespace CustomizeLib.MelonLoader
             if (CustomCore.CustomAdvancedBuffs.Count > 0)
             {
                 bool[] newAdv = new bool[__instance.advancedUpgrades.Count + CustomCore.CustomAdvancedBuffs.Count];
-                int[] newAdvUnlock = new int[__instance.advancedUnlockRound.Count + CustomCore.CustomAdvancedBuffs.Count];
+                int[] newAdvUnlock =
+                    new int[__instance.advancedUnlockRound.Count + CustomCore.CustomAdvancedBuffs.Count];
                 Array.Copy(__instance.advancedUpgrades, newAdv, __instance.advancedUpgrades.Length);
                 Array.Copy(__instance.advancedUnlockRound, newAdvUnlock, __instance.advancedUnlockRound.Length);
                 __instance.advancedUpgrades = newAdv;
                 __instance.advancedUnlockRound = newAdvUnlock;
             }
+
             if (CustomCore.CustomUltimateBuffs.Count > 0)
             {
                 bool[] newUlti = new bool[__instance.ultimateUpgrades.Count + CustomCore.CustomUltimateBuffs.Count];
                 Array.Copy(__instance.ultimateUpgrades, newUlti, __instance.ultimateUpgrades.Length);
                 __instance.ultimateUpgrades = newUlti;
             }
+
             if (CustomCore.CustomDebuffs.Count > 0)
             {
                 bool[] newdeb = new bool[__instance.debuff.Count + CustomCore.CustomDebuffs.Count];
@@ -439,9 +724,10 @@ namespace CustomizeLib.MelonLoader
         {
             for (int i = __result.Count - 1; i >= 0; i--)
             {
-                if (CustomCore.CustomAdvancedBuffs.ContainsKey(__result[i]) && !CustomCore.CustomAdvancedBuffs[__result[i]].Item3())
+                if (CustomCore.CustomAdvancedBuffs.ContainsKey(__result.ToArray()[i]) &&
+                    !CustomCore.CustomAdvancedBuffs[__result.ToArray()[i]].Item3())
                 {
-                    __result.Remove(__result[i]);
+                    __result.Remove(__result.ToArray()[i]);
                 }
             }
         }
@@ -456,15 +742,20 @@ namespace CustomizeLib.MelonLoader
         {
             foreach (var travelBuff in __instance.gameObject.GetComponentsInChildren<TravelBuff>())
             {
-                if (travelBuff.theBuffType is (int)BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(travelBuff.theBuffNumber))
+                if (travelBuff.theBuffType is (int)BuffType.AdvancedBuff &&
+                    CustomCore.CustomAdvancedBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text =
+                        $"ï¿¥{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
                 }
-                if (travelBuff.theBuffType is (int)BuffType.UltimateBuff && CustomCore.CustomUltimateBuffs.ContainsKey(travelBuff.theBuffNumber))
+
+                if (travelBuff.theBuffType is (int)BuffType.UltimateBuff &&
+                    CustomCore.CustomUltimateBuffs.ContainsKey(travelBuff.theBuffNumber))
                 {
                     travelBuff.cost = CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item3;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"£¤{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
+                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text =
+                        $"ï¿¥{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
                 }
             }
         }
@@ -482,6 +773,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.BigNut.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -494,6 +803,7 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
             return true;
         }
 
@@ -506,6 +816,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.DoubleBoxPlants.TryGetValue(thePlantType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -518,6 +846,7 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
             return true;
         }
 
@@ -530,6 +859,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.FlyingPlants.TryGetValue(thePlantType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -562,6 +909,33 @@ namespace CustomizeLib.MelonLoader
 
                 return false;
             }
+
+            if (CustomCore.CustomPlantsSkin.ContainsKey(plant.thePlantType))
+            {
+                plant.plantTag = new()
+                {
+                    icePlant = TypeMgr.IsIcePlant(plant.thePlantType),
+                    caltropPlant = TypeMgr.IsCaltrop(plant.thePlantType),
+                    doubleBoxPlant = TypeMgr.DoubleBoxPlants(plant.thePlantType),
+                    firePlant = TypeMgr.IsFirePlant(plant.thePlantType),
+                    flyingPlant = TypeMgr.FlyingPlants(plant.thePlantType),
+                    lanternPlant = TypeMgr.IsPlantern(plant.thePlantType),
+                    smallLanternPlant = TypeMgr.IsSmallRangeLantern(plant.thePlantType),
+                    magnetPlant = TypeMgr.IsMagnetPlants(plant.thePlantType),
+                    nutPlant = TypeMgr.IsNut(plant.thePlantType),
+                    tallNutPlant = TypeMgr.IsTallNut(plant.thePlantType),
+                    potatoPlant = TypeMgr.IsPotatoMine(plant.thePlantType),
+                    potPlant = TypeMgr.IsPot(plant.thePlantType),
+                    puffPlant = TypeMgr.IsPuff(plant.thePlantType),
+                    pumpkinPlant = TypeMgr.IsPumpkin(plant.thePlantType),
+                    spickRockPlant = TypeMgr.IsSpickRock(plant.thePlantType),
+                    tanglekelpPlant = TypeMgr.IsTangkelp(plant.thePlantType),
+                    waterPlant = TypeMgr.IsWaterPlant(plant.thePlantType)
+                };
+
+                return false;
+            }
+
             return true;
         }
 
@@ -574,6 +948,7 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
             return true;
         }
 
@@ -586,6 +961,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsCaltrop.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -598,6 +991,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsFirePlant.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -610,6 +1021,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsIcePlant.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -622,6 +1051,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsMagnetPlants.TryGetValue(thePlantType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -634,6 +1081,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsNut.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -646,6 +1111,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsPlantern.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -658,6 +1141,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsPot.TryGetValue(thePlantType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -670,6 +1171,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsPotatoMine.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -682,6 +1201,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsPuff.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -694,6 +1231,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsPumpkin.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -706,6 +1261,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsSmallRangeLantern.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -718,6 +1291,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsSpecialPlant.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -730,6 +1321,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsSpickRock.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -742,6 +1351,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsTallNut.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -754,6 +1381,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsTangkelp.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -766,6 +1411,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.IsWaterPlant.TryGetValue(theSeedType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
 
@@ -778,6 +1441,24 @@ namespace CustomizeLib.MelonLoader
                 __result = true;
                 return false;
             }
+
+            if (CustomCore.TypeMgrExtraSkin.UmbrellaPlants.TryGetValue(thePlantType, out int value))
+            {
+                switch (value)
+                {
+                    case -1:
+                        return true;
+
+                    case 0:
+                        __result = false;
+                        return false;
+
+                    case 1:
+                        __result = true;
+                        return false;
+                }
+            }
+
             return true;
         }
     }

@@ -28,7 +28,7 @@ namespace ElectricPeaReborn.BepInEx
             {
                 bullet.normalSpeed = 3;
                 var pos = bullet.transform.position;
-                LayerMask layermask = bullet.zombieLayer.m_Mask;
+                //LayerMask layermask = bullet.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 1.5f);
                 foreach (var z in array)
                 {

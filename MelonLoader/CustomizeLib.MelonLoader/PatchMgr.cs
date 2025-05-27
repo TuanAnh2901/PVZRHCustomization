@@ -1,6 +1,9 @@
 ﻿using HarmonyLib;
 using Il2CppTMPro;
+using MelonLoader;
+using MelonLoader.Utils;
 using System.Text.Json;
+using System.Xml.Linq;
 using UnityEngine;
 
 ///
@@ -10,11 +13,6 @@ using UnityEngine;
 ///
 namespace CustomizeLib.MelonLoader
 {
-    /// <summary>
-    /// 初始化结束显示换肤按钮，加载皮肤
-    /// </summary>
-    /// <param name="__instance"></param>
-    /// <returns></returns>
     /// <summary>
     /// 植物图鉴
     /// </summary>
@@ -41,7 +39,7 @@ namespace CustomizeLib.MelonLoader
                 if (fullName != null)
                 {
                     //寻找Mods/Skin/
-                    string modsPath = Path.Combine(fullName, "Mods", "Skin");
+                    string modsPath = Path.Combine(fullName, MelonEnvironment.ModsDirectory, "Skin");
                     if (Directory.Exists(modsPath))
                     {
                         //只要skin_开头的文件
@@ -95,7 +93,7 @@ namespace CustomizeLib.MelonLoader
                                         }
                                         catch (Exception e)
                                         {
-                                            Console.WriteLine(e);
+                                            MelonLogger.Msg(e);
                                         }
                                     }
 
@@ -108,7 +106,7 @@ namespace CustomizeLib.MelonLoader
                                     }
                                     catch (Exception e)
                                     {
-                                        Console.WriteLine(e);
+                                        MelonLogger.Msg(e);
                                     }
 
                                     //获得新皮肤预览图
@@ -161,7 +159,7 @@ namespace CustomizeLib.MelonLoader
                                         }
                                         catch (Exception e)
                                         {
-                                            Console.WriteLine(e);
+                                            MelonLogger.Msg(e);
                                         }
                                     }
 
@@ -207,11 +205,11 @@ namespace CustomizeLib.MelonLoader
                                     try
                                     {
                                         CustomCore.PlantsSkinAlmanac.Add(plantType, jsonFlag ?
-                                            (plantAlmanac.Name, plantAlmanac.Description) : null);
+                                            (plantAlmanac.Name, plantAlmanac.Description) : null);//无json则不换图鉴内容
                                     }
                                     catch (Exception e)
                                     {
-                                        Console.WriteLine(e);
+                                        MelonLogger.Msg(e);
                                     }
 
                                     //有皮肤，按钮可以显示
@@ -221,7 +219,7 @@ namespace CustomizeLib.MelonLoader
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine(e);
+                                MelonLogger.Msg(e);
                             }
                         }
                     }
@@ -238,7 +236,7 @@ namespace CustomizeLib.MelonLoader
             if (CustomCore.CustomPlants.ContainsKey(plantType))
             {
                 //二创植物，按钮可以显示
-                __instance.skinButton.SetActive(CustomCore.CustomPlantsSkin.ContainsKey(plantType));
+                __instance.skinButton.SetActive(CustomCore.CustomPlantsSkin.ContainsKey(plantType));//修复其他植物不显示换肤按钮的bug
             }
         }
 
@@ -292,11 +290,11 @@ namespace CustomizeLib.MelonLoader
                 //阻断原始的加载
                 return false;
             }
-
+            //如果是二创库里注册的换皮肤植物
             if (CustomCore.CustomPlantsSkinActive.ContainsKey((PlantType)__instance.theSeedType) && CustomCore.PlantsSkinAlmanac.ContainsKey((PlantType)__instance.theSeedType) && CustomCore.CustomPlantsSkinActive[(PlantType)__instance.theSeedType])
             {
                 var alm = CustomCore.PlantsSkinAlmanac[(PlantType)__instance.theSeedType];
-                if (alm is null) return true;
+                if (alm is null) return true;//若无图鉴数据，直接进入函数本体，继续执行原本读取图鉴数据的逻辑
                 var almanac = alm.Value;
                 //遍历图鉴上的组件
                 for (int i = 0; i < __instance.transform.childCount; i++)
@@ -377,6 +375,7 @@ namespace CustomizeLib.MelonLoader
         [HarmonyPrefix]
         public static bool PreInitNameAndInfoFromJson(AlmanacMgrZombie __instance)
         {
+            //若在二创僵尸图鉴列表中
             if (CustomCore.ZombiesAlmanac.ContainsKey(__instance.theZombieType))
             {
                 for (int i = 0; i < __instance.transform.childCount; i++)
@@ -384,6 +383,7 @@ namespace CustomizeLib.MelonLoader
                     Transform childTransform = __instance.transform.GetChild(i);
                     if (childTransform == null)
                         continue;
+                    //僵尸名字
                     if (childTransform.name == "Name")
                     {
                         childTransform.GetComponent<TextMeshPro>().text =
@@ -391,7 +391,7 @@ namespace CustomizeLib.MelonLoader
                         childTransform.GetChild(0).GetComponent<TextMeshPro>().text =
                             CustomCore.ZombiesAlmanac[__instance.theZombieType].Item1;
                     }
-
+                    //僵尸信息
                     if (childTransform.name == "Info")
                     {
                         TextMeshPro info = childTransform.GetComponent<TextMeshPro>();
@@ -412,6 +412,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 为二创植物附加植物特性
+    /// </summary>
     [HarmonyPatch(typeof(CreatePlant), "SetPlant")]
     public static class CreatePlantPatch
     {
@@ -425,6 +428,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 资源加载
+    /// </summary>
     [HarmonyPatch(typeof(GameAPP))]
     public static class GameAPPPatch
     {
@@ -432,54 +438,57 @@ namespace CustomizeLib.MelonLoader
         [HarmonyPatch("LoadResources")]
         public static void LoadResources()
         {
-            foreach (var plant in CustomCore.CustomPlants)
+            foreach (var plant in CustomCore.CustomPlants)//二创植物
             {
-                GameAPP.resourcesManager.plantPrefabs[plant.Key] = plant.Value.Prefab;
-                GameAPP.resourcesManager.plantPrefabs[plant.Key].tag = "Plant";
+                GameAPP.resourcesManager.plantPrefabs[plant.Key] = plant.Value.Prefab;//注册预制体
+                GameAPP.resourcesManager.plantPrefabs[plant.Key].tag = "Plant";//必须打tag
                 if (!GameAPP.resourcesManager.allPlants.Contains(plant.Key))
-                    GameAPP.resourcesManager.allPlants.Add(plant.Key);
-                PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;
+                    GameAPP.resourcesManager.allPlants.Add(plant.Key);//注册植物类型
+                PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;//注册植物数据
                 PlantDataLoader.plantDatas.Add(plant.Key, plant.Value.PlantData);
-                GameAPP.resourcesManager.plantPreviews[plant.Key] = plant.Value.Preview;
-                GameAPP.resourcesManager.plantPreviews[plant.Key].tag = "Preview";
+                GameAPP.resourcesManager.plantPreviews[plant.Key] = plant.Value.Preview;//注册植物预览
+                GameAPP.resourcesManager.plantPreviews[plant.Key].tag = "Preview";//必修打tag
             }
 
-            Il2CppSystem.Array array = MixData.data.Cast<Il2CppSystem.Array>();
+            Il2CppSystem.Array array = MixData.data.Cast<Il2CppSystem.Array>();//注册融合配方
             foreach (var f in CustomCore.CustomFusions)
             {
                 array.SetValue(f.Item1, f.Item2, f.Item3);
             }
 
-            foreach (var z in CustomCore.CustomZombies)
+            foreach (var z in CustomCore.CustomZombies)//注册二创僵尸
             {
                 if (!GameAPP.resourcesManager.allZombieTypes.Contains(z.Key))
-                    GameAPP.resourcesManager.allZombieTypes.Add(z.Key);
-                GameAPP.resourcesManager.zombiePrefabs[z.Key] = z.Value.Item1;
-                GameAPP.resourcesManager.zombiePrefabs[z.Key].tag = "Zombie";
+                    GameAPP.resourcesManager.allZombieTypes.Add(z.Key);//注册僵尸类型
+                GameAPP.resourcesManager.zombiePrefabs[z.Key] = z.Value.Item1;//注册僵尸预制体
+                GameAPP.resourcesManager.zombiePrefabs[z.Key].tag = "Zombie";//必修打tag
             }
 
-            foreach (var bullet in CustomCore.CustomBullets)
+            foreach (var bullet in CustomCore.CustomBullets)//注册二创子弹
             {
-                GameAPP.resourcesManager.bulletPrefabs[bullet.Key] = bullet.Value;
+                GameAPP.resourcesManager.bulletPrefabs[bullet.Key] = bullet.Value;//注册子弹预制体
                 if (!GameAPP.resourcesManager.allBullets.Contains(bullet.Key))
-                    GameAPP.resourcesManager.allBullets.Add(bullet.Key);
+                    GameAPP.resourcesManager.allBullets.Add(bullet.Key);//注册子弹类型
             }
 
-            foreach (var par in CustomCore.CustomParticles)
+            foreach (var par in CustomCore.CustomParticles)//注册粒子效果
             {
                 GameAPP.particlePrefab[(int)par.Key] = par.Value;
-                GameAPP.resourcesManager.particlePrefabs[par.Key] = par.Value;
+                GameAPP.resourcesManager.particlePrefabs[par.Key] = par.Value;//注册粒子效果预制体
                 if (!GameAPP.resourcesManager.allParticles.Contains(par.Key))
-                    GameAPP.resourcesManager.allParticles.Add(par.Key);
+                    GameAPP.resourcesManager.allParticles.Add(par.Key);//注册粒子效果类型
             }
 
-            foreach (var spr in CustomCore.CustomSprites)
+            foreach (var spr in CustomCore.CustomSprites)//注册自定义精灵贴图
             {
                 GameAPP.spritePrefab[spr.Key] = spr.Value;
             }
         }
     }
 
+    /// <summary>
+    /// 花钱开大招
+    /// </summary>
     [HarmonyPatch(typeof(Money))]
     public static class MoneyPatch
     {
@@ -489,17 +498,17 @@ namespace CustomizeLib.MelonLoader
         {
             if (CustomCore.SuperSkills.ContainsKey(plant.thePlantType))
             {
-                var cost = CustomCore.SuperSkills[plant.thePlantType].Item1(plant);
+                var cost = CustomCore.SuperSkills[plant.thePlantType].Item1(plant);//实时计算大招花费
 
-                if (Board.Instance.theMoney < cost)
+                if (Board.Instance.theMoney < cost)//如果钱不够
                 {
-                    InGameText.Instance.ShowText($"大招需要{cost}金币", 5);
-                    return false;
+                    InGameText.Instance.ShowText($"大招需要{cost}金币", 5);//提示
+                    return false;//直接返回
                 }
 
                 if (plant.SuperSkill())
                 {
-                    CustomCore.SuperSkills[plant.thePlantType].Item2(plant);
+                    CustomCore.SuperSkills[plant.thePlantType].Item2(plant);//执行大招代码
                     plant.AnimSuperShoot();
                     __instance.UsedEvent(plant.thePlantColumn, plant.thePlantRow, cost);
                     __instance.OtherSuperSkill(plant);
@@ -515,6 +524,9 @@ namespace CustomizeLib.MelonLoader
     [HarmonyPatch(typeof(Mouse))]
     public static class MousePatch
     {
+        /// <summary>
+        /// 防止手套拿起来大坚果
+        /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch("GetPlantsOnMouse")]
         public static void PostGetPlantsOnMouse(ref Il2CppSystem.Collections.Generic.List<Plant> __result)
@@ -529,7 +541,7 @@ namespace CustomizeLib.MelonLoader
         }
 
         /// <summary>
-        /// 左键点击
+        /// 处理自定义左键点击
         /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch("LeftClickWithNothing")]
@@ -566,6 +578,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 处理对植物使用物品事件
+    /// </summary>
     [HarmonyPatch(typeof(Plant))]
     public static class PlantPatch
     {
@@ -666,6 +681,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 已废弃
+    /// </summary>
     [HarmonyPatch(typeof(TravelBuff))]
     public static class TravelBuffPatch
     {
@@ -685,6 +703,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 注册二创词条
+    /// </summary>
     [HarmonyPatch(typeof(TravelMgr))]
     public static class TravelMgrPatch
     {
@@ -692,7 +713,7 @@ namespace CustomizeLib.MelonLoader
         [HarmonyPrefix]
         public static void PostAwake(TravelMgr __instance)
         {
-            if (CustomCore.CustomAdvancedBuffs.Count > 0)
+            if (CustomCore.CustomAdvancedBuffs.Count > 0)//普通词条
             {
                 bool[] newAdv = new bool[__instance.advancedUpgrades.Count + CustomCore.CustomAdvancedBuffs.Count];
                 int[] newAdvUnlock =
@@ -703,14 +724,14 @@ namespace CustomizeLib.MelonLoader
                 __instance.advancedUnlockRound = newAdvUnlock;
             }
 
-            if (CustomCore.CustomUltimateBuffs.Count > 0)
+            if (CustomCore.CustomUltimateBuffs.Count > 0)//强究词条
             {
                 bool[] newUlti = new bool[__instance.ultimateUpgrades.Count + CustomCore.CustomUltimateBuffs.Count];
                 Array.Copy(__instance.ultimateUpgrades, newUlti, __instance.ultimateUpgrades.Length);
                 __instance.ultimateUpgrades = newUlti;
             }
 
-            if (CustomCore.CustomDebuffs.Count > 0)
+            if (CustomCore.CustomDebuffs.Count > 0)//僵尸词条
             {
                 bool[] newdeb = new bool[__instance.debuff.Count + CustomCore.CustomDebuffs.Count];
                 Array.Copy(__instance.debuff, newdeb, __instance.debuff.Length);
@@ -718,6 +739,9 @@ namespace CustomizeLib.MelonLoader
             }
         }
 
+        /// <summary>
+        /// 按自定义条件筛词条
+        /// </summary>
         [HarmonyPatch("GetAdvancedBuffPool")]
         [HarmonyPostfix]
         public static void PostGetAdvancedBuffPool(ref Il2CppSystem.Collections.Generic.List<int> __result)
@@ -733,6 +757,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 词条商店卡片贴图(是否有效没试未知)
+    /// </summary>
     [HarmonyPatch(typeof(TravelStore))]
     public static class TravelStorePatch
     {
@@ -761,6 +788,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 自定义类型，特性附加
+    /// </summary>
     [HarmonyPatch(typeof(TypeMgr))]
     public static class TypeMgrPatch
     {
@@ -904,7 +934,7 @@ namespace CustomizeLib.MelonLoader
                     pumpkinPlant = TypeMgr.IsPumpkin(plant.thePlantType),
                     spickRockPlant = TypeMgr.IsSpickRock(plant.thePlantType),
                     tanglekelpPlant = TypeMgr.IsTangkelp(plant.thePlantType),
-                    waterPlant = TypeMgr.IsWaterPlant(plant.thePlantType)
+                    waterPlant = TypeMgr.IsWaterPlant(plant.thePlantType),
                 };
 
                 return false;
@@ -933,19 +963,6 @@ namespace CustomizeLib.MelonLoader
                     waterPlant = TypeMgr.IsWaterPlant(plant.thePlantType)
                 };
 
-                return false;
-            }
-
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("IsAirZombie")]
-        public static bool PreIsAirZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.IsAirZombie.Contains(theZombieType))
-            {
-                __result = true;
                 return false;
             }
 
@@ -1463,6 +1480,9 @@ namespace CustomizeLib.MelonLoader
         }
     }
 
+    /// <summary>
+    /// 注册二创僵尸数据
+    /// </summary>
     [HarmonyPatch(typeof(ZombieData))]
     public static class ZombieDataPatch
     {

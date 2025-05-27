@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace CustomizeLib.MelonLoader
 {
+    /// <summary>
+    /// 二创植物图鉴数据
+    /// </summary>
     public struct CustomPlantAlmanac
     {
         public string Description { get; set; }
@@ -11,6 +14,9 @@ namespace CustomizeLib.MelonLoader
         public string Name { get; set; }
     }
 
+    /// <summary>
+    /// 二创植物数据
+    /// </summary>
     public struct CustomPlantData
     {
         public int ID { get; set; }
@@ -61,6 +67,11 @@ namespace CustomizeLib.MelonLoader
 
     public static class Extensions
     {
+        /// <summary>
+        /// 换皮肤时备份植物特性
+        /// </summary>
+        /// <param name="typeMgrExtraSkinFromJson"></param>
+        /// <param name="plantType"></param>
         public static void AddValueToTypeMgrExtraSkinBackup(this CustomTypeMgrExtraSkin typeMgrExtraSkinFromJson,
             PlantType plantType)
         {
@@ -95,9 +106,17 @@ namespace CustomizeLib.MelonLoader
             //CustomCore.TypeMgrExtraSkinBackup.WaterZombie.Add(plantType, typeMgrExtraSkinFromJson.WaterZombie);
         }
 
+        /// <summary>
+        /// 防拆解
+        /// </summary>
+        /// <param name="plant"></param>
         public static void DisableDisMix(this Plant plant) =>
                     (plant.firstParent, plant.secondParent) = (PlantType.Nothing, PlantType.Nothing);
 
+        /// <summary>
+        /// 卡槽中植物贴图换皮肤
+        /// </summary>
+        /// <param name="parent"></param>
         public static void FindCardUIAndChangeSprite(this Transform parent)
         {
             for (int i = 0; i < parent.childCount; i++)
@@ -138,6 +157,14 @@ namespace CustomizeLib.MelonLoader
             }
         }
 
+        /// <summary>
+        /// 从ab包里读取资源
+        /// </summary>
+        /// <typeparam name="T">资源类型</typeparam>
+        /// <param name="ab">ab包对象</param>
+        /// <param name="name">对象名称</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static T GetAsset<T>(this AssetBundle ab, string name) where T : UnityEngine.Object
         {
             foreach (var ase in ab.LoadAllAssetsAsync().allAssets)
@@ -151,12 +178,27 @@ namespace CustomizeLib.MelonLoader
             throw new ArgumentException($"Could not find {name} from {ab.name}");
         }
 
+        /// <summary>
+        /// 获取僵尸总血量
+        /// </summary>
+        /// <param name="zombie"></param>
+        /// <returns></returns>
         public static int GetTotalHealth(this Zombie zombie) =>
             (int)zombie.theHealth + zombie.theFirstArmorHealth + zombie.theSecondArmorHealth;
 
+        /// <summary>
+        /// 场上是否存在某类型对象
+        /// </summary>
+        /// <typeparam name="T">要检查的对象类型</typeparam>
+        /// <param name="board"></param>
+        /// <returns></returns>
         public static bool ObjectExist<T>(this Board board) =>
             board.GameObject().transform.GetComponentsInChildren<T>().Length > 0;
 
+        /// <summary>
+        /// 交换换皮肤植物特性
+        /// </summary>
+        /// <param name="plantType"></param>
         public static void SwapTypeMgrExtraSkinAndBackup(PlantType plantType)
         {
             // BigNut
@@ -644,8 +686,7 @@ namespace CustomizeLib.MelonLoader
     // json对象
     public class JsonSkinObject
     {
-        public Dictionary<int, int> CustomBulletType { get; set; } =
-            [];
+        public Dictionary<int, int> CustomBulletType { get; set; } = [];
 
         public CustomPlantData CustomPlantData { get; set; }
         public CustomPlantAlmanac PlantAlmanac { get; set; }

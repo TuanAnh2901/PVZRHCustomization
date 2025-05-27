@@ -795,18 +795,6 @@ namespace CustomizeLib.BepInEx
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch("IsAirZombie")]
-        public static bool PreIsAirZombie(ref ZombieType theZombieType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.IsAirZombie.Contains(theZombieType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
         [HarmonyPatch("IsCaltrop")]
         public static bool PreIsCaltrop(ref PlantType theSeedType, ref bool __result)
         {

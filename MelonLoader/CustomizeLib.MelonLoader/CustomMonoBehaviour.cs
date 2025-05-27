@@ -7,6 +7,9 @@ using Random = System.Random;
 
 namespace CustomizeLib.MelonLoader;
 
+/// <summary>
+/// made by @likefengzi
+/// </summary>
 [RegisterTypeInIl2Cpp]
 public class CustomPlantMonoBehaviour : MonoBehaviour
 {
@@ -145,6 +148,5 @@ public class CustomPlantMonoBehaviour : MonoBehaviour
     public Plant ThisPlant => gameObject.GetComponent<Plant>();
 
     //public BulletType bulletType;
-    public static Dictionary<PlantType, Dictionary<int, int>> BulletTypes =
-        [];
+    public static Dictionary<PlantType, Dictionary<int, int>> BulletTypes = [];
 }

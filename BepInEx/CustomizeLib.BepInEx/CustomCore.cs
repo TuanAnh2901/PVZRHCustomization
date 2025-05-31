@@ -22,7 +22,7 @@ namespace CustomizeLib.BepInEx
         }
     }
 
-    [BepInPlugin("inf75.pvzcustomization", "PVZCustomization", "2.4")]
+    [BepInPlugin("inf75.pvzcustomization", "PVZCustomization", "2.6")]
     public class CustomCore : BasePlugin
     {
         public static class TypeMgrExtra
@@ -156,6 +156,7 @@ namespace CustomizeLib.BepInEx
 
         public static int RegisterCustomBuff(string text, BuffType buffType, Func<bool> canUnlock, int cost, string? color = null, PlantType plantType = PlantType.Nothing)
         {
+            //if (color is not null) text = $"<color={color}>{text}</color>";
             switch (buffType)
             {
                 case BuffType.AdvancedBuff:
@@ -206,8 +207,8 @@ namespace CustomizeLib.BepInEx
         public static void RegisterCustomParticle(ParticleType id, GameObject particle) => CustomParticles.Add(id, particle);
 
         public static void RegisterCustomPlant<TBase, TClass>([NotNull] int id, [NotNull] GameObject prefab, [NotNull] GameObject preview,
-                            List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
-                            where TBase : Plant where TClass : MonoBehaviour
+                                    List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
+                                    where TBase : Plant where TClass : MonoBehaviour
         {
             prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
             prefab.AddComponent<TClass>();
@@ -242,8 +243,8 @@ namespace CustomizeLib.BepInEx
         }
 
         public static void RegisterCustomPlant<TBase>([NotNull] int id, [NotNull] GameObject prefab, [NotNull] GameObject preview,
-                    List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
-                    where TBase : Plant
+                            List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
+                            where TBase : Plant
         {
             prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
             if (!CustomPlantTypes.Contains((PlantType)id))
@@ -277,6 +278,42 @@ namespace CustomizeLib.BepInEx
         }
 
         public static void RegisterCustomPlantClickEvent([NotNull] int id, [NotNull] Action<Plant> action) => CustomPlantClicks.Add((PlantType)id, action);
+
+        /// <summary>
+        /// 注册自定义植物皮肤(用于给原有植物添加皮肤)
+        /// </summary>
+        /// <typeparam name="TBase">植物基类</typeparam>
+        /// <param name="id">植物id</param>
+        /// <param name="prefab">植物预制体</param>
+        /// <param name="preview">植物预览预制体</param>
+        /// <param name="ctor">数据绑定函数</param>
+        public static void RegisterCustomPlantSkin<TBase>([NotNull] int id, [NotNull] GameObject prefab,
+            [NotNull] GameObject preview, Action<TBase> ctor)
+            where TBase : Plant
+        {
+            prefab.tag = "Plant";
+            preview.tag = "Preview";
+            //植物预制体挂载植物脚本
+            prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
+            ctor(prefab.GetComponent<TBase>());
+            CustomPlantsSkinActive.Add((PlantType)id, false);
+            if (!CustomPlantsSkin.ContainsKey((PlantType)id))
+            {
+                //植物id不重复才进行注册
+                //CustomPlantTypes.Add((PlantType)id);
+                CustomPlantsSkin.Add((PlantType)id, new CustomPlantData()
+                {
+                    ID = id,
+                    Prefab = prefab,
+                    Preview = preview,
+                    PlantData = null
+                });
+            }
+            else
+            {
+                Instance.Value.Log.LogError($"Duplicate Plant ID: {id}");
+            }
+        }
 
         /// <summary>
         /// 注册自定义植物

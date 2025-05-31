@@ -4,49 +4,16 @@ using Il2Cpp;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
-using ObsidianRandomZombie.MelonLoader;
 using System.Collections;
 using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(Core), "ObsidianRandomZombie", "1.0", "Infinite75", null)]
-[assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
-[assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
-
-namespace ObsidianRandomZombie.MelonLoader
+namespace ObsidianDollZombie.MelonLoader
 {
     [HarmonyPatch(typeof(DiamondRandomZombie))]
     public static class DiamondRandomZombiePatch
     {
-        [HarmonyPatch("FirstArmorBroken")]
-        [HarmonyPrefix]
-        public static bool PreFirstArmorBroken(DiamondRandomZombie __instance)
-        {
-            if (__instance.theZombieType is (ZombieType)98)
-            {
-                if (__instance.theFirstArmorHealth < __instance.theFirstArmorMaxHealth * 2 / 3)
-                {
-                    __instance.theFirstArmorBroken = 1;
-                    __instance.theFirstArmor.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[204];
-                    return false;
-                }
-                if (__instance.theFirstArmorHealth < __instance.theFirstArmorMaxHealth / 3)
-                {
-                    __instance.theFirstArmorBroken = 2;
-                    __instance.theFirstArmor.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[205];
-                    return false;
-                }
-                if (__instance.theFirstArmorHealth >= __instance.theFirstArmorMaxHealth * 2 / 3)
-                {
-                    __instance.theFirstArmorBroken = 0;
-                    __instance.theFirstArmor.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[207];
-                    return false;
-                }
-            }
-            return true;
-        }
-
         [HarmonyPatch("SetRandomZombie")]
         [HarmonyPrefix]
         public static bool PreSetRandomZombie(DiamondRandomZombie __instance, ref GameObject __result)
@@ -114,9 +81,60 @@ namespace ObsidianRandomZombie.MelonLoader
                 }
                 return false;
             }
+            if (gameObject.CompareTag("Zombie") && gameObject.TryGetComponent<ObsidianDollZombie>(out var z2) && z2.zombie is not null
+                && z2.zombie.theZombieRow == __instance.theMowerRow && !z2.zombie.isMindControlled)
+            {
+                if (!z2.HasMower)
+                {
+                    GameObject mower = __instance.gameObject;
+                    UnityEngine.Object.Destroy(mower.GetComponent<BoxCollider2D>());
+                    UnityEngine.Object.Destroy(mower.GetComponent<Animator>());
+                    UnityEngine.Object.Destroy(mower.GetComponent<Mower>());
+                    mower.transform.SetParent(z2.gameObject.transform.FindChild("Zombie_innerarm_hand"));
+                    mower.transform.localPosition = new(-0.8f, -1.6f);
+                    mower.layer = mower.transform.parent.gameObject.layer;
+                }
+                z2.PickUpMower();
+                return false;
+            }
+
             return true;
         }
     }
+
+    /*
+    [HarmonyPatch(typeof(RandomZombie))]
+    public static class RandomZombiePatch
+    {
+        [HarmonyPatch(nameof(RandomZombie.FirstArmorTakeDamage))]
+        [HarmonyPrefix]
+        public static bool PostFirstArmorTakeDamage(RandomZombie __instance)
+        {
+            if (__instance.theZombieType is (ZombieType)98)
+            {
+                if (__instance.theFirstArmorHealth < __instance.theFirstArmorMaxHealth * 2 / 3)
+                {
+                    __instance.theFirstArmorBroken = 1;
+                    __instance.theFirstArmor.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[204];
+                    return false;
+                }
+                if (__instance.theFirstArmorHealth < __instance.theFirstArmorMaxHealth / 3)
+                {
+                    __instance.theFirstArmorBroken = 2;
+                    __instance.theFirstArmor.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[205];
+                    return false;
+                }
+                if (__instance.theFirstArmorHealth >= __instance.theFirstArmorMaxHealth * 2 / 3)
+                {
+                    __instance.theFirstArmorBroken = 0;
+                    __instance.theFirstArmor.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[207];
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    */
 
     [HarmonyPatch(typeof(Zombie))]
     public static class ZombiePatch
@@ -136,13 +154,17 @@ namespace ObsidianRandomZombie.MelonLoader
                     CreateZombie.Instance.SetZombieWithMindControl(__instance.theZombieRow, (ZombieType)98, __instance.transform.position.x);
                 }
             }
+            if (__instance.TryCast<DiamondRandomZombie>() is not null && UnityEngine.Random.RandomRangeInt(0, 9) == 1)
+            {
+                CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)99, __instance.transform.position.x);
+            }
         }
 
         [HarmonyPatch("AttackEffect")]
         [HarmonyPrefix]
         public static bool PreAttackEffect(Zombie __instance, ref Plant plant)
         {
-            if (__instance.theZombieType is (ZombieType)99 && __instance.gameObject.TryGetComponent<ObsidianRandomZombie>(out var z)
+            if (__instance.theZombieType is (ZombieType)99 && __instance.gameObject.TryGetComponent<ObsidianDollZombie>(out var z)
                 && !__instance.isMindControlled && z.HasMower)
             {
                 plant.Die();
@@ -158,24 +180,7 @@ namespace ObsidianRandomZombie.MelonLoader
         [HarmonyPatch("Warm")]
         [HarmonyPatch("KnockBack")]
         [HarmonyPrefix]
-        public static bool PreKnockBack(Zombie __instance) => __instance.theZombieType is not (ZombieType)98;
-    }
-
-    public class Core : MelonMod
-    {
-        public override void OnInitializeMelon()
-        {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "obsidianrandomzombie");
-            CustomCore.RegisterCustomZombie<DiamondRandomZombie, ObsidianRandomZombie>((ZombieType)98,
-                ab.GetAsset<GameObject>("ObsidianRandomZombie"), 206, 50, 40000, 12000, 0);
-            CustomCore.RegisterCustomSprite(204, ab.GetAsset<Sprite>("ObsidianRandomZombie_head2"));
-            CustomCore.RegisterCustomSprite(205, ab.GetAsset<Sprite>("ObsidianRandomZombie_head3"));
-            CustomCore.RegisterCustomSprite(206, ab.GetAsset<Sprite>("ObsidianRandomZombie_0"));
-            CustomCore.RegisterCustomSprite(207, ab.GetAsset<Sprite>("ObsidianRandomZombie_head1"));
-            ObsidianRandomZombie.Debuff = CustomCore.RegisterCustomBuff("黑曜石盲盒僵尸只开出领袖僵尸", BuffType.Debuff, () => true, 0);
-            CustomCore.AddZombieAlmanacStrings(98, "黑曜石盲盒僵尸", "?????!!!!!\n\n<color=#3D1400>头套贴图作者：@林秋AutumnLin @E杯芒果奶昔 </color>\n<color=#3D1400>韧性：</color><color=red>12000</color>\n<color=#3D1400>特点：</color><color=red>究极黑曜石巨人生成时伴生。免疫击退、冰冻、红温，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，受到攻击时扣除与减伤前伤害等量钱币，究极机械保龄球替伤无效，死亡时变成随机非领袖僵尸</color>\n<color=#3D1400>词条：</color><color=red>黑曜石盲盒僵尸只开出领袖僵尸</color>\n<color=#3D1400>“小植物们，快来看我的另一个新发明，黑曜石盲盒，看起来很棒对不对，我觉得非常好，他不但无比坚硬，还很看运气。不过有也给了一个小小的礼物，让你一定玩的「开心」，还有，不要再用大嘴花解决我的发明了！！“ \n(埃德加博士留的)</color>");
-        }
+        public static bool PreKnockBack(Zombie __instance) => __instance.theZombieType is not (ZombieType)98 or (ZombieType)99;
     }
 
     [RegisterTypeInIl2Cpp]
@@ -216,7 +221,7 @@ namespace ObsidianRandomZombie.MelonLoader
                     }
                 }
                 catch { break; }
-            } while (Board.Instance is not null && zombie is not null && zombie.isActiveAndEnabled);
+            } while (Board.Instance is not null && zombie is not null && zombie.isActiveAndEnabled && zombie.theHealth > 0);
         }
 
         public void Start()

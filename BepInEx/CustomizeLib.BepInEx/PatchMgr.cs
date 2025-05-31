@@ -428,8 +428,11 @@ namespace CustomizeLib.BepInEx
                 GameAPP.resourcesManager.plantPrefabs[plant.Key] = plant.Value.Prefab;
                 GameAPP.resourcesManager.plantPrefabs[plant.Key].tag = "Plant";
                 if (!GameAPP.resourcesManager.allPlants.Contains(plant.Key)) GameAPP.resourcesManager.allPlants.Add(plant.Key);
-                PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;
-                PlantDataLoader.plantDatas.Add(plant.Key, plant.Value.PlantData);
+                if (plant.Value.PlantData is not null)
+                {
+                    PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;//注册植物数据
+                    PlantDataLoader.plantDatas.Add(plant.Key, plant.Value.PlantData);
+                }
                 GameAPP.resourcesManager.plantPreviews[plant.Key] = plant.Value.Preview;
                 GameAPP.resourcesManager.plantPreviews[plant.Key].tag = "Preview";
             }
@@ -567,9 +570,12 @@ namespace CustomizeLib.BepInEx
                     (customPlantData.Preview, GameAPP.resourcesManager.plantPreviews[plantType]);
 
                 //交换植物数据
-                (PlantDataLoader.plantData[(int)plantType], customPlantData.PlantData) =
-                    (customPlantData.PlantData, PlantDataLoader.plantData[(int)plantType]);
-                PlantDataLoader.plantDatas[plantType] = PlantDataLoader.plantData[(int)plantType];
+                if (customPlantData.PlantData is not null)
+                {
+                    (PlantDataLoader.plantData[(int)plantType], customPlantData.PlantData) =
+                        (customPlantData.PlantData, PlantDataLoader.plantData[(int)plantType]);
+                    PlantDataLoader.plantDatas[plantType] = PlantDataLoader.plantData[(int)plantType];
+                }
                 CustomCore.CustomPlantsSkin[plantType] = customPlantData;
 
                 //交换特性列表
@@ -614,6 +620,23 @@ namespace CustomizeLib.BepInEx
         }
     }
 
+    /// <summary>
+    /// 二创词条文本染色
+    /// </summary>
+    [HarmonyPatch(typeof(TravelBuffOptionButton))]
+    public static class TravelBuffOptionButtonPatch
+    {
+        [HarmonyPatch(nameof(TravelBuffOptionButton.SetBuff))]
+        public static void PostSetBuff(TravelBuffOptionButton __instance, ref BuffType buffType, ref int buffIndex)
+        {
+            if (buffType is BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(buffIndex)
+                && CustomCore.CustomAdvancedBuffs[buffIndex].Item5 is not null)
+            {
+                __instance.introduce.text = $"<color={CustomCore.CustomAdvancedBuffs[buffIndex].Item5}>{__instance.introduce.text}</color>";
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(TravelBuff))]
     public static class TravelBuffPatch
     {
@@ -628,6 +651,23 @@ namespace CustomizeLib.BepInEx
             if (__instance.theBuffType == 2 && CustomCore.CustomUltimateBuffs.ContainsKey(__instance.theBuffNumber))
             {
                 __instance.thePlantType = CustomCore.CustomUltimateBuffs[__instance.theBuffNumber].Item1;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 二创词条文本染色
+    /// </summary>
+    [HarmonyPatch(typeof(TravelLookBuff))]
+    public static class TravelLookBuffPatch
+    {
+        [HarmonyPatch(nameof(TravelLookBuff.SetBuff))]
+        public static void PostSetBuff(TravelLookBuff __instance, ref BuffType buffType, ref int buffIndex)
+        {
+            if (buffType is BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(buffIndex)
+                && CustomCore.CustomAdvancedBuffs[buffIndex].Item5 is not null)
+            {
+                __instance.introduce.text = $"<color={CustomCore.CustomAdvancedBuffs[buffIndex].Item5}>{__instance.introduce.text}</color>";
             }
         }
     }
@@ -650,7 +690,7 @@ namespace CustomizeLib.BepInEx
             }
             if (CustomCore.CustomUltimateBuffs.Count > 0)
             {
-                bool[] newUlti = new bool[__instance.ultimateUpgrades.Count + CustomCore.CustomUltimateBuffs.Count];
+                int[] newUlti = new int[__instance.ultimateUpgrades.Count + CustomCore.CustomUltimateBuffs.Count];
                 Array.Copy(__instance.ultimateUpgrades, newUlti, __instance.ultimateUpgrades.Length);
                 __instance.ultimateUpgrades = newUlti;
             }
@@ -672,6 +712,26 @@ namespace CustomizeLib.BepInEx
                 {
                     __result.Remove(__result[i]);
                 }
+            }
+        }
+
+        [HarmonyPatch(nameof(TravelMgr.GetAdvancedText))]
+        [HarmonyPostfix]
+        public static void PostGetAdvancedText(ref int index, ref string __result)
+        {
+            if (CustomCore.CustomAdvancedBuffs.ContainsKey(index) && CustomCore.CustomAdvancedBuffs[index].Item5 is not null)
+            {
+                __result = $"<color={CustomCore.CustomAdvancedBuffs[index].Item5}>{__result}</color>";
+            }
+        }
+
+        [HarmonyPatch(nameof(TravelMgr.GetPlantTypeByAdvBuff))]
+        [HarmonyPostfix]
+        public static void PostGetPlantTypeByAdvBuff(ref int index, ref PlantType __result)
+        {
+            if (CustomCore.CustomAdvancedBuffs.ContainsKey(index) && CustomCore.CustomAdvancedBuffs[index].Item1 is not PlantType.Nothing)
+            {
+                __result = CustomCore.CustomAdvancedBuffs[index].Item1;
             }
         }
     }

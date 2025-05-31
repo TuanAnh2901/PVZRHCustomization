@@ -26,17 +26,12 @@ namespace SuperDoomSqualour.MelonLoader
             bool mindCtrlled = false;
             if (UnityEngine.Random.Range(0, 10) is 0 || Lawnf.TravelAdvanced(SuperDoomSqualour.Buff))
             {
-                if (TypeMgr.IsBossZombie(zombie.theZombieType))
-                    zombie.Die();
-                else
-                {
-                    zombie.TakeDamage(DmgType.Normal, __instance.Damage, true);
-                    zombie.SetMindControl();
-                    zombie.isDoom = true;
-                    zombie.doomWithPit = false;
-                    zombie.SetColor(Zombie.ZombieColor.Doom);
-                }
-
+                zombie.TakeDamage(DmgType.Normal, __instance.Damage, true);
+                zombie.SetMindControl();
+                zombie.isDoom = true;
+                zombie.doomWithPit = false;
+                zombie.SetColor(Zombie.ZombieColor.Doom);
+                if (!zombie.isMindControlled) zombie.Die();
                 mindCtrlled = true;
             }
             else
@@ -100,7 +95,7 @@ namespace SuperDoomSqualour.MelonLoader
                     // 创建第一个子弹
                     Bullet bullet1 = CreateBullet.Instance.SetBullet(spawnPosition.x, spawnPosition.y, __instance.theRow, (BulletType)904, 10);
 
-                    if (bullet1 != null && __instance.lour != null)
+                    if (bullet1 != null)
                     {
                         bullet1.GetComponent<Bullet_lourCactus>().lour = __instance.lour;
                         bullet1.GetComponent<Rigidbody2D>().velocity = new Vector2(-1f, 1f);
@@ -110,7 +105,7 @@ namespace SuperDoomSqualour.MelonLoader
                     // 创建第二个子弹
                     Bullet bullet2 = CreateBullet.Instance.SetBullet(spawnPosition.x, spawnPosition.y, __instance.theRow, (BulletType)904, 10);
 
-                    if (bullet2 != null && __instance.lour != null)
+                    if (bullet2 != null)
                     {
                         bullet2.GetComponent<Bullet_lourCactus>().lour = __instance.lour;
                         bullet2.GetComponent<Rigidbody2D>().velocity = new Vector2(-1f, -1f);
@@ -120,7 +115,7 @@ namespace SuperDoomSqualour.MelonLoader
                     // 创建第三个子弹
                     Bullet bullet3 = CreateBullet.Instance.SetBullet(spawnPosition.x, spawnPosition.y, __instance.theRow, (BulletType)904, 10);
 
-                    if (bullet3 != null && __instance.lour != null)
+                    if (bullet3 != null)
                     {
                         bullet3.GetComponent<Bullet_lourCactus>().lour = __instance.lour;
                         bullet3.GetComponent<Rigidbody2D>().velocity = new Vector2(1.4f, 0);
@@ -142,6 +137,7 @@ namespace SuperDoomSqualour.MelonLoader
     public static class PlantPatch
     {
         [HarmonyPatch(nameof(Plant.Die))]
+        [HarmonyPatch(nameof(Plant.Crashed))]
         [HarmonyPrefix]
         public static void PreDie(CattailGirl __instance)
         {

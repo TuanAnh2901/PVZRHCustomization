@@ -1,15 +1,16 @@
 ﻿using CustomizeLib.MelonLoader;
+using Il2Cpp;
 using MelonLoader;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Il2Cpp;
 using UnityEngine;
+using static MelonLoader.MelonLogger;
 
 ///
 ///Credit to likefengzi(https://github.com/likefengzi)(https://space.bilibili.com/237491236)
 ///
 
-[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.5.1-2.4", "Infinite75,likefengzi", null)]
+[assembly: MelonInfo(typeof(CustomCore), "PVZRHCustomization", "2.6-2.6", "Infinite75,likefengzi", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
 [assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
 
@@ -164,12 +165,13 @@ namespace CustomizeLib.MelonLoader
         /// <param name="buffType">词条类型(普通，强究，僵尸)</param>
         /// <param name="canUnlock">解锁条件</param>
         /// <param name="cost">词条商店花费积分</param>
-        /// <param name="color">词条颜色(已废弃)</param>
-        /// <param name="plantType">选词条时展示植物的类型(已废弃)</param>
+        /// <param name="color">词条颜色</param>
+        /// <param name="plantType">选词条时展示植物的类型</param>
         /// <returns>分到的词条id</returns>
         public static int RegisterCustomBuff(string text, BuffType buffType, Func<bool> canUnlock, int cost,
             string? color = null, PlantType plantType = PlantType.Nothing)
         {
+            //if (color is not null) text = $"<color={color}>{text}</color>";
             switch (buffType)
             {
                 case BuffType.AdvancedBuff:
@@ -472,6 +474,42 @@ namespace CustomizeLib.MelonLoader
             else
             {
                 //添加融合配方
+                MelonLogger.Msg($"Duplicate Plant ID: {id}");
+            }
+        }
+
+        /// <summary>
+        /// 注册自定义植物皮肤(用于给原有植物添加皮肤)
+        /// </summary>
+        /// <typeparam name="TBase">植物基类</typeparam>
+        /// <param name="id">植物id</param>
+        /// <param name="prefab">植物预制体</param>
+        /// <param name="preview">植物预览预制体</param>
+        /// <param name="ctor">数据绑定函数</param>
+        public static void RegisterCustomPlantSkin<TBase>([NotNull] int id, [NotNull] GameObject prefab,
+            [NotNull] GameObject preview, Action<TBase> ctor)
+            where TBase : Plant
+        {
+            prefab.tag = "Plant";
+            preview.tag = "Preview";
+            //植物预制体挂载植物脚本
+            prefab.AddComponent<TBase>().thePlantType = (PlantType)id;
+            ctor(prefab.GetComponent<TBase>());
+            CustomPlantsSkinActive.Add((PlantType)id, false);
+            if (!CustomPlantsSkin.ContainsKey((PlantType)id))
+            {
+                //植物id不重复才进行注册
+                //CustomPlantTypes.Add((PlantType)id);
+                CustomPlantsSkin.Add((PlantType)id, new CustomPlantData()
+                {
+                    ID = id,
+                    Prefab = prefab,
+                    Preview = preview,
+                    PlantData = null
+                });
+            }
+            else
+            {
                 MelonLogger.Msg($"Duplicate Plant ID: {id}");
             }
         }

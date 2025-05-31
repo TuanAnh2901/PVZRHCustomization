@@ -83,11 +83,11 @@ namespace UltimateWinterMelonCannon.MelonLoader
         public void AnimShooting()
         {
             GameAPP.PlaySound(4, 1.0f);
-            var RowFromY = Mouse.Instance.GetRowFromY(plant.target.x, plant.target.y);
+            var RowFromY = Mouse.Instance.GetRowFromY(plant.cannonTarget.x, plant.cannonTarget.y);
             var bullet = plant.board.GetComponent<CreateBullet>().SetBullet(plant.shoot.transform.position.x, plant.shoot.transform.position.y, RowFromY, (BulletType)BulletId, 14);
             var pos2 = bullet.cannonPos;
-            pos2.x = plant.target.x;
-            pos2.y = plant.target.y;
+            pos2.x = plant.cannonTarget.x;
+            pos2.y = plant.cannonTarget.y;
             bullet.cannonPos = pos2;
             bullet.rb.velocity = new(1.5f, 0);
             bullet.theStatus = BulletStatus.GoldMelon_cannon;

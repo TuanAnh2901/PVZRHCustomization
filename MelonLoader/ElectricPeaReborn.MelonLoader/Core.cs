@@ -2,6 +2,7 @@
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using Unity.VisualScripting;
+using Il2Cpp;
 using UnityEngine;
 using static Il2CppSystem.Collections.Hashtable;
 using static MelonLoader.MelonLogger;

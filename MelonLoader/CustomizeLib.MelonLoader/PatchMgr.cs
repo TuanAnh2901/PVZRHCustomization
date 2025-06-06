@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Il2CppTMPro;
+using Il2Cpp;
 using MelonLoader;
 using MelonLoader.Utils;
 using System;

@@ -45,19 +45,19 @@ namespace CherryHypnoGatlingBlover.MelonLoader
 	{
 		public override void OnInitializeMelon()
 		{
-			Console.OutputEncoding = System.Text.Encoding.UTF8;
-            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "cherryhypnogatlingblover");
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            var ab = CustomizeLib.MelonLoader.CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "cherryhypnogatlingblover");
             if(ab == null)
     {
                 MelonLogger.Error("Failed to load asset bundle: cherryhypnogatlingblover. Make sure it is embedded and the name matches.");
                 return;
             }
-            CustomCore.RegisterCustomPlant<Shooter, CherryHypnoGatlingBlover>(965, ab.GetAsset<GameObject>("CherryHypnoGatlingBloverPrefab"),
+            CustomizeLib.MelonLoader.CustomCore.RegisterCustomPlant<Shooter, CherryHypnoGatlingBlover>(965, ab.GetAsset<GameObject>("CherryHypnoGatlingBloverPrefab"),
                 ab.GetAsset<GameObject>("CherryHypnoGatlingBloverPreview"), [(1003, 1004), (1004, 1003)], 0.1f, 0, 400, 400000, 10, 300);
             MelonLogger.Msg("Registering Custom Bullet for Hypno Cherry");
-            CustomCore.RegisterCustomBullet<Bullet_HypnoCherry>((int)(BulletType)965, ab.GetAsset<GameObject>("Bullet_HypnoCherry"));
-            CustomCore.TypeMgrExtra.FlyingPlants.Add((PlantType)965);
-            CustomCore.AddPlantAlmanacStrings(965, "HypnoCherryDrone", "The enchanting Flying Cherry has a chance to charm zombies with its bullets and transform them into the Ultimate Machine Gun Reader\n<color=#3D1400>Image Author: Infinite75 & Miracle</color>\n<color=#3D1400>Damage: </color><color=red>400</color>\n<color=#3D1400>Fusion Recipe: </color><color=red>1003 + 1004</color>\n<color=#3D1400>If the attack speed of the plant below is less than 1.5s, it will synchronize the attack speed</color>\n<color=#FF0000>Has a chance to charm zombies with less than 40% health, and after being charmed, there’s a 10% chance to transform the zombie into the Charming Cherry Machine</color>\n<color=#FF0000>When removed, it will drop cards for both the Ultimate Cherry Shooter and the Charming Clover</color>\n\n<color=#905000>\"Show off, I’ll make you fly, did you hear that, little brat\" The Flying Cherry Shooter says this every day in front of other plants, but the other plants have never reduced their desire to let her fly on top of them</color>");
+            CustomizeLib.MelonLoader.CustomCore.RegisterCustomBullet<Bullet_HypnoCherry>((int)(BulletType)965, ab.GetAsset<GameObject>("Bullet_HypnoCherry"));
+            CustomizeLib.MelonLoader.CustomCore.TypeMgrExtra.FlyingPlants.Add((PlantType)965);
+            CustomizeLib.MelonLoader.CustomCore.AddPlantAlmanacStrings(965, "HypnoCherryDrone", "The enchanting Flying Cherry has a chance to charm zombies with its bullets and transform them into the Ultimate Machine Gun Reader\n<color=#3D1400>Image Author: Infinite75 & Miracle</color>\n<color=#3D1400>Damage: </color><color=red>400</color>\n<color=#3D1400>Fusion Recipe: </color><color=red>1003 + 1004</color>\n<color=#3D1400>If the attack speed of the plant below is less than 1.5s, it will synchronize the attack speed</color>\n<color=#FF0000>Has a chance to charm zombies with less than 40% health, and after being charmed, there’s a 10% chance to transform the zombie into the Charming Cherry Machine</color>\n<color=#FF0000>When removed, it will drop cards for both the Ultimate Cherry Shooter and the Charming Clover</color>\n\n<color=#905000>\"Show off, I’ll make you fly, did you hear that, little brat\" The Flying Cherry Shooter says this every day in front of other plants, but the other plants have never reduced their desire to let her fly on top of them</color>");
         }
 	}
 

@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Text.Json;
 using System.Xml.Linq;
 using UnityEngine;
-using Il2Cpp;
+
 ///
 /// Specially credit to 暗影Dev
 /// Specially credit to likefengzi(https://github.com/likefengzi)(https://space.bilibili.com/237491236)

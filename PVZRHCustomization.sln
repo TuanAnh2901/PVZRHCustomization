@@ -69,6 +69,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceDoomScaredyShroom.BepInE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceDoomCherryJalapeno.BepInEx", "BepInEx\IceDoomCherryJalapeno.BepInEx\IceDoomCherryJalapeno.BepInEx.csproj", "{C3BD9B7F-7027-49A1-BFCB-8A4D69322830}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CherryHypnoGatlingBlover.MelonLoader", "MelonLoader\CherryHypnoGatlingBlover.MelonLoader\CherryHypnoGatlingBlover.MelonLoader.csproj", "{DE3B5C24-0201-46B6-9301-E4A6FEE03726}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +193,10 @@ Global
 		{C3BD9B7F-7027-49A1-BFCB-8A4D69322830}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3BD9B7F-7027-49A1-BFCB-8A4D69322830}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3BD9B7F-7027-49A1-BFCB-8A4D69322830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE3B5C24-0201-46B6-9301-E4A6FEE03726}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE3B5C24-0201-46B6-9301-E4A6FEE03726}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE3B5C24-0201-46B6-9301-E4A6FEE03726}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE3B5C24-0201-46B6-9301-E4A6FEE03726}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

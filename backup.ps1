@@ -18,6 +18,7 @@ function Show-Menu {
     Write-Host "10. SuperCornUmbrella"
     Write-Host "11. UltimateWinterMelonCannon"
     Write-Host "12. CustomizeLib"
+    Write-Host "13. CherryHypnoGatlingBlover"
     Write-Host "0. Exit"
     Write-Host "===================="
 }
@@ -59,6 +60,7 @@ do {
         '10' { Backup-Project "SuperCornUmbrella" ".\MelonLoader\SuperCornUmbrella.MelonLoader" }
         '11' { Backup-Project "UltimateWinterMelonCannon" ".\MelonLoader\UltimateWinterMelonCannon.MelonLoader" }
         '12' { Backup-Project "CustomizeLib" ".\MelonLoader\CustomizeLib.MelonLoader" }
+        '13' { Backup-Project "CherryHypnoGatlingBlover" ".\MelonLoader\CherryHypnoGatlingBlover.MelonLoader"}
         '0' { 
             Write-Host "Exiting..."
             return 

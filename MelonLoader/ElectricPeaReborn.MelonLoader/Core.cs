@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using Unity.VisualScripting;
@@ -59,7 +59,7 @@ namespace ElectricPeaReborn.MelonLoader
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "electricpea");
-            CustomCore.RegisterCustomBullet<Bullet, Bullet_electricPea>(903, ab.GetAsset<GameObject>("ProjectileElectricPea"));
+            CustomCore.RegisterCustomBullet<Bullet, Bullet_electricPea>((BulletType)903, ab.GetAsset<GameObject>("ProjectileElectricPea"));
             CustomCore.RegisterCustomPlant<Shooter, ElectricPea>(960, ab.GetAsset<GameObject>("ElectricPeaPrefab"),
                 ab.GetAsset<GameObject>("ElectricPeaPreview"), [(1005, 3), (3, 1005)], 0.5f, 0, 1000, 32000, 1.5f, 1000);
             CustomCore.AddPlantAlmanacStrings(960, "Electric Pea", "Shoots an electric ball causing extremely fast damage\n<color=#3D1400>Image Author: </color>\n<color=#3D1400>Damage: </color><color=red>300/0.1s</color>\n<color=#3D1400>Fusion Recipe: </color><color=red>Double Cherry Pea + Wallnut</color>\n<color=#3D1400>Incredibly powerful, tearing through space with each ultra-powerful electric shot!</color>");

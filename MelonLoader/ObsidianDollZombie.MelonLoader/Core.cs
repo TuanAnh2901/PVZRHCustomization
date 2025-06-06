@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
@@ -129,6 +129,7 @@ namespace ObsidianDollZombie.MelonLoader
             return true;
         }
 
+        [HarmonyPatch("FindAndDestoryZombieHead")]
         [HarmonyPatch("SetCold")]
         [HarmonyPatch("SetFreeze")]
         [HarmonyPatch("Warm")]
@@ -143,7 +144,7 @@ namespace ObsidianDollZombie.MelonLoader
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "obsidiandollzombie");
-            CustomCore.RegisterCustomZombie<DollZombie, ObsidianDollZombie>(99,
+            CustomCore.RegisterCustomZombie<DollZombie, ObsidianDollZombie>((ZombieType)99,
                 ab.GetAsset<GameObject>("ObsidianDollZombie"), 202, 50, 40000, 12000, 0);
             CustomCore.RegisterCustomSprite(200, ab.GetAsset<Sprite>("ObsidianDollZombie_head2"));
             CustomCore.RegisterCustomSprite(201, ab.GetAsset<Sprite>("ObsidianDollZombie_head3"));
@@ -200,7 +201,10 @@ namespace ObsidianDollZombie.MelonLoader
 
         public void Start()
         {
-            zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
+            if (GameAPP.theGameStatus is 0 && zombie is not null)
+            {
+                zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
+            }
         }
 
         public void Update()

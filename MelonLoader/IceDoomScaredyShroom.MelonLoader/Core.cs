@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using IceDoomScaredyShroom.MelonLoader;
 using Il2CppInterop.Runtime.Injection;

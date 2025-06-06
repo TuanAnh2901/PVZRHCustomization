@@ -1,11 +1,11 @@
-﻿using CustomizeLib;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
 using System.Reflection;
 using Unity.VisualScripting;
 using UnityEngine;
 using BepInEx.Unity.IL2CPP;
+using CustomizeLib.BepInEx;
 
 namespace SuperGarlicFume.BepInEx
 {
@@ -61,7 +61,7 @@ namespace SuperGarlicFume.BepInEx
             plant.zombieList.Clear();
             foreach (var z in Board.Instance.zombieArray)
             {
-                if (z is not null && !z.IsDestroyed() && !z.isMindControlled && !TypeMgr.IsAirZombie(z.theZombieType) && z.theZombieRow == plant.thePlantRow && z.shadow.transform.position.x > plant.shadow.transform.position.x)
+                if (z is not null && !z.IsDestroyed() && !z.isMindControlled && !TypeMgr.IsAirZombie(z.theZombieType) && z.theZombieRow == plant.thePlantRow && z.axis.position.x > plant.axis.position.x)
                 {
                     plant.zombieList.Add(z);
                 }
@@ -88,7 +88,7 @@ namespace SuperGarlicFume.BepInEx
                     z.SetCold(10);
                     z.AddfreezeLevel(10 * (Lawnf.TravelUltimate(5) ? 5 : 1));
 
-                    if (z.poisonLevel <= 1000000 && Lawnf.TravelAdvanced(Buff3) && z.theFreezeCountDown > 3)
+                    if (z.poisonLevel <= 1000000 && Lawnf.TravelAdvanced(Buff3) && z.freezeTimer > 3)
                     {
                         double multiplier = 1;
                         foreach (var p in Board.Instance.plantArray)
@@ -100,7 +100,7 @@ namespace SuperGarlicFume.BepInEx
                         }
                         double newPoison = z.poisonLevel + Math.Pow(Math.E, multiplier);
                         if (newPoison > int.MaxValue / 2) newPoison = int.MaxValue / 2;
-                        z.theFreezeCountDown = 3;
+                        z.freezeTimer = 3;
                         z.poisonLevel = (int)newPoison;
                         z.BodyTakeDamage((int)(multiplier * multiplier * multiplier * z.poisonLevel));
                     }

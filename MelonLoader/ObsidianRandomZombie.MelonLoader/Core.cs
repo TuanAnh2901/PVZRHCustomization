@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime.Attributes;
@@ -51,15 +51,15 @@ namespace ObsidianRandomZombie.MelonLoader
         [HarmonyPrefix]
         public static bool PreSetRandomZombie(DiamondRandomZombie __instance, ref GameObject __result)
         {
-            if (__instance.theZombieType is (ZombieType)98)
+            if (__instance is not null && __instance.theZombieType is (ZombieType)98)
             {
                 Vector3 position = __instance.axis.position;
                 List<int> ids = [];
                 if (Lawnf.TravelDebuff(ObsidianRandomZombie.Debuff))
                 {
-                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.allZombieTypes.Count; i++)
                     {
-                        if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.zombiePrefab[i] is not null)
+                        if (TypeMgr.IsBossZombie((ZombieType)i) && GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null)
                         {
                             ids.Add(i);
                         }
@@ -67,9 +67,9 @@ namespace ObsidianRandomZombie.MelonLoader
                 }
                 else
                 {
-                    for (int i = 0; i < GameAPP.zombiePrefab.Length; i++)
+                    for (int i = 0; i < GameAPP.resourcesManager.allZombieTypes.Count; i++)
                     {
-                        if (GameAPP.zombiePrefab[i] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
+                        if (GameAPP.resourcesManager.zombiePrefabs[GameAPP.resourcesManager.allZombieTypes[i]] is not null && !TypeMgr.IsBossZombie((ZombieType)i) && !TypeMgr.NotRandomZombie((ZombieType)i))
                         {
                             ids.Add(i);
                         }
@@ -152,22 +152,13 @@ namespace ObsidianRandomZombie.MelonLoader
             return true;
         }
 
+        [HarmonyPatch("FindAndDestoryZombieHead")]
         [HarmonyPatch("SetCold")]
         [HarmonyPatch("SetFreeze")]
         [HarmonyPatch("Warm")]
         [HarmonyPatch("KnockBack")]
         [HarmonyPrefix]
         public static bool PreKnockBack(Zombie __instance) => __instance.theZombieType is not (ZombieType)98;
-
-        [HarmonyPatch("TakeDamage")]
-        [HarmonyPrefix]
-        public static void PreTakeDamage(Zombie __instance, ref int theDamage)
-        {
-            if (__instance.theZombieType is (ZombieType)98)
-            {
-                Board.Instance.theMoney -= theDamage;
-            }
-        }
     }
 
     public class Core : MelonMod
@@ -176,7 +167,7 @@ namespace ObsidianRandomZombie.MelonLoader
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "obsidianrandomzombie");
-            CustomCore.RegisterCustomZombie<DiamondRandomZombie, ObsidianRandomZombie>(98,
+            CustomCore.RegisterCustomZombie<DiamondRandomZombie, ObsidianRandomZombie>((ZombieType)98,
                 ab.GetAsset<GameObject>("ObsidianRandomZombie"), 206, 50, 40000, 12000, 0);
             CustomCore.RegisterCustomSprite(204, ab.GetAsset<Sprite>("ObsidianRandomZombie_head2"));
             CustomCore.RegisterCustomSprite(205, ab.GetAsset<Sprite>("ObsidianRandomZombie_head3"));
@@ -207,8 +198,11 @@ namespace ObsidianRandomZombie.MelonLoader
 
         public void Start()
         {
-            zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
-            zombie.theZombieType = (ZombieType)98;
+            if (GameAPP.theGameStatus is 0 && zombie is not null)
+            {
+                zombie!.theFirstArmorType = Zombie.FirstArmorType.Doll;
+                zombie.theZombieType = (ZombieType)98;
+            }
         }
 
         public static int Debuff { get; set; } = -1;

@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.BepInEx;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using System;
@@ -27,7 +27,7 @@ namespace SuperUmbrellasExtra.BepInEx
               3, 0, 100, 4000, 60f, 1200);
             CustomCore.RegisterSuperSkill(170, (plant) =>
             {
-                var pos = plant.shadow.transform.position;
+                var pos = plant.axis.position;
                 LayerMask layermask = plant.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                 long health = 1;
@@ -42,7 +42,7 @@ namespace SuperUmbrellasExtra.BepInEx
             },
             (plant) =>
             {
-                var pos = plant.shadow.transform.position;
+                var pos = plant.axis.position;
                 LayerMask layermask = plant.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                 foreach (var z in array)
@@ -73,12 +73,12 @@ namespace SuperUmbrellasExtra.BepInEx
                     if (TypeMgr.IsBossZombie(zombie.theZombieType))
                     {
                         __instance.thePlantHealth -= 3899;
-                        __instance.UpdateHealthText();
+                        __instance.UpdateText();
                     }
                     else
                     {
                         __instance.thePlantHealth -= 900;
-                        __instance.UpdateHealthText();
+                        __instance.UpdateText();
                     }
                 }
                 }

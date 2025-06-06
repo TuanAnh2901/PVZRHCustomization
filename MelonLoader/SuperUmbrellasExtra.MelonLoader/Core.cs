@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using MelonLoader;
 using SuperUmbrellasExtra.MelonLoader;

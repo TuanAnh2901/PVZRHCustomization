@@ -1,6 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Unity.IL2CPP;
-using CustomizeLib;
+using CustomizeLib.BepInEx;
 using HarmonyLib;
 using System.Reflection;
 using UnityEngine;

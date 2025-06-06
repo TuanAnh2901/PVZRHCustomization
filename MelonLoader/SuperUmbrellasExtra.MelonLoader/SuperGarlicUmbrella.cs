@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.MelonLoader;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
@@ -39,7 +39,7 @@ namespace SuperUmbrellasExtra.MelonLoader
                         {
                             zombie.SetPoison(10);
                         }
-                        if (count * Math.Log(health) < 100)
+                        if (count * Math.Log(health) < 10)
                         {
                             zombie.Die(2);
                             CreateZombie.Instance.SetZombie(zombie.theZombieRow, ZombieType.GoldZombie, zombie.transform.position.x);

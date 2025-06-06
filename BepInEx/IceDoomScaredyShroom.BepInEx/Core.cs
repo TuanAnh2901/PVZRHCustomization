@@ -1,10 +1,10 @@
-﻿using CustomizeLib;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using BepInEx;
 using UnityEngine;
 using BepInEx.Unity.IL2CPP;
 using System.Reflection;
+using CustomizeLib.BepInEx;
 
 namespace IceDoomScaredyShroom.BepInEx
 {
@@ -36,13 +36,13 @@ namespace IceDoomScaredyShroom.BepInEx
         {
             Board.Instance.SetDoom(plant.thePlantColumn, plant.thePlantRow, false, true, default, 1800);
             plant.thePlantHealth = (int)(plant.thePlantHealth / 3f);
-            plant.UpdateHealthText();
+            plant.UpdateText();
         }
 
         public void SuperAnimShoot()
         {
             var t = plant.transform.Find("Shoot");
-            CreateBullet.Instance.SetBullet(t.position.x + 0.1f, t.position.y, plant.thePlantRow, 24, 0).theBulletDamage = plant.attackDamage;
+            CreateBullet.Instance.SetBullet(t.position.x + 0.1f, t.position.y, plant.thePlantRow, BulletType.Bullet_iceDoom, 0).Damage = plant.attackDamage;
             GameAPP.PlaySound(68);
         }
 

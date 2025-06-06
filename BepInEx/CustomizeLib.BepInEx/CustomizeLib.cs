@@ -5,10 +5,11 @@ using Il2CppInterop.Runtime;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TMPro;
+using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace CustomizeLib
+namespace CustomizeLib.BepInEx
 {
     public struct CustomPlantData
     {
@@ -18,12 +19,12 @@ namespace CustomizeLib
         public GameObject Preview { get; set; }
     }
 
-    [HarmonyPatch(typeof(AlmanacMgr))]
+    [HarmonyPatch(typeof(AlmanacPlantBank))]
     public static class AlmanacMgrPatch
     {
         [HarmonyPatch("InitNameAndInfoFromJson")]
         [HarmonyPrefix]
-        public static bool PreInitNameAndInfoFromJson(AlmanacMgr __instance)
+        public static bool PreInitNameAndInfoFromJson(AlmanacPlantBank __instance)
         {
             if (CustomCore.PlantsAlmanac.ContainsKey((PlantType)__instance.theSeedType))
             {
@@ -55,7 +56,7 @@ namespace CustomizeLib
 
         [HarmonyPatch("OnMouseDown")]
         [HarmonyPrefix]
-        public static bool PreOnMouseDown(AlmanacMgr __instance)
+        public static bool PreOnMouseDown(AlmanacPlantBank __instance)
         {
             __instance.introduce = __instance.gameObject.transform.FindChild("Info").gameObject.GetComponent<TextMeshPro>();
             __instance.pageCount = __instance.introduce.m_pageNumber * 1;
@@ -105,31 +106,6 @@ namespace CustomizeLib
         }
     }
 
-    [HarmonyPatch(typeof(AlmanacZombieCtrl))]
-    public static class AlmanacZombieCtrlPatch
-    {
-        [HarmonyPatch("Awake")]
-        [HarmonyPostfix]
-        public static void PostAwake(AlmanacZombieCtrl __instance)
-        {
-            var transform = __instance.gameObject.transform.GetChild(1).GetChild(3).GetChild(0).GetChild(0);
-            var template = transform.GetChild(0).gameObject;
-            int row = 1;
-            int col = 0;
-            foreach (var z in CustomCore.CustomZombies)
-            {
-                var button = UnityEngine.Object.Instantiate(template, new(-7.5f + 1.8f * col, 2.5f - 1.8f * row, 0), new(0, 0, 0, 0), transform);
-                button.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = GameAPP.spritePrefab[z.Value.Item2];
-                if (++col > 6)
-                {
-                    col = 0;
-                    row++;
-                }
-                button.GetComponent<AlmanacCardZombie>().theZombieType = (ZombieType)z.Key;
-            }
-        }
-    }
-
     [HarmonyPatch(typeof(CreatePlant), "SetPlant")]
     public static class CreatePlantPatch
     {
@@ -172,11 +148,13 @@ namespace CustomizeLib
         {
             foreach (var plant in CustomCore.CustomPlants)
             {
-                GameAPP.plantPrefab[(int)plant.Key] = plant.Value.Prefab;
-                GameAPP.plantPrefab[(int)plant.Key].tag = "Plant";
+                GameAPP.resourcesManager.plantPrefabs[plant.Key] = plant.Value.Prefab;
+                GameAPP.resourcesManager.plantPrefabs[plant.Key].tag = "Plant";
+                if (!GameAPP.resourcesManager.allPlants.Contains(plant.Key)) GameAPP.resourcesManager.allPlants.Add(plant.Key);
                 PlantDataLoader.plantData[(int)plant.Key] = plant.Value.PlantData;
-                GameAPP.prePlantPrefab[(int)plant.Key] = plant.Value.Preview;
-                GameAPP.prePlantPrefab[(int)plant.Key].tag = "Preview";
+                PlantDataLoader.plantDatas.Add(plant.Key, plant.Value.PlantData);
+                GameAPP.resourcesManager.plantPreviews[plant.Key] = plant.Value.Preview;
+                GameAPP.resourcesManager.plantPreviews[plant.Key].tag = "Preview";
             }
             Il2CppSystem.Array array = MixData.data.Cast<Il2CppSystem.Array>();
             foreach (var f in CustomCore.CustomFusions)
@@ -185,16 +163,20 @@ namespace CustomizeLib
             }
             foreach (var z in CustomCore.CustomZombies)
             {
-                GameAPP.zombiePrefab[z.Key] = z.Value.Item1;
-                GameAPP.zombiePrefab[z.Key].tag = "Zombie";
+                if (!GameAPP.resourcesManager.allZombieTypes.Contains(z.Key)) GameAPP.resourcesManager.allZombieTypes.Add(z.Key);
+                GameAPP.resourcesManager.zombiePrefabs[z.Key] = z.Value.Item1;
+                GameAPP.resourcesManager.zombiePrefabs[z.Key].tag = "Zombie";
             }
             foreach (var bullet in CustomCore.CustomBullets)
             {
-                GameAPP.bulletPrefab[(int)bullet.Key] = bullet.Value;
+                GameAPP.resourcesManager.bulletPrefabs[bullet.Key] = bullet.Value;
+                if (!GameAPP.resourcesManager.allBullets.Contains(bullet.Key)) GameAPP.resourcesManager.allBullets.Add(bullet.Key);
             }
             foreach (var par in CustomCore.CustomParticles)
             {
-                GameAPP.particlePrefab[par.Key] = par.Value;
+                GameAPP.particlePrefab[(int)par.Key] = par.Value;
+                GameAPP.resourcesManager.particlePrefabs[par.Key] = par.Value;
+                if (!GameAPP.resourcesManager.allParticles.Contains(par.Key)) GameAPP.resourcesManager.allParticles.Add(par.Key);
             }
             foreach (var spr in CustomCore.CustomSprites)
             {
@@ -216,7 +198,7 @@ namespace CustomizeLib
 
                 if (Board.Instance.theMoney < cost)
                 {
-                    InGameText.Instance.EnableText($"大招需要{cost}金币", 5);
+                    InGameText.Instance.ShowText($"大招需要{cost}金币", 5);
                     return false;
                 }
                 if (plant.SuperSkill())
@@ -254,7 +236,7 @@ namespace CustomizeLib
         {
             foreach (GameObject gameObject in (List<GameObject>)[..from RaycastHit2D raycastHit2D in
                                            (RaycastHit2D[])Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition),
-                                           Vector2.zero)                          select raycastHit2D.collider.gameObject])
+                                           Vector2.zero) select raycastHit2D.collider.gameObject])
             {
                 if (gameObject.TryGetComponent<Plant>(out var plant) && CustomCore.CustomPlantClicks.ContainsKey(plant.thePlantType))
                 {
@@ -298,12 +280,13 @@ namespace CustomizeLib
         }
     }
 
-    [HarmonyPatch(typeof(TravelMenuMgr))]
+    /*
+    [HarmonyPatch(typeof(TravelBuffMenu))]
     public static class TravelMenuMgrPatch
     {
         [HarmonyPostfix]
         [HarmonyPatch("SetText")]
-        public static void PostSetText(TravelMenuMgr __instance)
+        public static void PostSetText(TravelBuffMenu __instance)
         {
             for (int i = 0; i < 3; i++)
             {
@@ -320,6 +303,7 @@ namespace CustomizeLib
             }
         }
     }
+    */
 
     [HarmonyPatch(typeof(TravelMgr))]
     public static class TravelMgrPatch
@@ -353,7 +337,7 @@ namespace CustomizeLib
 
         [HarmonyPatch("GetAdvancedBuffPool")]
         [HarmonyPostfix]
-        public static void PostGetAdvancedBuffPool(TravelMgr __instance, ref Il2CppSystem.Collections.Generic.List<int> __result)
+        public static void PostGetAdvancedBuffPool(ref Il2CppSystem.Collections.Generic.List<int> __result)
         {
             for (int i = __result.Count - 1; i >= 0; i--)
             {
@@ -500,18 +484,6 @@ namespace CustomizeLib
         public static bool PreIsCaltrop(ref PlantType theSeedType, ref bool __result)
         {
             if (CustomCore.TypeMgrExtra.IsCaltrop.Contains(theSeedType))
-            {
-                __result = true;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("IsCustomPlant")]
-        public static bool PreIsCustomPlant(ref PlantType theSeedType, ref bool __result)
-        {
-            if (CustomCore.TypeMgrExtra.IsCustomPlant.Contains(theSeedType))
             {
                 __result = true;
                 return false;
@@ -712,7 +684,7 @@ namespace CustomizeLib
         }
     }
 
-    [BepInPlugin("inf75.customizelib", "CustomizeLib", "1.2")]
+    [BepInPlugin("inf75.customizelib", "PVZRHCustomization", "2.2")]
     public class CustomCore : BasePlugin
     {
         public static class TypeMgrExtra
@@ -723,7 +695,6 @@ namespace CustomizeLib
             public static List<ZombieType> EliteZombie { get; set; } = [];
             public static List<PlantType> FlyingPlants { get; set; } = [];
             public static List<ZombieType> IsAirZombie { get; set; } = [];
-            public static List<ZombieType> IsBossZombie { get; set; } = [];
             public static List<PlantType> IsCaltrop { get; set; } = [];
             public static List<PlantType> IsCustomPlant { get; set; } = [];
             public static List<PlantType> IsFirePlant { get; set; } = [];
@@ -745,6 +716,7 @@ namespace CustomizeLib
             public static List<ZombieType> NotRandomZombie { get; set; } = [];
             public static List<ZombieType> UltimateZombie { get; set; } = [];
             public static List<PlantType> UmbrellaPlants { get; set; } = [];
+            public static List<ZombieType> UselessHypnoZombie { get; set; } = [];
             public static List<ZombieType> WaterZombie { get; set; } = [];
         }
 
@@ -763,8 +735,7 @@ namespace CustomizeLib
                 stream.CopyTo(stream1);
                 var ab = AssetBundle.LoadFromMemory(stream1.ToArray());
                 ArgumentNullException.ThrowIfNull(ab);
-                BepInEx.Logging.Logger.CreateLogSource("CustomizeLib").LogInfo($"Successfully load AssetBundle {name}.");
-
+                Instance.Value.Log.LogInfo($"Successfully load AssetBundle {name}.");
                 return ab;
             }
             catch (Exception e)
@@ -803,20 +774,26 @@ namespace CustomizeLib
             }
         }
 
-        public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab)
+        public static void RegisterCustomBullet<TBullet>(BulletType id, GameObject bulletPrefab) where TBullet : Bullet
         {
-            if (!CustomBullets.ContainsKey((BulletType)id) && !CreateBullet.BulletTypeMap.ContainsKey((BulletType)id))
+            if (!CustomBullets.ContainsKey(id))
             {
-                CustomBullets.Add((BulletType)id, bulletPrefab);
-                CreateBullet.BulletTypeMap.Add((BulletType)id, Il2CppType.Of<TBullet>());
-            }
-            else
-            {
-                BepInEx.Logging.Logger.CreateLogSource("CustomizeLib").LogError($"Duplicate Bullet ID: {id}");
+                bulletPrefab.AddComponent<TBullet>().theBulletType = id;
+                CustomBullets.Add(id, bulletPrefab);
             }
         }
 
-        public static void RegisterCustomParticle(int id, GameObject particle) => CustomParticles.Add(id, particle);
+        public static void RegisterCustomBullet<TBase, TBullet>(BulletType id, GameObject bulletPrefab) where TBase : Bullet where TBullet : MonoBehaviour
+        {
+            if (!CustomBullets.ContainsKey(id))
+            {
+                bulletPrefab.AddComponent<TBase>().theBulletType = id;
+                bulletPrefab.AddComponent<TBullet>();
+                CustomBullets.Add(id, bulletPrefab);
+            }
+        }
+
+        public static void RegisterCustomParticle(ParticleType id, GameObject particle) => CustomParticles.Add(id, particle);
 
         public static void RegisterCustomPlant<TBase, TClass>([NotNull] int id, [NotNull] GameObject prefab, [NotNull] GameObject preview,
                     List<(int, int)> fusions, float attackInterval, float produceInterval, int attackDamage, int maxHealth, float cd, int sun)
@@ -850,7 +827,7 @@ namespace CustomizeLib
             }
             else
             {
-                BepInEx.Logging.Logger.CreateLogSource("CustomizeLib").LogError($"Duplicate Plant ID: {id}");
+                Instance.Value.Log.LogError($"Duplicate Plant ID: {id}");
             }
         }
 
@@ -885,7 +862,7 @@ namespace CustomizeLib
             }
             else
             {
-                BepInEx.Logging.Logger.CreateLogSource("CustomizeLib").LogError($"Duplicate Plant ID: {id}");
+                Instance.Value.Log.LogError($"Duplicate Plant ID: {id}");
             }
         }
 
@@ -902,21 +879,21 @@ namespace CustomizeLib
                 CreatePlant.Instance.SetPlant(p.thePlantColumn, p.thePlantRow, newPlant);
             });
 
-        public static void RegisterCustomZombie<TBase, TClass>(int id, GameObject zombie, int spriteId,
+        public static void RegisterCustomZombie<TBase, TClass>(ZombieType id, GameObject zombie, int spriteId,
             int theAttackDamage, int theMaxHealth, int theFirstArmorMaxHealth, int theSecondArmorMaxHealth)
             where TBase : Zombie where TClass : MonoBehaviour
         {
-            zombie.AddComponent<TBase>().theZombieType = (ZombieType)id;
+            zombie.AddComponent<TBase>().theZombieType = id;
             zombie.AddComponent<TClass>();
 
-            ZombieData.zombieData[id] = new()
+            ZombieData.zombieData[(int)id] = new()
             {
                 theAttackDamage = theAttackDamage,
                 theFirstArmorMaxHealth = theFirstArmorMaxHealth,
                 theMaxHealth = theMaxHealth,
                 theSecondArmorMaxHealth = theSecondArmorMaxHealth
             };
-            CustomZombieTypes.Add((ZombieType)id);
+            CustomZombieTypes.Add(id);
             CustomZombies.Add(id, (zombie, spriteId));
         }
 
@@ -925,21 +902,23 @@ namespace CustomizeLib
         public override void Load()
         {
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+            Instance = new(this);
         }
 
         public static Dictionary<int, (PlantType, string, Func<bool>, int, string?)> CustomAdvancedBuffs { get; set; } = [];
         public static Dictionary<BulletType, GameObject> CustomBullets { get; set; } = [];
         public static Dictionary<int, string> CustomDebuffs { get; set; } = [];
         public static List<(int, int, int)> CustomFusions { get; set; } = [];
-        public static Dictionary<int, GameObject> CustomParticles { get; set; } = [];
+        public static Dictionary<ParticleType, GameObject> CustomParticles { get; set; } = [];
         public static Dictionary<PlantType, Action<Plant>> CustomPlantClicks { get; set; } = [];
         public static Dictionary<PlantType, CustomPlantData> CustomPlants { get; set; } = [];
         public static List<PlantType> CustomPlantTypes { get; set; } = [];
         public static Dictionary<int, Sprite> CustomSprites { get; set; } = [];
         public static Dictionary<int, (PlantType, string, int, string?)> CustomUltimateBuffs { get; set; } = [];
         public static Dictionary<(PlantType, BucketType), Action<Plant>> CustomUseItems { get; set; } = [];
-        public static Dictionary<int, (GameObject, int)> CustomZombies { get; set; } = [];
+        public static Dictionary<ZombieType, (GameObject, int)> CustomZombies { get; set; } = [];
         public static List<ZombieType> CustomZombieTypes { get; set; } = [];
+        public static Lazy<CustomCore> Instance { get; set; } = new();
         public static Dictionary<PlantType, (string, string)> PlantsAlmanac { get; set; } = [];
         public static Dictionary<PlantType, (Func<Plant, int>, Action<Plant>)> SuperSkills { get; set; } = [];
         public static Dictionary<ZombieType, (string, string)> ZombiesAlmanac { get; set; } = [];

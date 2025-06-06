@@ -1,4 +1,4 @@
-﻿using CustomizeLib;
+﻿using CustomizeLib.BepInEx;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using Unity.VisualScripting;
@@ -21,7 +21,7 @@ namespace SuperUmbrellasExtra.BepInEx
               ab.GetAsset<GameObject>("SuperHypnoUmbrellaPreview"), [(916, 8), (923, 8), (170, 8), (171, 8), (172, 8), (173, 8), (175, 8), (174, 8),], 3, 0, 3600, 4000, 60f, 1800);
             CustomCore.RegisterSuperSkill(176, (plant) =>
             {
-                var pos = plant.shadow.transform.position;
+                var pos = plant.axis.position;
                 LayerMask layermask = plant.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                 int i = 1;
@@ -36,7 +36,7 @@ namespace SuperUmbrellasExtra.BepInEx
             },
             (plant) =>
             {
-                var pos = plant.shadow.transform.position;
+                var pos = plant.axis.position;
                 LayerMask layermask = plant.zombieLayer.m_Mask;
                 var array = Physics2D.OverlapCircleAll(new(pos.x, pos.y), 3f);
                 foreach (var z in array)
@@ -64,7 +64,7 @@ namespace SuperUmbrellasExtra.BepInEx
                 else
                 {
                     __instance.thePlantHealth -= 700;
-                    __instance.UpdateHealthText();
+                    __instance.UpdateText();
                 }
                 zombie.KnockBack(1.5f * (__instance.UmbrellaPot is not null ? 2 : 1));
                 return false;

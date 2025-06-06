@@ -1,23 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="obsidianrandomzombie" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Include="obsidianrandomzombie" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\CustomizeLib.MelonLoader\CustomizeLib.MelonLoader.csproj" />
+	  <ProjectReference Include="..\CustomizeLib.MelonLoader\CustomizeLib.MelonLoader.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -58,7 +58,7 @@ namespace SuperUmbrellasExtra.MelonLoader
                 GameAPP.PlaySound(49);
             });
             CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)170);
-            CustomCore.AddPlantAlmanacStrings(170, "紫宝石伞", "紫宝石伞能放大招吞噬周围的僵尸\n<color=#3D1400>贴图作者：@仨硝基甲苯_ @林秋AutumnLin @暗影Dev</color>\n<color=#3D1400>特点：</color><color=red>僵尸主动靠近紫宝石伞时将其吞下，使伞扣除900血量/3999血量(吞下领袖僵尸时)且无法替伤，花费{50000*[1-e^(-0.00003*周围僵尸总血量)]-1}钱币释放大招，无视一切判定秒杀周围全部僵尸，冷却45s</color>\n<color=#3D1400>融合配方：</color><color=red>其他宝石伞+大嘴花</color>\n<color=#3D1400>词条1：</color><color=red>彩虹伞神：当场上同时有9种宝石伞时，所有钱币花费量降为500(解锁条件：场上同时存在9种宝石伞)</color>\n<color=#3D1400>词条2：</color><color=red>保护保护伞：紫、黑、魅宝石伞触发被动时受伤大幅减少且可被替伤(解锁条件：场上存在紫、黑、魅宝石伞之一)</color>\n<color=#3D1400>紫宝石伞是一名出色的魔术师，他变的魔术从来不会少人，每次他的魔术秀都会爆满，但是没有哪个僵尸会发现大变活僵的演员其实在他肚子里</color>");
+            CustomCore.AddPlantAlmanacStrings(170, "紫宝石伞(170)", "紫宝石伞能放大招吞噬周围的僵尸\n<color=#3D1400>贴图作者：@仨硝基甲苯_ @林秋AutumnLin </color>\n<color=#3D1400>特点：</color><color=red>僵尸主动靠近紫宝石伞时将其吞下，使伞扣除900血量/3999血量(吞下领袖僵尸时)且无法替伤，花费{50000*[1-e^(-0.00003*周围僵尸总血量)]-1}钱币释放大招，无视一切判定秒杀周围全部僵尸，冷却45s</color>\n<color=#3D1400>融合配方：</color><color=red>其他宝石伞+大嘴花</color>\n<color=#3D1400>词条1：</color><color=red>彩虹伞神：当场上同时有9种宝石伞时，所有钱币花费量降为500(解锁条件：场上同时存在9种宝石伞)</color>\n<color=#3D1400>词条2：</color><color=red>保护保护伞：紫、黑、魅宝石伞触发被动时受伤大幅减少且可被替伤(解锁条件：场上存在紫、黑、魅宝石伞之一)</color>\n<color=#3D1400>紫宝石伞是一名出色的魔术师，他变的魔术从来不会少人，每次他的魔术秀都会爆满，但是没有哪个僵尸会发现大变活僵的演员其实在他肚子里</color>");
         }
 
         [HideFromIl2Cpp]

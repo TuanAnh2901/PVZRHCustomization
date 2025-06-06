@@ -9,6 +9,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="SuperJalapenoUmbrella.cs~RF2a299808.TMP" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <EmbeddedResource Include="superumbrellasextra" />
 	</ItemGroup>
 

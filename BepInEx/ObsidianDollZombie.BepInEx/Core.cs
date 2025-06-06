@@ -67,70 +67,6 @@ namespace ObsidianDollZombie.BepInEx
         }
     }
 
-    [HarmonyPatch(typeof(Mower))]
-    public static class MowerPatch
-    {
-        [HarmonyPatch("OnTriggerStay2D")]
-        [HarmonyPrefix]
-        public static bool PreOnTriggerStay2D(Mower __instance, ref Collider2D collision)
-        {
-            GameObject gameObject = collision.gameObject;
-            if (gameObject.CompareTag("Zombie") && gameObject.TryGetComponent<ObsidianDollZombie>(out var z)
-                && z.zombie.theZombieRow == __instance.theMowerRow && !z.zombie.isMindControlled)
-            {
-                if (!z.HasMower)
-                {
-                    GameObject mower = __instance.gameObject;
-                    UnityEngine.Object.Destroy(mower.GetComponent<BoxCollider2D>());
-                    UnityEngine.Object.Destroy(mower.GetComponent<Animator>());
-                    UnityEngine.Object.Destroy(mower.GetComponent<Mower>());
-                    mower.transform.SetParent(z.gameObject.transform.FindChild("Zombie_innerarm_hand"));
-                    mower.transform.localPosition = new(-0.8f, -1.6f);
-                    mower.layer = mower.transform.parent.gameObject.layer;
-                }
-                z.PickUpMower();
-                return false;
-            }
-            return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(Zombie))]
-    public static class ZombiePatch
-    {
-        [HarmonyPatch("Start")]
-        [HarmonyPostfix]
-        public static void PostStart(Zombie __instance)
-        {
-            if (__instance.TryCast<DiamondRandomZombie>() is not null && UnityEngine.Random.RandomRangeInt(0, 9) == 1)
-            {
-                CreateZombie.Instance.SetZombie(__instance.theZombieRow, (ZombieType)99, __instance.transform.position.x);
-            }
-        }
-
-        [HarmonyPatch("AttackEffect")]
-        [HarmonyPrefix]
-        public static bool PreAttackEffect(Zombie __instance, ref Plant plant)
-        {
-            if (__instance.theZombieType is (ZombieType)99 && __instance.gameObject.TryGetComponent<ObsidianDollZombie>(out var z)
-                && !__instance.isMindControlled && z.HasMower)
-            {
-                plant.Die();
-                return false;
-            }
-
-            return true;
-        }
-
-        [HarmonyPatch("FindAndDestoryZombieHead")]
-        [HarmonyPatch("SetCold")]
-        [HarmonyPatch("SetFreeze")]
-        [HarmonyPatch("Warm")]
-        [HarmonyPatch("KnockBack")]
-        [HarmonyPrefix]
-        public static bool PreKnockBack(Zombie __instance) => __instance.theZombieType is not (ZombieType)99;
-    }
-
     [BepInPlugin("inf75.obsidiandollzombie", "ObsidianDollZombie", "1.0")]
     public class Core : BasePlugin
     {
@@ -139,6 +75,7 @@ namespace ObsidianDollZombie.BepInEx
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             ClassInjector.RegisterTypeInIl2Cpp<ObsidianDollZombie>();
+            ClassInjector.RegisterTypeInIl2Cpp<ObsidianRandomZombie>();
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "obsidiandollzombie");
             CustomCore.RegisterCustomZombie<DollZombie, ObsidianDollZombie>((ZombieType)99,
                 ab.GetAsset<GameObject>("ObsidianDollZombie"), 202, 50, 40000, 18000, 0);
@@ -146,7 +83,16 @@ namespace ObsidianDollZombie.BepInEx
             CustomCore.RegisterCustomSprite(201, ab.GetAsset<Sprite>("ObsidianDollZombie_head3"));
             CustomCore.RegisterCustomSprite(202, ab.GetAsset<Sprite>("ObsidianDollZombie_0"));
             CustomCore.RegisterCustomSprite(203, ab.GetAsset<Sprite>("ObsidianDollZombie_head1"));
-            CustomCore.AddZombieAlmanacStrings(99, "黑曜石套娃僵尸", "一个很很很很肉的路障僵尸?????(似乎对小推车有着深入研究)\n\n<color=#3D1400>头套贴图作者：@林秋AutumnLin @E杯芒果奶昔 @暗影Dev</color>\n<color=#3D1400>韧性：</color><color=red>18000</color>\n<color=#3D1400>特点：</color><color=red>钻石盲盒僵尸生成时有10%伴生，死亡时生成3个钻石套娃僵尸。免疫击退，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，此状态下若再次遇到小推车则将所有小推车变成黑曜石套娃僵尸</color>\n<color=#3D1400>黑曜石套娃僵尸对自己的头套十分满意。这不仅是因为在外观上无可挑剔，更是因为层层嵌套让他无懈可击。</color>");
+            CustomCore.AddZombieAlmanacStrings(99, "黑曜石套娃僵尸", "一个很很很很肉的路障僵尸?????(似乎对小推车有着深入研究)\n\n<color=#3D1400>头套贴图作者：@林秋AutumnLin @E杯芒果奶昔 </color>\n<color=#3D1400>韧性：</color><color=red>18000</color>\n<color=#3D1400>特点：</color><color=red>钻石盲盒僵尸生成时有10%伴生，死亡时生成3个钻石套娃僵尸。免疫击退，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，此状态下若再次遇到小推车则将所有小推车变成黑曜石套娃僵尸</color>\n<color=#3D1400>黑曜石套娃僵尸对自己的头套十分满意。这不仅是因为在外观上无可挑剔，更是因为层层嵌套让他无懈可击。</color>");
+
+            CustomCore.RegisterCustomZombie<DiamondRandomZombie, ObsidianRandomZombie>((ZombieType)98,
+                ab.GetAsset<GameObject>("ObsidianRandomZombie"), 206, 50, 40000, 12000, 0);
+            CustomCore.RegisterCustomSprite(204, ab.GetAsset<Sprite>("ObsidianRandomZombie_head2"));
+            CustomCore.RegisterCustomSprite(205, ab.GetAsset<Sprite>("ObsidianRandomZombie_head3"));
+            CustomCore.RegisterCustomSprite(206, ab.GetAsset<Sprite>("ObsidianRandomZombie_0"));
+            CustomCore.RegisterCustomSprite(207, ab.GetAsset<Sprite>("ObsidianRandomZombie_head1"));
+            ObsidianRandomZombie.Debuff = CustomCore.RegisterCustomBuff("黑曜石盲盒僵尸只开出领袖僵尸", BuffType.Debuff, () => true, 0);
+            CustomCore.AddZombieAlmanacStrings(98, "黑曜石盲盒僵尸", "?????!!!!!\n\n<color=#3D1400>头套贴图作者：@林秋AutumnLin @E杯芒果奶昔 </color>\n<color=#3D1400>韧性：</color><color=red>12000</color>\n<color=#3D1400>特点：</color><color=red>究极黑曜石巨人生成时伴生。免疫击退、冰冻、红温，遇到小推车时会将其拾起并回满血，此后啃咬植物直接代码杀，受到攻击时扣除与减伤前伤害等量钱币，究极机械保龄球替伤无效，死亡时变成随机非领袖僵尸</color>\n<color=#3D1400>词条：</color><color=red>黑曜石盲盒僵尸只开出领袖僵尸</color>\n<color=#3D1400>“小植物们，快来看我的另一个新发明，黑曜石盲盒，看起来很棒对不对，我觉得非常好，他不但无比坚硬，还很看运气。不过有也给了一个小小的礼物，让你一定玩的「开心」，还有，不要再用大嘴花解决我的发明了！！“ \n(埃德加博士留的)</color>");
         }
     }
 

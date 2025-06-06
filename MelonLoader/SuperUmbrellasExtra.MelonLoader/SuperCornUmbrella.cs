@@ -37,7 +37,7 @@ namespace SuperUmbrellasExtra.MelonLoader
             });
             CustomCore.TypeMgrExtra.UmbrellaPlants.Add((PlantType)175);
             CustomCore.AddFusion(916, 175, 26);
-            CustomCore.AddPlantAlmanacStrings(175, "黄宝石伞", "黄宝石伞能用黄油黏住靠近的僵尸，又能放出大招黏住一定范围的僵尸\n<color=#3D1400>贴图作者：@仨硝基甲苯_ @林秋AutumnLin @暗影Dev</color>\n<color=#3D1400>特点：</color><color=red>绿宝石伞亚种，使用玉米投手、卷心菜投手切换。僵尸主动靠近黄宝石伞时特性同黄油伞，花费6000钱币释放大招，对周围僵尸施加黄油效果并击退</color>\n<color=#3D1400>融合配方：</color><color=red>其他宝石伞+玉米投手</color>\n<color=#3D1400>词条1：</color><color=red>彩虹伞神：当场上同时有9种宝石伞时，所有钱币花费量降为500(解锁条件：场上同时存在9种宝石伞)</color>\n<color=#3D1400>作为餐厅的主厨，黄宝石伞做的菜一直饱受好评，“这要归功于师傅娴熟的按摩技术，以及作为主要厨具的自我修养。”</color>");
+            CustomCore.AddPlantAlmanacStrings(175, "黄宝石伞(175)", "黄宝石伞能用黄油黏住靠近的僵尸，又能放出大招黏住一定范围的僵尸\n<color=#3D1400>贴图作者：@仨硝基甲苯_ @林秋AutumnLin </color>\n<color=#3D1400>特点：</color><color=red>绿宝石伞亚种，使用玉米投手、卷心菜投手切换。僵尸主动靠近黄宝石伞时特性同黄油伞，花费6000钱币释放大招，对周围僵尸施加黄油效果并击退</color>\n<color=#3D1400>融合配方：</color><color=red>其他宝石伞+玉米投手</color>\n<color=#3D1400>词条1：</color><color=red>彩虹伞神：当场上同时有9种宝石伞时，所有钱币花费量降为500(解锁条件：场上同时存在9种宝石伞)</color>\n<color=#3D1400>作为餐厅的主厨，黄宝石伞做的菜一直饱受好评，“这要归功于师傅娴熟的按摩技术，以及作为主要厨具的自我修养。”</color>");
         }
 
         [HideFromIl2Cpp]

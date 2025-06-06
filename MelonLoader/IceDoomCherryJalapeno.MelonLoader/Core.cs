@@ -59,7 +59,7 @@ namespace IceDoomCherryJalapeno.MelonLoader
             par.AddComponent<BombCherry>();
             CustomCore.RegisterCustomParticle((ParticleType)203, par);
             CustomCore.TypeMgrExtra.IsIcePlant.Add((PlantType)177);
-            CustomCore.AddPlantAlmanacStrings(177, "冰毁爆竹", "炸伤并冰冻碰到的僵尸，每碰到5个僵尸生成一次冰毁爆炸\n<color=#3D1400>贴图作者：@仨硝基甲苯_ @屑红leong @暗影Dev</color>\n<color=#3D1400>伤害：</color><color=red>300(同烈焰爆竹),1800(全屏)</color>\n<color=#3D1400>融合配方：</color><color=red>烈焰爆竹+寒冰毁灭菇</color>\n<color=#3D1400>作为远近闻名的艺术家，冰毁爆竹的炸弹配方一直是商业机密，想要的人不在少数，“想要？站前面看着吧。”不巧的是此时他真正进行行为艺术《艺术就是……》</color>");
+            CustomCore.AddPlantAlmanacStrings(177, "冰毁爆竹(177)", "炸伤并冰冻碰到的僵尸，每碰到5个僵尸生成一次冰毁爆炸\n<color=#3D1400>贴图作者：@仨硝基甲苯_ @屑红leong </color>\n<color=#3D1400>伤害：</color><color=red>300(同烈焰爆竹),1800(全屏)</color>\n<color=#3D1400>融合配方：</color><color=red>烈焰爆竹+寒冰毁灭菇</color>\n<color=#3D1400>作为远近闻名的艺术家，冰毁爆竹的炸弹配方一直是商业机密，想要的人不在少数，“想要？站前面看着吧。”不巧的是此时他真正进行行为艺术《艺术就是……》</color>");
         }
     }
 

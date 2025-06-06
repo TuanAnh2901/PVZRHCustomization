@@ -23,7 +23,7 @@ namespace ElectricPeaReborn.MelonLoader
 
         public void Start()
         {
-            gameObject.GetComponent<Collider2D>().enabled = false;
+            gameObject.GetComponent<BoxCollider2D>().enabled = false;
         }
 
         public void Update()
@@ -47,6 +47,7 @@ namespace ElectricPeaReborn.MelonLoader
                         }
                     }
                 }
+                gameObject.GetComponent<BoxCollider2D>().enabled = false;
             }
         }
 

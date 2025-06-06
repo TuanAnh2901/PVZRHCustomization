@@ -136,14 +136,15 @@ namespace CherryTorchPatcher
         static void Postfix(Plant __instance)
         {
             // Chỉ xử lý CherryTorch
-            if (__instance is CherryTorch cherryTorch)
+            //if (__instance is CherryTorch cherryTorch)
+            if (__instance.thePlantType == PlantType.CherryTorch)
             {
+                CherryTorch cherryTorch = __instance as CherryTorch;
+                // Cập nhật damage cho tất cả cherry flies hiện có
                 if (Core.unlimitedCherryFlies.ContainsKey(cherryTorch))
                 {
-                    // Cập nhật damage cho tất cả cherry flies hiện có
                     var flies = Core.unlimitedCherryFlies[cherryTorch];
                     int validCount = flies.Count(fly => fly != null && !fly.WasCollected);
-
                     for (int i = 0; i < flies.Count; i++)
                     {
                         if (flies[i] != null && !flies[i].WasCollected)
@@ -154,6 +155,23 @@ namespace CherryTorchPatcher
                     }
                 }
             }
+            //{
+            //    if (Core.unlimitedCherryFlies.ContainsKey(cherryTorch))
+            //    {
+            //        // Cập nhật damage cho tất cả cherry flies hiện có
+            //        var flies = Core.unlimitedCherryFlies[cherryTorch];
+            //        int validCount = flies.Count(fly => fly != null && !fly.WasCollected);
+
+            //        for (int i = 0; i < flies.Count; i++)
+            //        {
+            //            if (flies[i] != null && !flies[i].WasCollected)
+            //            {
+            //                // Cập nhật damage liên tục dựa trên số lượng hiện tại
+            //                flies[i].dmg = 300 + (300 * validCount);
+            //            }
+            //        }
+            //    }
+            //}
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -26,15 +26,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\CustomizeLib.MelonLoader\CustomizeLib.MelonLoader.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(GamePath)\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
-		<!-- </Reference>
+		</Reference>
 		<Reference Include="CustomizeLib.MelonLoader">
-			<HintPath>$(GamePath)\Mods\CustomizeLib.MelonLoader.dll</HintPath> -->
+			<HintPath>$(GamePath)\Mods\CustomizeLib.MelonLoader.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2CppMono.Security">
 			<HintPath>$(GamePath)\MelonLoader\Il2CppAssemblies\Il2CppMono.Security.dll</HintPath>
@@ -313,12 +309,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="CattailLourPatches.cs" />
 		<Compile Include="Core.cs" />
 		<Compile Include="Bullet_HypnoCherry.cs" />
 		<Compile Include="CherryHypnoGatlingBlover.cs" />
-		<Compile Include="CherryTorchPatcher.cs" />
-		<Compile Include="LourFly.cs" />
+		<Compile Include="PlantChange.cs" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
